@@ -1,64 +1,70 @@
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Color3, Vector3, Mesh, MeshBuilder, StandardMaterial } from "@babylonjs/core";
+import * as BABYLON from "babylonjs";
+import * as MAT from "babylonjs-materials";
 import SceneColors from "../helpers/SceneColors";
+
 const Lab000Wrapper = {
   engine: null,
   scene: null,
 
   createScene: async (canvas) => {
     // Create and customize the scene
-    const engine = new Engine(canvas);
-    const scene = new Scene(engine);
+    const engine = new BABYLON.Engine(canvas);
+    const scene = new BABYLON.Scene(engine);
 
-    const camera = new ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new Vector3(0, 0, 0), scene);
+    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0), scene);
     camera.wheelDeltaPercentage = 0.01;
     camera.upperBetaLimit = Math.PI / 1.5;
     camera.lowerRadiusLimit = 2;
     camera.upperRadiusLimit = 50;
-    camera.setPosition(new Vector3(0, 1.5, -2));
-    camera.setTarget(new Vector3(0, 2, 4));
+    camera.setPosition(new BABYLON.Vector3(0, 1.5, -2));
+    camera.setTarget(new BABYLON.Vector3(0, 2, 4));
     camera.attachControl(canvas, true);
 
     // Customize the scene lighting and background color
-    const ambientLight1 = new HemisphericLight("light-01", new Vector3(5, 5, 5), scene);
+    const ambientLight1 = new BABYLON.HemisphericLight("light-01", new BABYLON.Vector3(5, 5, 5), scene);
     ambientLight1.intensity = 0.7;
-    const ambientLight2 = new HemisphericLight("light-02", new Vector3(-5, 5, -5), scene);
+    const ambientLight2 = new BABYLON.HemisphericLight("light-02", new BABYLON.Vector3(-5, 5, -5), scene);
     ambientLight2.intensity = 0.7;
-    scene.clearColor = SceneColors.light4;
+    scene.clearColor = SceneColors.dark1;
     // scene.clearColor = new Color3(0.9, 0.9, 0.9);
 
     // Add a ground plane to the scene. Used for WebXR teleportation
-    const ground = MeshBuilder.CreateGround("ground", { height: 50, width: 60, subdivisions: 4 }, scene);
-    const groundMat = new StandardMaterial("ground-material", scene);
-    groundMat.alpha = 1;
-    groundMat.diffuseColor = SceneColors.dark1;
-    // groundMat.diffuseColor = new Color3(0.6, 0.6, 0.6);
-    groundMat.specularColor = new Color3(0.2, 0.2, 0.2);
-    ground.material = groundMat;
+    const ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 50, width: 60, subdivisions: 4 }, scene);
+    const groundMaterial = new MAT.GridMaterial("groundMaterial", scene);
+    groundMaterial.majorUnitFrequency = 5;
+    groundMaterial.minorUnitFrequency = 0.1;
+    groundMaterial.gridRatio = 1;
+    groundMaterial.backFaceCulling = false;
+    groundMaterial.mainColor = SceneColors.light1;
+    groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    groundMaterial.opacity = 0.98;
+    ground.material = groundMaterial;
 
     // Make some boxes to test out the colors in VR
-    const group = new Mesh("logo-group");
-    group.position = new Vector3(0, 1.2, 3);
+    const group = new BABYLON.Mesh("logo-group");
+    group.position = new BABYLON.Vector3(-3.5, 0.5, 3);
     // group.rotation = new Vector3(0, 2, 0);
-    group.scaling = new Vector3(0.3, 0.3, 0.3);
-    makeBox("purple", group, scene).position = new Vector3(0, 0, 0);
-    makeBox("blue", group, scene).position = new Vector3(0.5, 0, 0);
-    makeBox("teal", group, scene).position = new Vector3(1.0, 0, 0);
-    makeBox("cyan", group, scene).position = new Vector3(1.5, 0, 0);
+    // group.scaling = new BABYLON.Vector3(0.3, 0.3, 0.3);
+    // group.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+    makeBox("purple", group, scene).position = new BABYLON.Vector3(0, 0, 0);
+    makeBox("blue", group, scene).position = new BABYLON.Vector3(1, 0, 0);
+    makeBox("teal", group, scene).position = new BABYLON.Vector3(2, 0, 0);
+    makeBox("cyan", group, scene).position = new BABYLON.Vector3(3, 0, 0);
 
-    makeBox("green", group, scene).position = new Vector3(2.0, 0, 0);
-    makeBox("yellow", group, scene).position = new Vector3(2.5, 0, 0);
-    makeBox("orange", group, scene).position = new Vector3(3.0, 0, 0);
-    makeBox("red", group, scene).position = new Vector3(3.5, 0, 0);
+    makeBox("green", group, scene).position = new BABYLON.Vector3(4, 0, 0);
+    makeBox("yellow", group, scene).position = new BABYLON.Vector3(5, 0, 0);
+    makeBox("orange", group, scene).position = new BABYLON.Vector3(6, 0, 0);
+    makeBox("red", group, scene).position = new BABYLON.Vector3(7, 0, 0);
 
-    makeBox("dark1", group, scene).position = new Vector3(0, 1, 0);
-    makeBox("dark2", group, scene).position = new Vector3(0.5, 1, 0);
-    makeBox("dark3", group, scene).position = new Vector3(1.0, 1, 0);
-    makeBox("dark4", group, scene).position = new Vector3(1.5, 1, 0);
+    makeBox("dark1", group, scene).position = new BABYLON.Vector3(0, 1, 0);
+    makeBox("dark2", group, scene).position = new BABYLON.Vector3(1, 1, 0);
+    makeBox("dark3", group, scene).position = new BABYLON.Vector3(2, 1, 0);
+    makeBox("dark4", group, scene).position = new BABYLON.Vector3(3, 1, 0);
 
-    makeBox("light1", group, scene).position = new Vector3(2.0, 1, 0);
-    makeBox("light2", group, scene).position = new Vector3(2.5, 1, 0);
-    makeBox("light3", group, scene).position = new Vector3(3.0, 1, 0);
-    makeBox("light4", group, scene).position = new Vector3(3.5, 1, 0);
+    makeBox("light1", group, scene).position = new BABYLON.Vector3(4, 1, 0);
+    makeBox("light2", group, scene).position = new BABYLON.Vector3(5, 1, 0);
+    makeBox("light3", group, scene).position = new BABYLON.Vector3(6, 1, 0);
+    makeBox("light4", group, scene).position = new BABYLON.Vector3(7, 1, 0);
 
     // WebXRDefaultExperience
     const xrDefault = scene.createDefaultXRExperienceAsync({
@@ -77,10 +83,10 @@ const Lab000Wrapper = {
 
 const makeBox = (colorName, parent, scene) => {
   // Create a colored box from using a string to get the color from the Brand object
-  const mat = new StandardMaterial(`${colorName}-material`, scene);
+  const mat = new BABYLON.StandardMaterial(`${colorName}-material`, scene);
   mat.diffuseColor = SceneColors[colorName];
-  mat.specularColor = new Color3(0.1, 0.1, 0.1);
-  const mesh = MeshBuilder.CreateBox(`${colorName}-box`, { size: 0.5 }, scene);
+  mat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  const mesh = BABYLON.MeshBuilder.CreateBox(`${colorName}-box`, { size: 1 }, scene);
   mesh.material = mat;
   mesh.parent = parent;
   return mesh;

@@ -10,6 +10,8 @@
     "@babylonjs/core": "^5.0.0-beta.4",
     "@babylonjs/gui": "^5.0.0-beta.4",
     "@babylonjs/loaders": "^5.0.0-beta.4",
+    "babylonjs": "^4.2.1",
+    "babylonjs-materials": "^4.2.1",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12"
   },
