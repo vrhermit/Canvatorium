@@ -3,10 +3,14 @@
   <router-view />
 </template>
 
-<script setup>
+<script>
 import NavBar from "./components/NavBar.vue";
-import { defineProps } from "vue";
+export default {
+  name: "App",
+  components: {
+    NavBar,
+  } 
+}
 
-defineProps({});
 </script>
 

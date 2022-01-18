@@ -21,3 +21,10 @@ To test this on a standalone device such as an Oculus Quest 2, use ngrok to to t
 ```
 c://DevTools/ngrok.exe http 3000
 ```
+
+Install the latest Babylon JS 5.0 Preview
+
+```
+npm i --save @babylonjs/core@preview @babylonjs/gui@preview @babylonjs/loaders@preview
+
+```
