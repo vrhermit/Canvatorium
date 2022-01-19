@@ -55,3 +55,12 @@ If you don't want to use these certs just disable the following lines in `vue.co
       cert: fs.readFileSync(".certs/cert.pem")
     },
 ```
+
+### Babylon JS
+
+Install the latest Babylon JS 5.0 Preview
+
+```
+npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@preview
+
+```
