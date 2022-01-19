@@ -1,14 +1,18 @@
 <script setup>
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
+import { ref, onMounted } from "@vue/runtime-core";
+
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import { ref, onMounted } from "@vue/runtime-core";
 
 const bjsCanvas = ref(null);
 
 const sample = ref("default value");
+const count = ref(0);
+let manager;
+let anchor;
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -25,27 +29,10 @@ const createScene = async (canvas) => {
   group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
 
   // Create the 3D UI manager
-  var anchor = new BABYLON.AbstractMesh("anchor", scene);
+  anchor = new BABYLON.AbstractMesh("anchor", scene);
+  manager = new GUI.GUI3DManager(scene);
 
-  var manager = new GUI.GUI3DManager(scene);
-
-  // Let's add a button
-  var button = new GUI.Button3D("reset");
-  manager.addControl(button);
-  button.linkToTransformNode(anchor);
-  button.position.z = -0.75;
-  button.position.y = 1.5;
-  var text1 = new GUI.TextBlock();
-  text1.text = sample.value;
-  text1.color = "white";
-  text1.fontSize = 24;
-  button.content = text1;
-
-  button.onPointerUpObservable.add(() => {
-    sample.value = "new value";
-    text1.text = sample.value;
-    console.log("Sample value changed to: " + sample.value);
-  });
+  makeButton();
 
   // WebXRDefaultExperience
   const xrDefault = scene.createDefaultXRExperienceAsync({
@@ -59,6 +46,27 @@ const createScene = async (canvas) => {
   });
 };
 
+const makeButton = () => {
+  // Let's add a button
+  var button = new GUI.Button3D("reset");
+  manager.addControl(button);
+  button.linkToTransformNode(anchor);
+  button.position.y = 1;
+
+  var text1 = new GUI.TextBlock();
+  text1.text = sample.value;
+  text1.color = "white";
+  text1.fontSize = 24;
+  button.content = text1;
+
+  button.onPointerUpObservable.add(() => {
+    count.value++;
+    sample.value = "new value";
+    text1.text = sample.value + " " + count.value;
+    console.log("Sample value changed to: " + sample.value + " " + count.value);
+  });
+};
+
 onMounted(() => {
   if (bjsCanvas.value) {
     createScene(bjsCanvas.value);
@@ -67,7 +75,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>{{ sample }}</div>
+  <div>{{ sample }} - {{ count }}</div>
   <canvas id="bjsCanvas" ref="bjsCanvas" />
 </template>
 
