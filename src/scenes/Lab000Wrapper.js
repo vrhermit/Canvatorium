@@ -1,7 +1,9 @@
 import * as BABYLON from "babylonjs";
-import * as MAT from "babylonjs-materials";
+
 import LabColors from "../lab-shared/LabColors";
 import addLabCamera from "../lab-shared/LabCamera";
+import addLabLights from "../lab-shared/LabLights";
+import addLabRoom from "../lab-shared/LabRoom";
 
 const Lab000Wrapper = {
   engine: null,
@@ -12,31 +14,28 @@ const Lab000Wrapper = {
     const engine = new BABYLON.Engine(canvas);
     const scene = new BABYLON.Scene(engine);
 
+    // Use the shared lap tools
     addLabCamera(canvas, scene);
+    addLabLights(scene);
+    const ground = addLabRoom(scene);
 
-    // Customize the scene lighting and background color
-    const ambientLight1 = new BABYLON.HemisphericLight("light-01", new BABYLON.Vector3(5, 5, 5), scene);
-    ambientLight1.intensity = 0.7;
-    const ambientLight2 = new BABYLON.HemisphericLight("light-02", new BABYLON.Vector3(-5, 5, -5), scene);
-    ambientLight2.intensity = 0.7;
-    scene.clearColor = LabColors.dark1;
-    // scene.clearColor = new Color3(0.9, 0.9, 0.9);
-
-    // Add a ground plane to the scene. Used for WebXR teleportation
-    const ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 50, width: 60, subdivisions: 4 }, scene);
-    const groundMaterial = new MAT.GridMaterial("groundMaterial", scene);
-    groundMaterial.majorUnitFrequency = 5;
-    groundMaterial.minorUnitFrequency = 0.1;
-    groundMaterial.gridRatio = 1;
-    groundMaterial.backFaceCulling = false;
-    groundMaterial.mainColor = LabColors.light1;
-    groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-    groundMaterial.opacity = 0.98;
-    ground.material = groundMaterial;
+    // // Add a ground plane to the scene. Used for WebXR teleportation
+    // const ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 20, width: 20, subdivisions: 4 }, scene);
+    // // ground.position.y = 10;
+    // ground.sideOrientation = "DOUBLESIDE";
+    // const groundMaterial = new MAT.GridMaterial("groundMaterial", scene);
+    // groundMaterial.majorUnitFrequency = 5;
+    // groundMaterial.minorUnitFrequency = 0.1;
+    // groundMaterial.gridRatio = 1;
+    // groundMaterial.backFaceCulling = false;
+    // groundMaterial.mainColor = LabColors.light1;
+    // groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+    // groundMaterial.opacity = 0.98;
+    // ground.material = groundMaterial;
 
     // Make some boxes to test out the colors in VR
     const group = new BABYLON.Mesh("logo-group");
-    group.position = new BABYLON.Vector3(-3.5, 0.5, 3);
+    group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
     // group.rotation = new Vector3(0, 2, 0);
     // group.scaling = new BABYLON.Vector3(0.3, 0.3, 0.3);
     // group.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
