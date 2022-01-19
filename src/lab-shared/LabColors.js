@@ -1,5 +1,5 @@
 import { Color3 } from "@babylonjs/core";
-const SceneColors = {
+const LabColors = {
   purple: new Color3.FromHexString("#8854d0"),
   blue: new Color3.FromHexString("#3867d6"),
   teal: new Color3.FromHexString("#2d98da"),
@@ -21,4 +21,4 @@ const SceneColors = {
   light4: new Color3.FromHexString("#d3d9e1")
 };
 
-export default SceneColors;
+export default LabColors;

@@ -1,6 +1,7 @@
 import * as BABYLON from "babylonjs";
 import * as MAT from "babylonjs-materials";
-import SceneColors from "../helpers/SceneColors";
+import LabColors from "../lab-shared/LabColors";
+import addLabCamera from "../lab-shared/LabCamera";
 
 const Lab000Wrapper = {
   engine: null,
@@ -11,21 +12,14 @@ const Lab000Wrapper = {
     const engine = new BABYLON.Engine(canvas);
     const scene = new BABYLON.Scene(engine);
 
-    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0), scene);
-    camera.wheelDeltaPercentage = 0.01;
-    camera.upperBetaLimit = Math.PI / 1.5;
-    camera.lowerRadiusLimit = 2;
-    camera.upperRadiusLimit = 50;
-    camera.setPosition(new BABYLON.Vector3(0, 1.5, -2));
-    camera.setTarget(new BABYLON.Vector3(0, 2, 4));
-    camera.attachControl(canvas, true);
+    addLabCamera(canvas, scene);
 
     // Customize the scene lighting and background color
     const ambientLight1 = new BABYLON.HemisphericLight("light-01", new BABYLON.Vector3(5, 5, 5), scene);
     ambientLight1.intensity = 0.7;
     const ambientLight2 = new BABYLON.HemisphericLight("light-02", new BABYLON.Vector3(-5, 5, -5), scene);
     ambientLight2.intensity = 0.7;
-    scene.clearColor = SceneColors.dark1;
+    scene.clearColor = LabColors.dark1;
     // scene.clearColor = new Color3(0.9, 0.9, 0.9);
 
     // Add a ground plane to the scene. Used for WebXR teleportation
@@ -35,7 +29,7 @@ const Lab000Wrapper = {
     groundMaterial.minorUnitFrequency = 0.1;
     groundMaterial.gridRatio = 1;
     groundMaterial.backFaceCulling = false;
-    groundMaterial.mainColor = SceneColors.light1;
+    groundMaterial.mainColor = LabColors.light1;
     groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
     groundMaterial.opacity = 0.98;
     ground.material = groundMaterial;
@@ -84,7 +78,7 @@ const Lab000Wrapper = {
 const makeBox = (colorName, parent, scene) => {
   // Create a colored box from using a string to get the color from the Brand object
   const mat = new BABYLON.StandardMaterial(`${colorName}-material`, scene);
-  mat.diffuseColor = SceneColors[colorName];
+  mat.diffuseColor = LabColors[colorName];
   mat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   const mesh = BABYLON.MeshBuilder.CreateBox(`${colorName}-box`, { size: 1 }, scene);
   mesh.material = mat;
