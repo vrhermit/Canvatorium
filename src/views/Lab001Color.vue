@@ -66,6 +66,7 @@ const makeBox = (colorName, parent, scene) => {
   );
   mesh.material = mat;
   mesh.parent = parent;
+
   return mesh;
 };
 
