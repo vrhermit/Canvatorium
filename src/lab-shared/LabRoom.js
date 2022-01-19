@@ -34,6 +34,7 @@ const addLabRoom = (scene) => {
   wall4.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2);
   wall4.position = new BABYLON.Vector3(0, 5, 10);
 
+  // Return the ground to use for teleportation
   return ground;
 };
 export default addLabRoom;

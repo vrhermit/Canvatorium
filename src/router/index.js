@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import Lab000 from "../views/Lab000.vue";
-
+import Lab001Color from "../views/Lab001Color.vue";
 const routes = [
   {
     path: "/",
@@ -12,6 +12,11 @@ const routes = [
     path: "/Lab000",
     name: "Lab000",
     component: Lab000
+  },
+  {
+    path: "/Lab001",
+    name: "Lab001",
+    component: Lab001Color
   },
   {
     path: "/about",

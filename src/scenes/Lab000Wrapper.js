@@ -22,9 +22,7 @@ const Lab000Wrapper = {
     // Make some boxes to test out the colors in VR
     const group = new BABYLON.Mesh("logo-group");
     group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
-    // group.rotation = new Vector3(0, 2, 0);
-    // group.scaling = new BABYLON.Vector3(0.3, 0.3, 0.3);
-    // group.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+
     makeBox("purple", group, scene).position = new BABYLON.Vector3(0, 0, 0);
     makeBox("blue", group, scene).position = new BABYLON.Vector3(1, 0, 0);
     makeBox("teal", group, scene).position = new BABYLON.Vector3(2, 0, 0);
