@@ -92,20 +92,20 @@ onMounted(() => {
 });
 
 // Watch with a single value
-// watch(count, (newValue, oldValue) => {
-//   const texture = scene.getTextureByName("card-texture");
-//   texture.getControlByName("card-text").text =
-//     "From " + oldValue + " to " + newValue;
-// });
-
-// Watch with multiple values
-watch([sample, count], (newValues, prevValues) => {
+watch(count, (newValue, oldValue) => {
   const texture = scene.getTextureByName("card-texture");
-  const [oldText, oldNum] = prevValues;
-  const [text, num] = newValues;
   texture.getControlByName("card-text").text =
-    oldText + " > " + text + "; " + oldNum + " > " + num;
+    "From " + oldValue + " to " + newValue;
 });
+
+// // Watch with multiple values
+// watch([sample, count], (newValues, prevValues) => {
+//   const texture = scene.getTextureByName("card-texture");
+//   const [oldText, oldNum] = prevValues;
+//   const [text, num] = newValues;
+//   texture.getControlByName("card-text").text =
+//     oldText + " > " + text + "; " + oldNum + " > " + num;
+// });
 
 // watchEffect watches any changes to reactive data using the effect hook
 // watchEffect(
@@ -121,14 +121,14 @@ watch([sample, count], (newValues, prevValues) => {
 </script>
 
 <template>
-  <div>{{ sample }} - {{ count }}</div>
-  <canvas id="bjsCanvas" ref="bjsCanvas" />
+  <!-- <div>{{ sample }} - {{ count }}</div> -->
+  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
 </template>
 
 <style>
-canvas {
+/* canvas {
   width: 100%;
-  height: 100%;
+  height: calc(100vh - 10rem);
   padding: auto;
-}
+} */
 </style>

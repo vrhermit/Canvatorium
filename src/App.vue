@@ -8,6 +8,15 @@
 </template>
 
 <style>
+body,
+html {
+  overflow: hidden;
+}
+canvas {
+  width: 100%;
+  height: calc(100vh - 10rem);
+  padding: auto;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
