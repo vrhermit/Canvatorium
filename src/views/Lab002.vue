@@ -1,7 +1,7 @@
 <script setup>
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
-import { ref, onMounted } from "@vue/runtime-core";
+import { ref, onMounted, watch } from "@vue/runtime-core";
 
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -9,15 +9,17 @@ import addLabRoom from "../lab-shared/LabRoom";
 
 const bjsCanvas = ref(null);
 
-const sample = ref("default value");
+const sample = ref("default");
 const count = ref(0);
+let engine;
+let scene;
 let manager;
 let anchor;
 
 const createScene = async (canvas) => {
   // Create and customize the scene
-  const engine = new BABYLON.Engine(canvas);
-  const scene = new BABYLON.Scene(engine);
+  engine = new BABYLON.Engine(canvas);
+  scene = new BABYLON.Scene(engine);
 
   // Use the shared lap tools
   addLabCamera(canvas, scene);
@@ -33,6 +35,7 @@ const createScene = async (canvas) => {
   manager = new GUI.GUI3DManager(scene);
 
   makeButton();
+  makeCard();
 
   // WebXRDefaultExperience
   const xrDefault = scene.createDefaultXRExperienceAsync({
@@ -46,6 +49,23 @@ const createScene = async (canvas) => {
   });
 };
 
+const makeCard = () => {
+  // GUI
+  var plane = BABYLON.MeshBuilder.CreatePlane("plane", {}, scene);
+  plane.position.y = 2;
+
+  var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane);
+  advancedTexture.name = "card-texture";
+
+  var cardText = new GUI.TextBlock("card-text");
+  cardText.text = "Watch";
+  cardText.color = "white";
+  cardText.fontSize = 64;
+
+  advancedTexture.addControl(cardText);
+  plane.scaling = new BABYLON.Vector3(5, 5, 5);
+};
+
 const makeButton = () => {
   // Let's add a button
   var button = new GUI.Button3D("reset");
@@ -54,16 +74,14 @@ const makeButton = () => {
   button.position.y = 1;
 
   var text1 = new GUI.TextBlock();
-  text1.text = sample.value;
+  text1.text = "Change Values";
   text1.color = "white";
   text1.fontSize = 24;
   button.content = text1;
 
   button.onPointerUpObservable.add(() => {
     count.value++;
-    sample.value = "new value";
-    text1.text = sample.value + " " + count.value;
-    console.log("Sample value changed to: " + sample.value + " " + count.value);
+    sample.value = "Modified";
   });
 };
 
@@ -72,6 +90,34 @@ onMounted(() => {
     createScene(bjsCanvas.value);
   }
 });
+
+// Watch with a single value
+// watch(count, (newValue, oldValue) => {
+//   const texture = scene.getTextureByName("card-texture");
+//   texture.getControlByName("card-text").text =
+//     "From " + oldValue + " to " + newValue;
+// });
+
+// Watch with multiple values
+watch([sample, count], (newValues, prevValues) => {
+  const texture = scene.getTextureByName("card-texture");
+  const [oldText, oldNum] = prevValues;
+  const [text, num] = newValues;
+  texture.getControlByName("card-text").text =
+    oldText + " > " + text + "; " + oldNum + " > " + num;
+});
+
+// watchEffect watches any changes to reactive data using the effect hook
+// watchEffect(
+//   () => {
+//     if (scene) {
+//       const texture = scene.getTextureByName("card-texture");
+//       texture.getControlByName("card-text").text =
+//         sample.value + " " + count.value;
+//     }
+//     console.log("watching", sample.value + " " + count.value, scene);
+//   }
+// );
 </script>
 
 <template>
