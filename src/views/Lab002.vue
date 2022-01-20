@@ -121,14 +121,6 @@ watch(count, (newValue, oldValue) => {
 </script>
 
 <template>
-  <!-- <div>{{ sample }} - {{ count }}</div> -->
   <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+  <p>Lab 002 - Playing with reactive data and watch/watchEffect</p>
 </template>
-
-<style>
-/* canvas {
-  width: 100%;
-  height: calc(100vh - 10rem);
-  padding: auto;
-} */
-</style>

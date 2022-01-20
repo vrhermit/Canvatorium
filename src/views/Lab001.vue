@@ -79,7 +79,5 @@ onMounted(() => {
 
 <template>
   <canvas id="bjsCanvas" ref="bjsCanvas" />
+  <p>Lab 001 - Picking out some colors to use in future controls</p>
 </template>
-
-<style>
-</style>

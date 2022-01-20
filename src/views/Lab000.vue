@@ -1,5 +1,9 @@
 <template>
   <canvas id="bjsCanvas" ref="bjsCanvas" />
+  <p>
+    Lab 000 - Just setting up the shared lab resources. Grid, Lights, Camera,
+    etc.
+  </p>
 </template>
 
 <script>
@@ -12,6 +16,3 @@ export default {
   },
 };
 </script>
-
-<style>
-</style>
