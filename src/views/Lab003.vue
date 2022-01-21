@@ -24,6 +24,7 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   addLabLights(scene);
   const ground = addLabRoom(scene);
+  console.log(ground);
 
   // Make some boxes to test out the colors in VR
   const group = new BABYLON.Mesh("logo-group");
@@ -36,12 +37,53 @@ const createScene = async (canvas) => {
   makeButton();
   makeCard();
 
+  // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
-  const xrDefault = scene.createDefaultXRExperienceAsync({
+
+  // Create the default experience
+  let xr = await scene.createDefaultXRExperienceAsync({
     floorMeshes: [ground],
   });
-  const xrHelper = xrDefault.baseExperience;
-  console.info("webxr:", xrHelper);
+
+  // Perform actions when entering immersiveXR mode
+  xr.baseExperience.sessionManager.onXRSessionInit.add((session) => {
+    console.log("XR Session Init", session);
+  });
+
+  // Move the player when thet enter immersive mode
+  xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
+    console.log("XR Camera", xrCamera);
+    xrCamera.position.z = -2;
+  });
+
+  // Playing with control input
+  console.log("input", xr.input);
+
+  //controller input
+  xr.input.onControllerAddedObservable.add((controller) => {
+    controller.onMotionControllerInitObservable.add((motionController) => {
+      if (motionController.handness === "left") {
+        const xr_ids = motionController.getComponentIds();
+        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
+        triggerComponent.onButtonStateChangedObservable.add(() => {
+          if (triggerComponent.pressed) {
+            count.value--;
+          }
+        });
+      }
+      if (motionController.handness === "right") {
+        const xr_ids = motionController.getComponentIds();
+        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
+        triggerComponent.onButtonStateChangedObservable.add(() => {
+          if (triggerComponent.pressed) {
+            count.value++;
+          }
+        });
+      }
+    });
+  });
+
+  // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {
     scene.render();
