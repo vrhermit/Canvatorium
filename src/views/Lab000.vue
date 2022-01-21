@@ -8,6 +8,11 @@
 
 <script>
 import Lab000Wrapper from "../scenes/Lab000Wrapper.js";
+
+/*
+Lab Notes:
+This lab use an interface object to create a BabylonJS scene, based on the workflow that I used during 'A Vue into 3D'
+*/
 export default {
   name: "Lab000",
 

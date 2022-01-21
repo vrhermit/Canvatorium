@@ -1,4 +1,10 @@
 <script setup>
+/*
+Lab Notes:
+This lab uses Vue 3 script setup. It replaces the interface object by combining it with the vue component for the lab.
+I picked out some colors to use throughout the labs in the future.
+I created a box for each color and used the standard BabylonJS material.
+*/
 import * as BABYLON from "babylonjs";
 import LabColors from "../lab-shared/LabColors";
 import addLabCamera from "../lab-shared/LabCamera";

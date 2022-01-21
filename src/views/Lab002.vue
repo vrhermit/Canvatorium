@@ -1,4 +1,10 @@
 <script setup>
+/*
+Lab Notes:
+Expanding on the script setup idea from lab 2.
+- Added some reactive references to some data (count and sample)
+- Explores watch() and watchEffect() with refs
+*/
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted, watch } from "@vue/runtime-core";
