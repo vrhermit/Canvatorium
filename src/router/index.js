@@ -3,6 +3,7 @@ import Home from "../views/Home.vue";
 import Lab000 from "../views/Lab000.vue";
 import Lab001 from "../views/Lab001.vue";
 import Lab002 from "../views/Lab002.vue";
+import Lab003 from "../views/Lab003.vue";
 const routes = [
   {
     path: "/",
@@ -24,6 +25,11 @@ const routes = [
     path: "/Lab002",
     name: "Lab002",
     component: Lab002
+  },
+  {
+    path: "/Lab003",
+    name: "Lab003",
+    component: Lab003
   },
   {
     path: "/about",

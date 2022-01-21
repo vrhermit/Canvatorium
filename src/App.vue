@@ -12,6 +12,7 @@
       <router-link class="nav-button" to="/lab002"
         >Lab 002 - watch() / watchEffect()</router-link
       >
+      <router-link class="nav-button" to="/lab003">Lab 003 - WebXR</router-link>
     </div>
     <div class="main">
       <router-view />
