@@ -34,7 +34,8 @@ const createScene = async (canvas) => {
   anchor = new BABYLON.AbstractMesh("anchor", scene);
   manager = new GUI.GUI3DManager(scene);
 
-  makeButton();
+  makeAddButton();
+  makeSubButton();
   makeCard();
 
   // START WebXR ------------------------------------------------------------
@@ -48,6 +49,8 @@ const createScene = async (canvas) => {
   // Perform actions when entering immersiveXR mode
   xr.baseExperience.sessionManager.onXRSessionInit.add((session) => {
     console.log("XR Session Init", session);
+    const texture = scene.getTextureByName("card-texture");
+    texture.getControlByName("card-text").text = "Welcome to Lab 003";
   });
 
   // Move the player when thet enter immersive mode
@@ -99,7 +102,7 @@ const makeCard = () => {
   advancedTexture.name = "card-texture";
 
   var cardText = new GUI.TextBlock("card-text");
-  cardText.text = "Watch";
+  cardText.text = "{message}";
   cardText.color = "white";
   cardText.fontSize = 64;
 
@@ -107,21 +110,41 @@ const makeCard = () => {
   plane.scaling = new BABYLON.Vector3(5, 5, 5);
 };
 
-const makeButton = () => {
+const makeAddButton = () => {
   // Let's add a button
-  var button = new GUI.Button3D("reset");
+  var button = new GUI.Button3D("button-add");
   manager.addControl(button);
   button.linkToTransformNode(anchor);
-  button.position.y = 1;
+  button.position = new BABYLON.Vector3(0.3, 1, 0);
+  button.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
 
   var text1 = new GUI.TextBlock();
-  text1.text = "Change Values";
+  text1.text = "count++";
   text1.color = "white";
-  text1.fontSize = 24;
+  text1.fontSize = 64;
   button.content = text1;
 
   button.onPointerUpObservable.add(() => {
     count.value++;
+  });
+};
+
+const makeSubButton = () => {
+  // Let's add a button
+  var button = new GUI.Button3D("button-sub");
+  manager.addControl(button);
+  button.linkToTransformNode(anchor);
+  button.position = new BABYLON.Vector3(-0.3, 1, 0);
+  button.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+
+  var text1 = new GUI.TextBlock();
+  text1.text = "count--";
+  text1.color = "white";
+  text1.fontSize = 64;
+  button.content = text1;
+
+  button.onPointerUpObservable.add(() => {
+    count.value--;
   });
 };
 
