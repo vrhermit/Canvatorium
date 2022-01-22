@@ -22,6 +22,10 @@ Testing cross-scene navigaiton with Router and Window.location.
 - I'm not sure if the issue is in Vue Router or on Babylon JS.
 - Placing this idea on hold for now. While
 - Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
+
+- Some more text
+- Some more text
+- Some more text
 `;
 
 let engine;
@@ -111,12 +115,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <div v-html="marked.parse(labNotes)"></div>
-  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <!-- <p>
+  <article class="lab-wrapper">
+    <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    <h2>{{ this.$route?.meta?.title }}</h2>
+    <h3>{{ this.$route?.meta?.subtitle }}</h3>
+    <div v-html="marked.parse(labNotes)"></div>
+    <!-- <p>
     Lab 005 - Router Nav to Lab 006 (not working). I'm not sure if the issue is
     in Vue Router or on Babylon JS. Placing this idea on hold for now. While
     Router may not work, I can brute force my way to other scenes with
     <code>window.location.assign("/lab006");</code>
   </p> -->
+  </article>
 </template>
+
+<style>
+.lab-wrapper {
+  overflow-y: auto;
+  height: calc(100vh - 1rem);
+  padding: 1rem;
+}
+</style>

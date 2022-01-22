@@ -58,7 +58,7 @@ canvas {
 
 .main {
   flex: 4;
-  padding: 1rem;
+  /* padding: 1rem; */
 }
 
 .fail {
