@@ -43,7 +43,11 @@ const routes = [
   {
     path: "/Lab005",
     name: "Lab 005",
-    component: Lab005
+    component: Lab005,
+    meta: {
+      title: "Lab 005",
+      description: "Description of Lab 005"
+    }
   },
   {
     path: "/Lab006",

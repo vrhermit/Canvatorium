@@ -6,7 +6,7 @@ Testing cross-scene navigaiton with Router and Window.location
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted } from "@vue/runtime-core";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -14,7 +14,18 @@ import addLabRoom from "../lab-shared/LabRoom";
 
 const bjsCanvas = ref(null);
 
+const labNotes = `
+Testing cross-scene navigaiton with Router and Window.location.
+Testing Links: https://playground.babylonjs.com/#28EKWI#37
+`;
+
 const router = useRouter();
+const route = useRoute();
+console.log("route", route);
+console.log(
+  "router description",
+  router.currentRoute?._value?.meta?.description
+);
 
 let engine;
 let scene;
@@ -110,4 +121,5 @@ onMounted(() => {
     Router may not work, I can brute force my way to other scenes with
     <code>window.location.assign("/lab006");</code>
   </p>
+  <div>{{ labNotes }}</div>
 </template>
