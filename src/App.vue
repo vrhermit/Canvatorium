@@ -18,6 +18,14 @@
       <router-link class="nav-button" to="/lab004"
         >Lab 004 - XR Controller Buttons</router-link
       >
+      <router-link class="nav-button" to="/lab005"
+        >Lab 005 - Router Nav to Lab 006
+        <span class="fail">X</span></router-link
+      >
+      <router-link class="nav-button" to="/lab006"
+        >Lab 006 - Router Nav to Lab 005
+        <span class="fail">X</span></router-link
+      >
     </div>
     <div class="main">
       <router-view />
@@ -67,6 +75,13 @@ canvas {
   padding: 1rem;
 }
 
+.fail {
+  background: #eb3b5a;
+  padding: 2px 4px;
+  border-radius: 8px;
+  color: white;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -79,7 +94,7 @@ canvas {
 }
 
 #nav a {
-  font-weight: bold;
+  /* font-weight: bold; */
   color: white;
 }
 

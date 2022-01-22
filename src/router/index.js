@@ -1,10 +1,13 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import Lab000 from "../views/Lab000.vue";
 import Lab001 from "../views/Lab001.vue";
 import Lab002 from "../views/Lab002.vue";
 import Lab003 from "../views/Lab003.vue";
 import Lab004 from "../views/Lab004.vue";
+import Lab005 from "../views/Lab005.vue";
+import Lab006 from "../views/Lab006.vue";
+
 const routes = [
   {
     path: "/",
@@ -38,6 +41,16 @@ const routes = [
     component: Lab004
   },
   {
+    path: "/Lab005",
+    name: "Lab 005",
+    component: Lab005
+  },
+  {
+    path: "/Lab006",
+    name: "Lab 006",
+    component: Lab006
+  },
+  {
     path: "/about",
     name: "About",
     // route level code-splitting
@@ -48,7 +61,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes
 });
 
