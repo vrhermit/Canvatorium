@@ -1,8 +1,8 @@
 <template>
   <div class="flex-grid">
     <div id="nav" class="sidebar">
-      <router-link class="nav-button" to="/"><h1>Canvatorium</h1></router-link>
-
+      <h1>Canvatorium</h1>
+      <p>An experimental design lab for spatial computing.</p>
       <router-link class="nav-button" to="/lab000"
         >Lab 000 - Hello Canvatorium</router-link
       >
@@ -37,7 +37,7 @@
 body,
 html {
   overflow: hidden;
-  background: black;
+  background: #0b0d10;
 }
 canvas {
   width: 100%;
@@ -45,17 +45,15 @@ canvas {
   padding: auto;
 }
 
-.nav-button {
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   color: white;
-  text-decoration: none;
-  padding: 1rem;
-  display: block;
-  border-bottom: 1px solid white;
 }
 
 .flex-grid {
   display: flex;
-  /* margin: auto -1rem 1rem; */
 }
 
 .col {
@@ -82,24 +80,24 @@ canvas {
   color: white;
 }
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: white;
-}
-
 #nav {
   padding: 0px;
 }
 
 #nav a {
-  /* font-weight: bold; */
-  color: white;
+  color: #d3d9e1;
 }
 
 #nav a.router-link-exact-active {
   color: #2d98da;
+}
+
+.nav-button {
+  color: white;
+  text-decoration: none;
+  padding: 1rem;
+  display: block;
+  border-bottom: 1px solid #b4becc;
 }
 
 /* width */

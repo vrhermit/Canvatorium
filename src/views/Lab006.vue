@@ -1,9 +1,7 @@
 <script setup>
 /*
 Lab Notes:
-Expanding on the script setup idea from lab 2.
-- Added some reactive references to some data (count and sample)
-- Explores watch() and watchEffect() with refs
+Testing cross-scene navigaiton with Router and Window.location
 */
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -17,7 +15,6 @@ import addLabRoom from "../lab-shared/LabRoom";
 const bjsCanvas = ref(null);
 
 const router = useRouter();
-// const route = useRoute();
 
 let engine;
 let scene;
@@ -89,9 +86,12 @@ const makeButton = () => {
 
   button.onPointerUpObservable.add(() => {
     console.log("button clicked");
+    // This does not work
     router.push({
       name: "Lab 005",
     });
+    // This does work
+    // window.location.assign("/lab005");
   });
 };
 
@@ -104,5 +104,5 @@ onMounted(() => {
 
 <template>
   <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>Lab 006 - Router Nav to Lab 005 (not working)</p>
+  <p>Lab 006 - Router Nav to Lab 005 (not working). See lab notes in 005.</p>
 </template>

@@ -1,9 +1,7 @@
 <script setup>
 /*
 Lab Notes:
-Expanding on the script setup idea from lab 2.
-- Added some reactive references to some data (count and sample)
-- Explores watch() and watchEffect() with refs
+Testing cross-scene navigaiton with Router and Window.location
 */
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -17,7 +15,6 @@ import addLabRoom from "../lab-shared/LabRoom";
 const bjsCanvas = ref(null);
 
 const router = useRouter();
-// const route = useRoute();
 
 let engine;
 let scene;
@@ -89,9 +86,12 @@ const makeButton = () => {
 
   button.onPointerUpObservable.add(() => {
     console.log("button clicked");
+    // This does not work
     router.push({
       name: "Lab 006",
     });
+    // This does work
+    // window.location.assign("/lab006");
   });
 };
 
@@ -106,6 +106,8 @@ onMounted(() => {
   <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
   <p>
     Lab 005 - Router Nav to Lab 006 (not working). I'm not sure if the issue is
-    in Vue Router or on Babylon JS. Placing this idea on hold for now.
+    in Vue Router or on Babylon JS. Placing this idea on hold for now. While
+    Router may not work, I can brute force my way to other scenes with
+    <code>window.location.assign("/lab006");</code>
   </p>
 </template>
