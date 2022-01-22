@@ -15,6 +15,9 @@
       <router-link class="nav-button" to="/lab003"
         >Lab 003 - Default XR Experience</router-link
       >
+      <router-link class="nav-button" to="/lab004"
+        >Lab 004 - XR Controller Buttons</router-link
+      >
     </div>
     <div class="main">
       <router-view />

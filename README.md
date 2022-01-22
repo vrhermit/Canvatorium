@@ -61,6 +61,6 @@ If you don't want to use these certs just disable the following lines in `vue.co
 Install the latest Babylon JS 5.0 Preview
 
 ```
-npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-materials@preview
+npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-loaders@preview babylonjs-materials@Preview
 
 ```
