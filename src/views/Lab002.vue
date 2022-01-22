@@ -1,14 +1,15 @@
 <script setup>
-/*
-Lab Notes:
+const labNotes = `
 Expanding on the script setup idea from lab 2.
 - Added some reactive references to some data (count and sample)
 - Explores watch() and watchEffect() with refs
-*/
+`;
+
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted, watch } from "@vue/runtime-core";
 
+import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
@@ -127,6 +128,9 @@ watch(count, (newValue, oldValue) => {
 </script>
 
 <template>
-  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>Lab 002 - Playing with reactive data and watch/watchEffect</p>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>

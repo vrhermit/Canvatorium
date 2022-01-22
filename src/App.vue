@@ -108,4 +108,8 @@ canvas {
 ::-webkit-scrollbar-thumb:hover {
   background: #53637b;
 }
+
+.babylonVRicon {
+  top: 100px;
+}
 </style>

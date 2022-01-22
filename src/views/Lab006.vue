@@ -1,13 +1,14 @@
 <script setup>
-/*
-Lab Notes:
+const labNotes = `
 Testing cross-scene navigaiton with Router and Window.location
-*/
+`;
+
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
 
+import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
@@ -103,6 +104,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>Lab 006 - Router Nav to Lab 005 (not working). See lab notes in 005.</p>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>

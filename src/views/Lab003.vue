@@ -1,17 +1,17 @@
 <script setup>
-/*
-Lab Notes:
+const labNotes = `
 Continuing from lab 2 with reactive data
 - Explore the xr object with async/await
 - Print a message when the visitor enters immersive mode
 - Reposition the camera when the user enters immersive mode
 - Add some button events to the trigger, these update the count value --/++
-*/
+`;
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted, watch } from "@vue/runtime-core";
 
+import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
@@ -172,6 +172,9 @@ watch(count, (newValue, oldValue) => {
 </script>
 
 <template>
-  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>Lab 003 - Learning more about WebXR in Babylon JS</p>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>

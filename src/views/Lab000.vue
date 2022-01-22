@@ -1,9 +1,9 @@
 <template>
-  <canvas id="bjsCanvas" ref="bjsCanvas" />
-  <p>
-    Lab 000 - Just setting up the shared lab resources. Grid, Lights, Camera,
-    etc.
-  </p>
+  <article class="lab-wrapper">
+    <canvas id="bjsCanvas" ref="bjsCanvas" />
+    <h2>Lab 000 - Hello Canvatorium</h2>
+    <p>Just setting up the shared lab resources. Grid, Lights, Camera, etc.</p>
+  </article>
 </template>
 
 <script>
@@ -21,3 +21,13 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+.lab-wrapper {
+  overflow-y: auto;
+  height: calc(100vh - 1rem);
+  margin: 0%;
+  padding: 1rem;
+}
+</style>

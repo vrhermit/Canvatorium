@@ -1,7 +1,7 @@
 <template>
   <div class="home">
-    <h1>Canvatorium</h1>
-    <h2>An experimental design lab for spatial computing.</h2>
+    <p>Everything about this project is a work in progress.</p>
+    <p>Each lab contains a Babylon JS scene, a title, and some notes.</p>
   </div>
 </template>
 

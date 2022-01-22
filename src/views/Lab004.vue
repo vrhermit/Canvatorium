@@ -1,18 +1,19 @@
 <script setup>
-/*
-Lab Notes:
+const labNotes = `
 Continuing from lab 3 with controller input and buttons
 - Explore the xr object with async/await
 - Print a message when the visitor enters immersive mode
 - Reposition the camera when the user enters immersive mode
 - Added controller button logging to a message value. Adapted from this playground: https://playground.babylonjs.com/#28EKWI#37
 - Tested with Oculus Quest 2 Controllers
-*/
+`;
+
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted, watch } from "@vue/runtime-core";
 
+import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
@@ -236,9 +237,9 @@ watch(message, (newValue, oldValue) => {
 </script>
 
 <template>
-  <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>
-    Lab 004 - WebXR Controller Input. Adapted from this useful
-    <a href="https://playground.babylonjs.com/#28EKWI#37">playground</a>.
-  </p>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>

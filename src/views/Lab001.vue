@@ -1,11 +1,13 @@
 <script setup>
-/*
-Lab Notes:
+const labNotes = `
 This lab uses Vue 3 script setup. It replaces the interface object by combining it with the vue component for the lab.
 I picked out some colors to use throughout the labs in the future.
 I created a box for each color and used the standard BabylonJS material.
-*/
+`;
+
 import * as BABYLON from "babylonjs";
+
+import LabLayout from "../components/LabLayout.vue";
 import LabColors from "../lab-shared/LabColors";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -84,6 +86,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas id="bjsCanvas" ref="bjsCanvas" />
-  <p>Lab 001 - Picking out some colors to use in future controls</p>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>
