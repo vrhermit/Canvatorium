@@ -88,7 +88,7 @@ const makeButton = () => {
     console.log("button clicked");
     // This does not work
     router.push({
-      name: "Lab 005",
+      name: "Lab005",
     });
     // This does work
     // window.location.assign("/lab005");

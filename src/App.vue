@@ -3,35 +3,23 @@
     <div id="nav" class="sidebar">
       <h1>Canvatorium</h1>
       <p>An experimental design lab for spatial computing.</p>
-      <router-link class="nav-button" to="/lab000"
-        >Lab 000 - Hello Canvatorium</router-link
-      >
-      <router-link class="nav-button" to="/lab001"
-        >Lab 001 - Picking Colors</router-link
-      >
-      <router-link class="nav-button" to="/lab002"
-        >Lab 002 - watch() / watchEffect()</router-link
-      >
-      <router-link class="nav-button" to="/lab003"
-        >Lab 003 - Default XR Experience</router-link
-      >
-      <router-link class="nav-button" to="/lab004"
-        >Lab 004 - XR Controller Buttons</router-link
-      >
-      <router-link class="nav-button" to="/lab005"
-        >Lab 005 - Router Nav to Lab 006
-        <span class="fail">X</span></router-link
-      >
-      <router-link class="nav-button" to="/lab006"
-        >Lab 006 - Router Nav to Lab 005
-        <span class="fail">X</span></router-link
-      >
+
+      <SidebarNavVue />
     </div>
     <div class="main">
       <router-view />
     </div>
   </div>
 </template>
+
+<script>
+import SidebarNavVue from "./components/SidebarNav.vue";
+export default {
+  components: {
+    SidebarNavVue,
+  },
+};
+</script>
 
 <style>
 body,
@@ -76,6 +64,7 @@ canvas {
 .fail {
   background: #eb3b5a;
   padding: 2px 4px;
+  margin-left: 6px;
   border-radius: 8px;
   color: white;
 }

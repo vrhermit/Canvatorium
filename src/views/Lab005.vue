@@ -6,26 +6,23 @@ Testing cross-scene navigaiton with Router and Window.location
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted } from "@vue/runtime-core";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter } from "vue-router";
+import { marked } from "marked";
 
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
 const bjsCanvas = ref(null);
+const router = useRouter();
 
 const labNotes = `
+Router Nav to Lab 006 (not working). 
 Testing cross-scene navigaiton with Router and Window.location.
-Testing Links: https://playground.babylonjs.com/#28EKWI#37
+- I'm not sure if the issue is in Vue Router or on Babylon JS.
+- Placing this idea on hold for now. While
+- Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
 `;
-
-const router = useRouter();
-const route = useRoute();
-console.log("route", route);
-console.log(
-  "router description",
-  router.currentRoute?._value?.meta?.description
-);
 
 let engine;
 let scene;
@@ -99,7 +96,7 @@ const makeButton = () => {
     console.log("button clicked");
     // This does not work
     router.push({
-      name: "Lab 006",
+      name: "Lab006",
     });
     // This does work
     // window.location.assign("/lab006");
@@ -114,12 +111,12 @@ onMounted(() => {
 </script>
 
 <template>
+  <div v-html="marked.parse(labNotes)"></div>
   <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-  <p>
+  <!-- <p>
     Lab 005 - Router Nav to Lab 006 (not working). I'm not sure if the issue is
     in Vue Router or on Babylon JS. Placing this idea on hold for now. While
     Router may not work, I can brute force my way to other scenes with
     <code>window.location.assign("/lab006");</code>
-  </p>
-  <div>{{ labNotes }}</div>
+  </p> -->
 </template>
