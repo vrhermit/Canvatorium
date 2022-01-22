@@ -7,7 +7,7 @@ import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted } from "@vue/runtime-core";
 import { useRouter } from "vue-router";
-import { marked } from "marked";
+import LabLayout from "../components/LabLayout.vue";
 
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -115,24 +115,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <article class="lab-wrapper">
-    <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
-    <h2>{{ this.$route?.meta?.title }}</h2>
-    <h3>{{ this.$route?.meta?.subtitle }}</h3>
-    <div v-html="marked.parse(labNotes)"></div>
-    <!-- <p>
-    Lab 005 - Router Nav to Lab 006 (not working). I'm not sure if the issue is
-    in Vue Router or on Babylon JS. Placing this idea on hold for now. While
-    Router may not work, I can brute force my way to other scenes with
-    <code>window.location.assign("/lab006");</code>
-  </p> -->
-  </article>
+  <LabLayout :labNotes="labNotes">
+    <template v-slot:scene>
+      <canvas style="overflow: hidden" id="bjsCanvas" ref="bjsCanvas" />
+    </template>
+  </LabLayout>
 </template>
-
-<style>
-.lab-wrapper {
-  overflow-y: auto;
-  height: calc(100vh - 1rem);
-  padding: 1rem;
-}
-</style>

@@ -30,7 +30,7 @@ html {
 canvas {
   width: 100%;
   height: calc(100vh - 10rem);
-  padding: auto;
+  /* padding: auto; */
 }
 
 #app {
@@ -91,7 +91,7 @@ canvas {
 
 /* width */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 0.5rem;
 }
 
 /* Track */
