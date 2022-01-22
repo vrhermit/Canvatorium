@@ -8,6 +8,7 @@ Continuing from lab 2 with reactive data
 - Add some button events to the trigger, these update the count value --/++
 */
 import * as BABYLON from "babylonjs";
+import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
 import { ref, onMounted, watch } from "@vue/runtime-core";
 
