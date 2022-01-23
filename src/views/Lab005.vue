@@ -1,10 +1,10 @@
 <script setup>
 const labNotes = `
 Router Nav to Lab 006 (not working). 
-Testing cross-scene navigaiton with Router and Window.location.
+Testing cross-scene navigation with Router and Window.location.
 - I'm not sure if the issue is in Vue Router or on Babylon JS.
-- Placing this idea on hold for now. While
-- Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
+- Placing this idea on hold for now.
+- While Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
 `;
 
 import * as BABYLON from "babylonjs";
