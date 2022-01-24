@@ -1,17 +1,15 @@
 <script setup>
 const labNotes = `
-Continuing from lab 3 with controller input and buttons
-- Explore the xr object with async/await
-- Print a message when the visitor enters immersive mode
-- Reposition the camera when the user enters immersive mode
-- Added controller button logging to a message value. Adapted from this playground: https://playground.babylonjs.com/#28EKWI#37
-- Tested with Oculus Quest 2 Controllers
+Explore the idea of overriding console.log() so I can view the log in VR
+- This is just a proof-of-concept, not a full-fledged solution
+- Override console.log() and stash the message in a reactive variable
+- watch the variable and display the message in VR by updating the text in a scroll view
 `;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
-import { ref, onMounted, watch } from "@vue/runtime-core";
+import { ref, reactive, onMounted, watch } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
@@ -19,13 +17,24 @@ import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
 const bjsCanvas = ref(null);
+let labLog = reactive([""]);
 
-const count = ref(0);
-const message = ref("message value");
+(function () {
+  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+  // Save the original method in a private variable
+  var _privateLog = console.log;
+  // Redefine console.log method with a custom function
+  console.log = function (message) {
+    // Here execute something with the given message or arguments variable
+    // alert("Our Custom Log Says: " + message);
+    labLog.push(message.toString());
+    _privateLog.apply(console, arguments);
+  };
+})();
+
 let engine;
 let scene;
-let manager;
-let anchor;
+let loggerText;
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -36,19 +45,12 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  console.log(ground);
 
   // Make some boxes to test out the colors in VR
   const group = new BABYLON.Mesh("logo-group");
   group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
 
-  // Create the 3D UI manager
-  anchor = new BABYLON.AbstractMesh("anchor", scene);
-  manager = new GUI.GUI3DManager(scene);
-
-  makeAddButton();
-  makeSubButton();
-  makeCard();
+  makeLogger();
 
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
@@ -58,21 +60,10 @@ const createScene = async (canvas) => {
     floorMeshes: [ground],
   });
 
-  // Perform actions when entering immersiveXR mode
-  xr.baseExperience.sessionManager.onXRSessionInit.add((session) => {
-    console.log("XR Session Init", session);
-    const texture = scene.getTextureByName("card-texture");
-    texture.getControlByName("card-text").text = "Welcome to Lab 003";
-  });
-
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    console.log("XR Camera", xrCamera);
     xrCamera.position.z = -2;
   });
-
-  // Playing with control input
-  console.log("input", xr.input);
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
@@ -82,36 +73,35 @@ const createScene = async (canvas) => {
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
         triggerComponent.onButtonStateChangedObservable.add(() => {
           if (triggerComponent.pressed) {
-            message.value = "Left Trigger Pressed";
+            console.log("Left Trigger Pressed");
           }
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
         squeezeComponent.onButtonStateChangedObservable.add(() => {
           if (squeezeComponent.pressed) {
-            message.value = "Left Grip Pressed";
+            console.log("Left Grip Pressed");
           }
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
         thumbstickComponent.onButtonStateChangedObservable.add(() => {
           if (thumbstickComponent.pressed) {
-            message.value = "Left Thumbstick Pressed";
+            console.log("Left Thumbstick Pressed");
           }
         });
-        thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-          message.value = "Left Axises: " + axes.x + " " + axes.y;
-          console.log("axes", axes);
-        });
+        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
+        //   console.log("Left Axis Values: " + axes.x + " " + axes.y);
+        // });
 
         let abuttonComponent = motionController.getComponent(xr_ids[3]); //x-button
         abuttonComponent.onButtonStateChangedObservable.add(() => {
           if (abuttonComponent.pressed) {
-            message.value = "X Button Pressed";
+            console.log("X Button Pressed");
           }
         });
         let bbuttonComponent = motionController.getComponent(xr_ids[4]); //y-button
         bbuttonComponent.onButtonStateChangedObservable.add(() => {
           if (bbuttonComponent.pressed) {
-            message.value = "Y Button Pressed";
+            console.log("Y Button Pressed");
           }
         });
       }
@@ -123,41 +113,42 @@ const createScene = async (canvas) => {
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
         triggerComponent.onButtonStateChangedObservable.add(() => {
           if (triggerComponent.pressed) {
-            message.value = "Right Trigger Pressed";
+            console.log("Right Trigger Pressed");
           }
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
         squeezeComponent.onButtonStateChangedObservable.add(() => {
           if (squeezeComponent.pressed) {
-            message.value = "Right Grip Pressed";
+            console.log("Right Grip Pressed");
           }
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
         thumbstickComponent.onButtonStateChangedObservable.add(() => {
           if (thumbstickComponent.pressed) {
-            message.value = "Right Thumbstick Pressed";
+            console.log("Right Thumbstick Pressed");
           }
         });
-        thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-          message.value = "Right Axises: " + axes.x + " " + axes.y;
-          console.log("axes", axes);
-        });
+        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
+        //   console.log("Right Axis Values: " + axes.x + " " + axes.y);
+        // });
 
         let abuttonComponent = motionController.getComponent(xr_ids[3]); //a-button
         abuttonComponent.onButtonStateChangedObservable.add(() => {
           if (abuttonComponent.pressed) {
-            message.value = "A Button Pressed";
+            console.log("A Button Pressed");
           }
         });
         let bbuttonComponent = motionController.getComponent(xr_ids[4]); //b-button
         bbuttonComponent.onButtonStateChangedObservable.add(() => {
           if (bbuttonComponent.pressed) {
-            message.value = "B Button Pressed";
+            console.log("B Button Pressed");
           }
         });
       }
     });
   });
+
+  console.log("console.log('Logging in WebXR!')");
   // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {
@@ -165,61 +156,55 @@ const createScene = async (canvas) => {
   });
 };
 
-const makeCard = () => {
+const makeLogger = () => {
   // GUI
-  var plane = BABYLON.MeshBuilder.CreatePlane("plane", {}, scene);
-  plane.position.y = 2;
-
-  var advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane);
-  advancedTexture.name = "card-texture";
-
-  var cardText = new GUI.TextBlock("card-text");
-  cardText.text = message.value;
-  cardText.color = "white";
-  cardText.fontSize = 64;
-
-  advancedTexture.addControl(cardText);
-  plane.scaling = new BABYLON.Vector3(5, 5, 5);
-};
-
-const makeAddButton = () => {
-  // Let's add a button
-  var button = new GUI.Button3D("button-add");
-  manager.addControl(button);
-  button.linkToTransformNode(anchor);
-  button.position = new BABYLON.Vector3(0.3, 1, 0);
-  button.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-
-  var text1 = new GUI.TextBlock();
-  text1.text = "count++";
-  text1.color = "white";
-  text1.fontSize = 64;
-  button.content = text1;
-
-  button.onPointerUpObservable.add(() => {
-    count.value++;
-    message.value = "count: " + count.value;
+  const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
+    height: 2.1,
+    width: 3.1,
+    depth: 0.2,
   });
-};
+  card.position = new BABYLON.Vector3(0, 1, 0);
+  card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  const plane = BABYLON.MeshBuilder.CreatePlane(
+    "detail-plane",
+    { height: 2, width: 3 },
+    scene
+  );
+  plane.position.z = -0.11;
+  plane.parent = card;
 
-const makeSubButton = () => {
-  // Let's add a button
-  var button = new GUI.Button3D("button-sub");
-  manager.addControl(button);
-  button.linkToTransformNode(anchor);
-  button.position = new BABYLON.Vector3(-0.3, 1, 0);
-  button.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
+    plane,
+    3 * 1024,
+    2 * 1024
+  );
+  advancedTexture.name = "logger-texture";
+  var sv = new GUI.ScrollViewer("logger-scroll");
+  sv.thickness = 48;
+  sv.color = "#3e4a5d";
+  sv.background = "#3e4a5d";
+  sv.width = `${3 * 1024}px`;
+  sv.height = `${2 * 1024}px`;
 
-  var text1 = new GUI.TextBlock();
-  text1.text = "count--";
-  text1.color = "white";
-  text1.fontSize = 48;
-  button.content = text1;
+  advancedTexture.addControl(sv);
 
-  button.onPointerUpObservable.add(() => {
-    count.value--;
-    message.value = "count: " + count.value;
-  });
+  var tb = new GUI.TextBlock("logger-text");
+  loggerText = tb;
+  tb.textWrapping = true;
+  tb.width = 3;
+  tb.height = 2;
+  tb.paddingTop = "1%";
+  tb.paddingLeft = "30px";
+  tb.paddingRight = "20px";
+  tb.paddingBottom = "1%";
+  tb.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.color = "#d3d9e1";
+  tb.fontSize = "96px";
+
+  sv.addControl(tb);
 };
 
 onMounted(() => {
@@ -229,10 +214,9 @@ onMounted(() => {
 });
 
 // Watch with a single value
-watch(message, (newValue, oldValue) => {
-  console.log(oldValue, newValue);
-  const texture = scene.getTextureByName("card-texture");
-  texture.getControlByName("card-text").text = newValue;
+watch(labLog, (newValue) => {
+  const logData = [...newValue];
+  loggerText.text = logData.reverse().join("\n");
 });
 </script>
 

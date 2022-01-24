@@ -7,6 +7,7 @@ import Lab003 from "../labs/Lab003.vue";
 import Lab004 from "../labs/Lab004.vue";
 import Lab005 from "../labs/Lab005.vue";
 import Lab006 from "../labs/Lab006.vue";
+import Lab007 from "../labs/Lab007.vue";
 
 const routes = [
   {
@@ -83,6 +84,17 @@ const routes = [
       title: "Lab 006",
       subtitle: "Router Nav to Lab 005",
       status: "failed"
+    }
+  },
+  {
+    path: "/Lab007",
+
+    name: "Lab007",
+    component: Lab007,
+    meta: {
+      title: "Lab 007",
+      subtitle: "Console... Log(?)",
+      status: "running"
     }
   },
   {
