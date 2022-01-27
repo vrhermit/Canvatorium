@@ -73,7 +73,9 @@ const addLabConsole = (scene) => {
 // TODO: Refactor this to append only the new eleements to the text block
 watch(labLog, (newValue) => {
   const logData = [...newValue];
-  loggerText.text = logData.reverse().join("\n");
+  if (loggerText) {
+    loggerText.text = logData.reverse().join("\n");
+  }
 });
 
 export default addLabConsole;

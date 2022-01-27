@@ -14,8 +14,9 @@ const Lab000Wrapper = {
     const engine = new BABYLON.Engine(canvas);
     const scene = new BABYLON.Scene(engine);
 
-    // Use the shared lap tools
+    // Use the shared lab tools
     addLabCamera(canvas, scene);
+    scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 0.8, -4);
     addLabLights(scene);
     const ground = addLabRoom(scene);
 

@@ -27,15 +27,11 @@ const createScene = async (canvas) => {
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
 
-  // Use the shared lap tools
+  // Use the shared lab tools
   addLabCamera(canvas, scene);
+  scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-
-  // Make some boxes to test out the colors in VR
-  const group = new BABYLON.Mesh("logo-group");
-  group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
-
   addLabConsole();
 
   // START WebXR ------------------------------------------------------------
