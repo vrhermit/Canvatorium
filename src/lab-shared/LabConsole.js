@@ -7,16 +7,18 @@ import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { reactive, watch } from "@vue/runtime-core";
 
-(function () {
-  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+// Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+const overrideConsole = () => {
   // Save the original method in a private variable
-  var _privateLog = console.log;
+  let _privateLog = console.log;
   // Redefine console.log method with a custom function
   console.log = function (message) {
     labLog.push(message.toString());
     _privateLog.apply(console, arguments);
   };
-})();
+};
+
+overrideConsole();
 
 // The data that we will display in the VR console
 let labLog = reactive([""]);
@@ -67,7 +69,8 @@ const addLabConsole = (scene) => {
   sv.addControl(tb);
 };
 
-// Watch with a single value
+// Watch the labLog data and update the text in the GUI
+// TODO: Refactor this to append only the new eleements to the text block
 watch(labLog, (newValue) => {
   const logData = [...newValue];
   loggerText.text = logData.reverse().join("\n");
