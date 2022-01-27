@@ -1,6 +1,11 @@
 <script setup>
 const labNotes = `
 Explore the new Near Menu in Babylon JS 5.0
+- Based on the Holohraphic Menu with limited customizations
+- Using manage.controlScaling to scale the menu
+- Using some properties on the follow behavior to adjust the relative position
+- Bug: [Near Menu Dragging does not work in WebXR on Quest 2](https://forum.babylonjs.com/t/near-menu-dragging-does-not-work-in-oculus-quest-2/27152)
+- Bug: [Scaling the controls does not update the scale of mouseover effects](https://forum.babylonjs.com/t/3d-gui-manage-control-scaling-does-not-scale-the-mouse-over-effects-on-holograph-ui/27150)
 `;
 
 import * as BABYLON from "babylonjs";
@@ -51,36 +56,42 @@ const createScene = async (canvas) => {
   // Create the 3D UI manager
   anchor = new BABYLON.AbstractMesh("anchor", scene);
   manager = new GUI.GUI3DManager(scene);
-  //   manager.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-  //   manager.useRealisticScaling = true;
 
   console.log("3D GUI:", manager, anchor);
 
   // Let's add a slate
   var near = new GUI.NearMenu("near");
   manager.addControl(near);
+  manager.controlScaling = 0.25;
 
   var button0 = new GUI.TouchHolographicButton("button0");
-  button0.imageUrl = "./textures/IconFollowMe.png";
   button0.text = "Button 0";
+  button0.onPointerClickObservable.add(() => {
+    console.log("Button 0 clicked");
+  });
   near.addButton(button0);
 
   var button1 = new GUI.TouchHolographicButton("button1");
-  button1.imageUrl = "./textures/IconClose.png";
   button1.text = "Button 1";
+  button1.onPointerClickObservable.add(() => {
+    console.log("Button 1 clicked");
+  });
+
   near.addButton(button1);
 
   var button2 = new GUI.TouchHolographicButton("button2");
-  button2.imageUrl = "./textures/IconFollowMe.png";
   button2.text = "Button 2";
+  button2.onPointerClickObservable.add(() => {
+    console.log("Button 2 clicked");
+  });
   near.addButton(button2);
 
   console.log("Near Menu:", near);
-  near.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
   near.defaultBehavior.followBehavior.defaultDistance = 1;
   near.defaultBehavior.followBehavior.minimumDistance = 1;
   near.defaultBehavior.followBehavior.maximumDistance = 2;
   near.defaultBehavior.followBehavior.pitchOffset = -35;
+  console.log("Near ", near.mesh);
 
   makeLogger();
 
@@ -102,24 +113,24 @@ const createScene = async (canvas) => {
     controller.onMotionControllerInitObservable.add((motionController) => {
       if (motionController.handness === "left") {
         const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Left Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Left Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Left Thumbstick Pressed");
-          }
-        });
+        // let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
+        // triggerComponent.onButtonStateChangedObservable.add(() => {
+        //   if (triggerComponent.pressed) {
+        //     console.log("Left Trigger Pressed");
+        //   }
+        // });
+        // let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
+        // squeezeComponent.onButtonStateChangedObservable.add(() => {
+        //   if (squeezeComponent.pressed) {
+        //     console.log("Left Grip Pressed");
+        //   }
+        // });
+        // let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
+        // thumbstickComponent.onButtonStateChangedObservable.add(() => {
+        //   if (thumbstickComponent.pressed) {
+        //     console.log("Left Thumbstick Pressed");
+        //   }
+        // });
         // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
         //   console.log("Left Axis Values: " + axes.x + " " + axes.y);
         // });
@@ -142,24 +153,24 @@ const createScene = async (canvas) => {
 
       if (motionController.handness === "right") {
         const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Right Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Right Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Right Thumbstick Pressed");
-          }
-        });
+        // let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
+        // triggerComponent.onButtonStateChangedObservable.add(() => {
+        //   if (triggerComponent.pressed) {
+        //     console.log("Right Trigger Pressed");
+        //   }
+        // });
+        // let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
+        // squeezeComponent.onButtonStateChangedObservable.add(() => {
+        //   if (squeezeComponent.pressed) {
+        //     console.log("Right Grip Pressed");
+        //   }
+        // });
+        // let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
+        // thumbstickComponent.onButtonStateChangedObservable.add(() => {
+        //   if (thumbstickComponent.pressed) {
+        //     console.log("Right Thumbstick Pressed");
+        //   }
+        // });
         // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
         //   console.log("Right Axis Values: " + axes.x + " " + axes.y);
         // });
