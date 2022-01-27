@@ -11,33 +11,20 @@ Explore the new Near Menu in Babylon JS 5.0
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
-import { ref, reactive, onMounted, watch } from "@vue/runtime-core";
+import { ref, onMounted } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
+import addLabConsole from "../lab-shared/LabConsole";
 
 const bjsCanvas = ref(null);
-let labLog = reactive([""]);
-
-(function () {
-  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
-  // Save the original method in a private variable
-  var _privateLog = console.log;
-  // Redefine console.log method with a custom function
-  console.log = function (message) {
-    labLog.push(message.toString());
-    _privateLog.apply(console, arguments);
-  };
-})();
 
 let engine;
 let scene;
 let manager;
 let anchor;
-
-let loggerText;
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -48,6 +35,8 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   addLabLights(scene);
   const ground = addLabRoom(scene);
+
+  addLabConsole();
 
   // Make some boxes to test out the colors in VR
   const group = new BABYLON.Mesh("logo-group");
@@ -92,8 +81,6 @@ const createScene = async (canvas) => {
   near.defaultBehavior.followBehavior.maximumDistance = 2;
   near.defaultBehavior.followBehavior.pitchOffset = -35;
   console.log("Near ", near.mesh);
-
-  makeLogger();
 
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
@@ -191,7 +178,6 @@ const createScene = async (canvas) => {
     });
   });
 
-  console.log("console.log('Logging in WebXR!')");
   // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {
@@ -199,68 +185,10 @@ const createScene = async (canvas) => {
   });
 };
 
-const makeLogger = () => {
-  // GUI
-  const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
-    height: 2.1,
-    width: 3.1,
-    depth: 0.2,
-  });
-  card.position = new BABYLON.Vector3(1, 1, 0);
-  card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-  card.rotation = new BABYLON.Vector3(0, Math.PI / 5, 0);
-  const plane = BABYLON.MeshBuilder.CreatePlane(
-    "detail-plane",
-    { height: 2, width: 3 },
-    scene
-  );
-  plane.position.z = -0.11;
-  plane.parent = card;
-
-  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
-    plane,
-    3 * 1024,
-    2 * 1024
-  );
-  advancedTexture.name = "logger-texture";
-  var sv = new GUI.ScrollViewer("logger-scroll");
-  sv.thickness = 48;
-  sv.color = "#3e4a5d";
-  sv.background = "#3e4a5d";
-  sv.width = `${3 * 1024}px`;
-  sv.height = `${2 * 1024}px`;
-
-  advancedTexture.addControl(sv);
-
-  var tb = new GUI.TextBlock("logger-text");
-  loggerText = tb;
-  tb.textWrapping = true;
-  tb.width = 3;
-  tb.height = 2;
-  tb.paddingTop = "1%";
-  tb.paddingLeft = "30px";
-  tb.paddingRight = "20px";
-  tb.paddingBottom = "1%";
-  tb.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  tb.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  tb.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  tb.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
-  tb.color = "#d3d9e1";
-  tb.fontSize = "96px";
-
-  sv.addControl(tb);
-};
-
 onMounted(() => {
   if (bjsCanvas.value) {
     createScene(bjsCanvas.value);
   }
-});
-
-// Watch with a single value
-watch(labLog, (newValue) => {
-  const logData = [...newValue];
-  loggerText.text = logData.reverse().join("\n");
 });
 </script>
 
