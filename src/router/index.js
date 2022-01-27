@@ -8,6 +8,7 @@ import Lab004 from "../labs/Lab004.vue";
 import Lab005 from "../labs/Lab005.vue";
 import Lab006 from "../labs/Lab006.vue";
 import Lab007 from "../labs/Lab007.vue";
+import Lab008 from "../labs/Lab008.vue";
 
 const routes = [
   {
@@ -88,12 +89,21 @@ const routes = [
   },
   {
     path: "/Lab007",
-
     name: "Lab007",
     component: Lab007,
     meta: {
       title: "Lab 007",
       subtitle: "Console... Log(?)",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab008",
+    name: "Lab008",
+    component: Lab008,
+    meta: {
+      title: "Lab 008",
+      subtitle: "Near Menu",
       status: "running"
     }
   },

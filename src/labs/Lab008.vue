@@ -1,9 +1,6 @@
 <script setup>
 const labNotes = `
-Explore the idea of overriding console.log() so I can view the log in VR
-- This is just a proof-of-concept, not a full-fledged solution
-- Override console.log() and stash the message in a reactive variable
-- watch the variable and display the message in VR by updating the text in a scroll view
+Explore the new Near Menu in Babylon JS 5.0
 `;
 
 import * as BABYLON from "babylonjs";
@@ -32,6 +29,9 @@ let labLog = reactive([""]);
 
 let engine;
 let scene;
+let manager;
+let anchor;
+
 let loggerText;
 
 const createScene = async (canvas) => {
@@ -47,6 +47,40 @@ const createScene = async (canvas) => {
   // Make some boxes to test out the colors in VR
   const group = new BABYLON.Mesh("logo-group");
   group.position = new BABYLON.Vector3(-3.5, 0.5, 0);
+
+  // Create the 3D UI manager
+  anchor = new BABYLON.AbstractMesh("anchor", scene);
+  manager = new GUI.GUI3DManager(scene);
+  //   manager.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  //   manager.useRealisticScaling = true;
+
+  console.log("3D GUI:", manager, anchor);
+
+  // Let's add a slate
+  var near = new GUI.NearMenu("near");
+  manager.addControl(near);
+
+  var button0 = new GUI.TouchHolographicButton("button0");
+  button0.imageUrl = "./textures/IconFollowMe.png";
+  button0.text = "Button 0";
+  near.addButton(button0);
+
+  var button1 = new GUI.TouchHolographicButton("button1");
+  button1.imageUrl = "./textures/IconClose.png";
+  button1.text = "Button 1";
+  near.addButton(button1);
+
+  var button2 = new GUI.TouchHolographicButton("button2");
+  button2.imageUrl = "./textures/IconFollowMe.png";
+  button2.text = "Button 2";
+  near.addButton(button2);
+
+  console.log("Near Menu:", near);
+  near.scaling = new BABYLON.Vector3(0.1, 0.1, 0.1);
+  near.defaultBehavior.followBehavior.defaultDistance = 1;
+  near.defaultBehavior.followBehavior.minimumDistance = 1;
+  near.defaultBehavior.followBehavior.maximumDistance = 2;
+  near.defaultBehavior.followBehavior.pitchOffset = -35;
 
   makeLogger();
 
@@ -161,8 +195,9 @@ const makeLogger = () => {
     width: 3.1,
     depth: 0.2,
   });
-  card.position = new BABYLON.Vector3(0, 1, 0);
+  card.position = new BABYLON.Vector3(1, 1, 0);
   card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  card.rotation = new BABYLON.Vector3(0, Math.PI / 5, 0);
   const plane = BABYLON.MeshBuilder.CreatePlane(
     "detail-plane",
     { height: 2, width: 3 },
