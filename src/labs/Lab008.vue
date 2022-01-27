@@ -45,7 +45,6 @@ const createScene = async (canvas) => {
 
   console.log("3D GUI:", manager, anchor);
 
-  // Let's add a slate
   var near = new GUI.NearMenu("near");
   manager.addControl(near);
   manager.controlScaling = 0.25;

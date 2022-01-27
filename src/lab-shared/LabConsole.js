@@ -25,6 +25,7 @@ let labLog = reactive([""]);
 
 // A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
 let loggerText;
+let scrollViewer;
 
 const addLabConsole = (scene) => {
   // GUI
@@ -42,6 +43,7 @@ const addLabConsole = (scene) => {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane, 3 * 1024, 2 * 1024);
   advancedTexture.name = "logger-texture";
   var sv = new GUI.ScrollViewer("logger-scroll");
+  scrollViewer = sv;
   sv.thickness = 48;
   sv.color = "#3e4a5d";
   sv.background = "#3e4a5d";
@@ -54,7 +56,7 @@ const addLabConsole = (scene) => {
   loggerText = tb;
   tb.textWrapping = true;
   tb.width = 3;
-  tb.height = 2;
+  tb.height = 3;
   tb.paddingTop = "1%";
   tb.paddingLeft = "30px";
   tb.paddingRight = "20px";
@@ -69,12 +71,37 @@ const addLabConsole = (scene) => {
   sv.addControl(tb);
 };
 
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+console.log("Just a test");
+
 // Watch the labLog data and update the text in the GUI
 // TODO: Refactor this to append only the new eleements to the text block
 watch(labLog, (newValue) => {
   const logData = [...newValue];
+  scrollViewer.verticalBar.value = 1;
   if (loggerText) {
-    loggerText.text = logData.reverse().join("\n");
+    loggerText.text = logData.join("\n");
+    loggerText.resizeToFit = true;
   }
 });
 
