@@ -23,9 +23,11 @@ overrideConsole();
 // The data that we will display in the VR console
 let labLog = reactive([""]);
 
+// A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
+let scrollViewer;
+
 // A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
 let loggerText;
-let scrollViewer;
 
 const addLabConsole = (scene) => {
   // GUI
@@ -71,37 +73,14 @@ const addLabConsole = (scene) => {
   sv.addControl(tb);
 };
 
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-console.log("Just a test");
-
 // Watch the labLog data and update the text in the GUI
 // TODO: Refactor this to append only the new eleements to the text block
 watch(labLog, (newValue) => {
   const logData = [...newValue];
-  scrollViewer.verticalBar.value = 1;
-  if (loggerText) {
+  if (scrollViewer && loggerText) {
     loggerText.text = logData.join("\n");
     loggerText.resizeToFit = true;
+    scrollViewer.verticalBar.value = 1;
   }
 });
 
