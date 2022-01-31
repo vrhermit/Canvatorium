@@ -36,8 +36,9 @@ const addLabConsole = (scene) => {
     width: 3.1,
     depth: 0.2
   });
-  card.position = new BABYLON.Vector3(0, 1, 0);
+  card.position = new BABYLON.Vector3(-1, 1, 1);
   card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  card.rotation = new BABYLON.Vector3(0, Math.PI / -5, 0);
   const plane = BABYLON.MeshBuilder.CreatePlane("detail-plane", { height: 2, width: 3 }, scene);
   plane.position.z = -0.11;
   plane.parent = card;

@@ -51,7 +51,7 @@ const createScene = async (canvas) => {
   makeBox("light4", group, scene).position = new BABYLON.Vector3(7, 1, 0);
 
   // WebXRDefaultExperience
-  const xrDefault = scene.createDefaultXRExperienceAsync({
+  const xrDefault = await scene.createDefaultXRExperienceAsync({
     floorMeshes: [ground],
   });
   const xrHelper = xrDefault.baseExperience;

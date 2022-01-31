@@ -43,7 +43,7 @@ const createScene = async (canvas) => {
   makeCard();
 
   // WebXRDefaultExperience
-  const xrDefault = scene.createDefaultXRExperienceAsync({
+  const xrDefault = await scene.createDefaultXRExperienceAsync({
     floorMeshes: [ground],
   });
   const xrHelper = xrDefault.baseExperience;
