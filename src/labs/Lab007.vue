@@ -32,8 +32,17 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  createLabConsole(scene);
+  const { consoleIsVisible, setConsoleTransform } = createLabConsole(scene);
 
+  consoleIsVisible.value = true;
+  setConsoleTransform(
+    new BABYLON.Vector3(0, 1, 0),
+    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(0.5, 0.5, 0.5)
+  );
+
+  console.log("WebXR Console Logging in Babylon JS");
+  console.log("Press the Y button to toggle the console");
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 
@@ -51,6 +60,9 @@ const createScene = async (canvas) => {
   xr.input.onControllerAddedObservable.add((controller) => {
     controller.onMotionControllerInitObservable.add((motionController) => {
       if (motionController.handness === "left") {
+        // console.log(xr.input);
+        // console.log("controller: ", controller.grip?.position);
+
         const xr_ids = motionController.getComponentIds();
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
         triggerComponent.onButtonStateChangedObservable.add(() => {
@@ -84,6 +96,23 @@ const createScene = async (canvas) => {
         bbuttonComponent.onButtonStateChangedObservable.add(() => {
           if (bbuttonComponent.pressed) {
             console.log("Y Button Pressed");
+            consoleIsVisible.value = !consoleIsVisible.value;
+            if (controller.grip) {
+              setConsoleTransform(
+                // Repacking these so I don't end up with a reference to the controller
+                new BABYLON.Vector3(
+                  controller.grip.position.x,
+                  controller.grip.position.y + 0.5,
+                  controller.grip.position.z + 0.5
+                ),
+                new BABYLON.Vector3(
+                  controller.grip.rotation.x,
+                  controller.grip.rotation.y,
+                  controller.grip.rotation.z
+                ),
+                new BABYLON.Vector3(0.25, 0.25, 0.25)
+              );
+            }
           }
         });
       }
@@ -130,7 +159,6 @@ const createScene = async (canvas) => {
     });
   });
 
-  console.log("console.log('Logging in WebXR!')");
   // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {

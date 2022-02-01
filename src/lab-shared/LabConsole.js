@@ -5,11 +5,12 @@ Lots to do before this is a robust tool: https://github.com/vrhermit/Canvatorium
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
-import { reactive, watch } from "@vue/runtime-core";
+import { ref, reactive, watch } from "@vue/runtime-core";
 
 export const createLabConsole = (scene) => {
   // The data that we will display in the VR console
   let conLogData = reactive([""]);
+  let consoleIsVisible = ref(false);
 
   // A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
   let scrollViewer;
@@ -42,6 +43,9 @@ export const createLabConsole = (scene) => {
   plane.position.z = -0.11;
   plane.parent = card;
 
+  card.isVisible = consoleIsVisible.value;
+  plane.isVisible = consoleIsVisible.value;
+
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane, 3 * 1024, 2 * 1024);
   advancedTexture.name = "logger-texture";
   var sv = new GUI.ScrollViewer("logger-scroll");
@@ -72,6 +76,12 @@ export const createLabConsole = (scene) => {
 
   sv.addControl(tb);
 
+  const setConsoleTransform = (position, rotation, scaling) => {
+    card.position = position;
+    card.rotation = rotation;
+    card.scaling = scaling;
+  };
+
   // Watch the labLog data and update the text in the GUI
   // TODO: Refactor this to append only the new eleements to the text block
   watch(conLogData, (newValue) => {
@@ -82,4 +92,11 @@ export const createLabConsole = (scene) => {
       scrollViewer.verticalBar.value = 1;
     }
   });
+
+  watch(consoleIsVisible, (newValue) => {
+    card.isVisible = newValue;
+    plane.isVisible = newValue;
+  });
+
+  return { consoleIsVisible, setConsoleTransform };
 };
