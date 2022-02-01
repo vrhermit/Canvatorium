@@ -16,7 +16,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import addLabConsole from "../lab-shared/LabConsole";
+import { createLabConsole } from "../lab-shared/LabConsole";
 
 import createTitleCard from "../composables/TitleCard";
 
@@ -38,7 +38,8 @@ const createScene = async (canvas) => {
   addLabLights(scene);
   const ground = addLabRoom(scene);
 
-  addLabConsole();
+  //   addLabConsole();
+  createLabConsole(scene);
 
   const { title, subtitle } = createTitleCard(scene);
 

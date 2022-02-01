@@ -15,7 +15,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import addLabConsole from "../lab-shared/LabConsole";
+import { createLabConsole } from "../lab-shared/LabConsole";
 
 const bjsCanvas = ref(null);
 
@@ -32,7 +32,7 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  addLabConsole();
+  createLabConsole(scene);
 
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience

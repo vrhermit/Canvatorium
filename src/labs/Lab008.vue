@@ -17,8 +17,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import addLabConsole from "../lab-shared/LabConsole";
-
+import { createLabConsole } from "../lab-shared/LabConsole";
 const bjsCanvas = ref(null);
 
 let engine;
@@ -37,7 +36,7 @@ const createScene = async (canvas) => {
   addLabLights(scene);
   const ground = addLabRoom(scene);
 
-  addLabConsole();
+  createLabConsole(scene);
 
   // Create the 3D UI manager
   anchor = new BABYLON.AbstractMesh("anchor", scene);

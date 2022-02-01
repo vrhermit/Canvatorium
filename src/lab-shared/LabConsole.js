@@ -7,29 +7,28 @@ import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { reactive, watch } from "@vue/runtime-core";
 
-// Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
-const overrideConsole = () => {
-  // Save the original method in a private variable
-  let _privateLog = console.log;
-  // Redefine console.log method with a custom function
-  console.log = function (message) {
-    labLog.push(message.toString());
-    _privateLog.apply(console, arguments);
+export const createLabConsole = (scene) => {
+  // The data that we will display in the VR console
+  let conLogData = reactive([""]);
+
+  // A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
+  let scrollViewer;
+
+  // A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
+  let loggerText;
+
+  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+  const overrideConsole = () => {
+    // Save the original method in a private variable
+    let _privateLog = console.log;
+    // Redefine console.log method with a custom function
+    console.log = function (message) {
+      conLogData.push(message.toString());
+      _privateLog.apply(console, arguments);
+    };
   };
-};
+  overrideConsole();
 
-overrideConsole();
-
-// The data that we will display in the VR console
-let labLog = reactive([""]);
-
-// A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
-let scrollViewer;
-
-// A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
-let loggerText;
-
-const addLabConsole = (scene) => {
   // GUI
   const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
     height: 2.1,
@@ -72,17 +71,15 @@ const addLabConsole = (scene) => {
   tb.fontSize = "96px";
 
   sv.addControl(tb);
+
+  // Watch the labLog data and update the text in the GUI
+  // TODO: Refactor this to append only the new eleements to the text block
+  watch(conLogData, (newValue) => {
+    const logData = [...newValue];
+    if (scrollViewer && loggerText) {
+      loggerText.text = logData.join("\n");
+      loggerText.resizeToFit = true;
+      scrollViewer.verticalBar.value = 1;
+    }
+  });
 };
-
-// Watch the labLog data and update the text in the GUI
-// TODO: Refactor this to append only the new eleements to the text block
-watch(labLog, (newValue) => {
-  const logData = [...newValue];
-  if (scrollViewer && loggerText) {
-    loggerText.text = logData.join("\n");
-    loggerText.resizeToFit = true;
-    scrollViewer.verticalBar.value = 1;
-  }
-});
-
-export default addLabConsole;
