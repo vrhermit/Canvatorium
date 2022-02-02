@@ -48,19 +48,25 @@ export const createLabConsole = (scene) => {
 
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane, 3 * 1024, 2 * 1024);
   advancedTexture.name = "logger-texture";
+
+  var panel = new GUI.StackPanel();
+  advancedTexture.addControl(panel);
+
   var sv = new GUI.ScrollViewer("logger-scroll");
   scrollViewer = sv;
   sv.thickness = 48;
   sv.color = "#3e4a5d";
   sv.background = "#3e4a5d";
   sv.width = `${3 * 1024}px`;
-  sv.height = `${2 * 1024}px`;
+  sv.height = `${2 * 1024 - 128}px`;
+  sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
-  advancedTexture.addControl(sv);
+  panel.addControl(sv);
 
   var tb = new GUI.TextBlock("logger-text");
   loggerText = tb;
   tb.textWrapping = true;
+
   tb.width = 3;
   tb.height = 3;
   tb.paddingTop = "1%";
@@ -75,6 +81,19 @@ export const createLabConsole = (scene) => {
   tb.fontSize = "96px";
 
   sv.addControl(tb);
+
+  var clearButton = GUI.Button.CreateSimpleButton("clear-button", "clear");
+  clearButton.width = "256px";
+  clearButton.height = "128px";
+  clearButton.color = "white";
+  clearButton.background = "#eb3b5a";
+  clearButton.fontSize = "96px";
+  clearButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+  clearButton.onPointerClickObservable.add(() => {
+    conLogData.splice(0, conLogData.length);
+    console.log("console cleared");
+  });
+  panel.addControl(clearButton);
 
   const setConsoleTransform = (position, rotation, scaling) => {
     card.position = position;
