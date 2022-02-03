@@ -6,6 +6,26 @@ Lots to do before this is a robust tool: https://github.com/vrhermit/Canvatorium
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import { ref, reactive, watch } from "@vue/runtime-core";
+import LabColors from "../lab-shared/LabColors";
+
+const makeGrabbable = function (model) {
+  Object.assign(model, {
+    startInteraction(pointerInfo, controllerMesh) {
+      this.props = this.props || {};
+      if (this.props.grabbedPointerId === undefined) {
+        this.props.originalParent = this.parent;
+      }
+      this.props.grabbedPointerId = pointerInfo.event.pointerId;
+      this.setParent(controllerMesh);
+    },
+    endInteraction(pointerInfo) {
+      if (this.props.grabbedPointerId === pointerInfo.event.pointerId) {
+        this.setParent(this.props.originalParent);
+        delete this.props.grabbedPointerId;
+      }
+    }
+  });
+};
 
 export const createLabConsole = (scene) => {
   // The data that we will display in the VR console
@@ -31,20 +51,36 @@ export const createLabConsole = (scene) => {
   overrideConsole();
 
   // GUI
+  const grabMaterial = new BABYLON.StandardMaterial("card-material", scene);
+  grabMaterial.diffuseColor = LabColors["purple"];
+  grabMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const grab = BABYLON.MeshBuilder.CreateBox("detail-card", {
+    height: 0.05,
+    width: 0.4,
+    depth: 0.05
+  });
+  grab.material = grabMaterial;
+  grab.position = new BABYLON.Vector3(0, 1, 0);
   const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
     height: 2.1,
     width: 3.1,
     depth: 0.2
   });
-  card.position = new BABYLON.Vector3(-1, 1, 1);
+  // card.parent = grab;
+  grab.addChild(card);
+  // card.position = new BABYLON.Vector3(-1, 1, 1);
+  card.position = new BABYLON.Vector3(0, 0.6, 0);
   card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-  // card.rotation = new BABYLON.Vector3(0, Math.PI / -5, 0);
-  // card.billboardMode = BABYLON.Mesh.BILLBOARDMODE_Y;
+  const cardMaterial = new BABYLON.StandardMaterial("card-material", scene);
+  cardMaterial.diffuseColor = LabColors["light1"];
+  cardMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  card.material = cardMaterial;
 
   const plane = BABYLON.MeshBuilder.CreatePlane("detail-plane", { height: 2, width: 3 }, scene);
   plane.position.z = -0.11;
   plane.parent = card;
 
+  grab.isVisible = consoleIsVisible.value;
   card.isVisible = consoleIsVisible.value;
   plane.isVisible = consoleIsVisible.value;
 
@@ -59,6 +95,7 @@ export const createLabConsole = (scene) => {
   sv.thickness = 48;
   sv.color = "#3e4a5d";
   sv.background = "#3e4a5d";
+  sv.opacity = 1;
   sv.width = `${3 * 1024}px`;
   sv.height = `${2 * 1024 - 128}px`;
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
@@ -97,10 +134,12 @@ export const createLabConsole = (scene) => {
   });
   panel.addControl(clearButton);
 
+  makeGrabbable(grab);
+
   const setConsoleTransform = (position, rotateTo, scaling) => {
-    card.position = position;
-    card.lookAt(rotateTo, Math.PI, 0, 0);
-    card.scaling = scaling;
+    grab.position = position;
+    grab.lookAt(rotateTo, Math.PI, 0, 0);
+    grab.scaling = scaling;
   };
 
   // Watch the labLog data and update the text in the GUI
@@ -115,6 +154,7 @@ export const createLabConsole = (scene) => {
   });
 
   watch(consoleIsVisible, (newValue) => {
+    grab.isVisible = newValue;
     card.isVisible = newValue;
     plane.isVisible = newValue;
   });

@@ -42,7 +42,10 @@ const createScene = async (canvas) => {
   );
 
   console.log("WebXR Console Logging in Babylon JS");
-  console.log("Press the Y button to toggle the console");
+  console.log("Press the Y button to show/hide the console");
+  console.log(
+    "When the console shows, it will appear in front of your left controller."
+  );
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 
@@ -54,8 +57,6 @@ const createScene = async (canvas) => {
   // let vrCamera;
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    // vrCamera = xrCamera;
-    // console.log("VR Camera:", vrCamera);
     xrCamera.position.z = -2;
   });
 
@@ -124,7 +125,7 @@ const createScene = async (canvas) => {
                 tmpRay.origin.z
               );
 
-              const newScale = new BABYLON.Vector3(0.25, 0.25, 0.25);
+              const newScale = new BABYLON.Vector3(0.5, 0.5, 0.5);
               setConsoleTransform(
                 // Repacking these so I don't end up with a reference to the controller
                 newPosition,
@@ -177,6 +178,45 @@ const createScene = async (canvas) => {
       }
     });
   });
+
+  // TEST GRABBING
+  const selectedMeshes = {};
+  // POINTERDOWN
+  scene.onPointerObservable.add((pointerInfo) => {
+    const { pickInfo } = pointerInfo;
+    const { hit } = pickInfo;
+    const { pickedMesh } = pickInfo;
+    if (!hit) return;
+    if (!pickedMesh) return;
+    if (!pickedMesh.startInteraction) return;
+    selectedMeshes[pointerInfo.event.pointerId] = pickedMesh;
+    if (
+      xr.baseExperience &&
+      xr.baseExperience.state === BABYLON.WebXRState.IN_XR
+    ) {
+      // XR Mode
+      const xrInput = xr.pointerSelection.getXRControllerByPointerId(
+        pointerInfo.event.pointerId
+      );
+      if (!xrInput) return;
+      const motionController = xrInput.motionController;
+      if (!motionController) return;
+      pickedMesh.startInteraction(pointerInfo, motionController.rootMesh);
+    } else {
+      pickedMesh.startInteraction(pointerInfo, scene.activeCamera);
+    }
+  }, BABYLON.PointerEventTypes.POINTERDOWN);
+
+  // POINTERUP
+  scene.onPointerObservable.add((pointerInfo) => {
+    const pickedMesh = selectedMeshes[pointerInfo.event.pointerId];
+    if (pickedMesh) {
+      if (pickedMesh.endInteraction) {
+        pickedMesh.endInteraction(pointerInfo);
+      }
+      delete selectedMeshes[pointerInfo.event.pointerId];
+    }
+  }, BABYLON.PointerEventTypes.POINTERUP);
 
   // END WebXR --------------------------------------------------
 
