@@ -37,7 +37,7 @@ const createScene = async (canvas) => {
   consoleIsVisible.value = true;
   setConsoleTransform(
     new BABYLON.Vector3(0, 1, 0),
-    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(0, 1, -2),
     new BABYLON.Vector3(0.5, 0.5, 0.5)
   );
 
@@ -51,8 +51,11 @@ const createScene = async (canvas) => {
     floorMeshes: [ground],
   });
 
+  // let vrCamera;
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
+    // vrCamera = xrCamera;
+    // console.log("VR Camera:", vrCamera);
     xrCamera.position.z = -2;
   });
 
@@ -60,9 +63,7 @@ const createScene = async (canvas) => {
   xr.input.onControllerAddedObservable.add((controller) => {
     controller.onMotionControllerInitObservable.add((motionController) => {
       if (motionController.handness === "left") {
-        // console.log(xr.input);
-        // console.log("controller: ", controller.grip?.position);
-
+        // console.log("grip", controller.grip);
         const xr_ids = motionController.getComponentIds();
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
         triggerComponent.onButtonStateChangedObservable.add(() => {
@@ -97,20 +98,33 @@ const createScene = async (canvas) => {
           if (bbuttonComponent.pressed) {
             console.log("Y Button Pressed");
             consoleIsVisible.value = !consoleIsVisible.value;
-            if (controller.grip) {
+
+            if (controller.grip && consoleIsVisible.value) {
+              const tmpRay = new BABYLON.Ray(
+                controller.pointer.absolutePosition,
+                controller.pointer.forward,
+                0.5
+              );
+              // controller.getWorldPointerRayToRef(tmpRay, true);
+
+              const newPosition = new BABYLON.Vector3(
+                tmpRay.origin.x + tmpRay.direction.x,
+                tmpRay.origin.y,
+                tmpRay.origin.z + tmpRay.direction.z
+              );
+
+              const newRotation = new BABYLON.Vector3(
+                tmpRay.origin.x,
+                tmpRay.origin.y,
+                tmpRay.origin.z
+              );
+
+              const newScale = new BABYLON.Vector3(0.25, 0.25, 0.25);
               setConsoleTransform(
                 // Repacking these so I don't end up with a reference to the controller
-                new BABYLON.Vector3(
-                  controller.grip.position.x,
-                  controller.grip.position.y + 0.5,
-                  controller.grip.position.z + 0.5
-                ),
-                new BABYLON.Vector3(
-                  controller.grip.rotation.x,
-                  controller.grip.rotation.y,
-                  controller.grip.rotation.z
-                ),
-                new BABYLON.Vector3(0.25, 0.25, 0.25)
+                newPosition,
+                newRotation,
+                newScale
               );
             }
           }
