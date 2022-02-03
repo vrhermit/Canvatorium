@@ -97,11 +97,10 @@ export const createLabConsole = (scene) => {
   });
   panel.addControl(clearButton);
 
-  const setConsoleTransform = (position, rotation, scaling) => {
+  const setConsoleTransform = (position, rotateTo, scaling) => {
     card.position = position;
-    card.rotation = rotation;
+    card.lookAt(rotateTo, Math.PI, 0, 0);
     card.scaling = scaling;
-    card.lookAt(rotation, Math.PI, 0, 0);
   };
 
   // Watch the labLog data and update the text in the GUI

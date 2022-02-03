@@ -100,19 +100,24 @@ const createScene = async (canvas) => {
             consoleIsVisible.value = !consoleIsVisible.value;
 
             if (controller.grip && consoleIsVisible.value) {
+              // Create an empty ray
               const tmpRay = new BABYLON.Ray(
-                controller.pointer.absolutePosition,
-                controller.pointer.forward,
-                0.5
+                new BABYLON.Vector3(),
+                new BABYLON.Vector3(),
+                Infinity
               );
-              // controller.getWorldPointerRayToRef(tmpRay, true);
 
+              // Update the ray to use the controller's position and forward
+              controller.getWorldPointerRayToRef(tmpRay, true);
+
+              // Calculate a position in front of the controller
               const newPosition = new BABYLON.Vector3(
                 tmpRay.origin.x + tmpRay.direction.x,
                 tmpRay.origin.y,
                 tmpRay.origin.z + tmpRay.direction.z
               );
 
+              // Use the current position of the controller as a vector to use with lookAt()
               const newRotation = new BABYLON.Vector3(
                 tmpRay.origin.x,
                 tmpRay.origin.y,
