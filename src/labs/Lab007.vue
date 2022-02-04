@@ -46,6 +46,7 @@ const createScene = async (canvas) => {
   console.log(
     "When the console shows, it will appear in front of your left controller."
   );
+
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 

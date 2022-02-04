@@ -98,6 +98,8 @@ export const createLabConsole = (scene) => {
   sv.opacity = 1;
   sv.width = `${3 * 1024}px`;
   sv.height = `${2 * 1024 - 128}px`;
+  sv.barSize = 60;
+  sv.barColor = "#53637b";
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
   panel.addControl(sv);
@@ -106,7 +108,7 @@ export const createLabConsole = (scene) => {
   loggerText = tb;
   tb.textWrapping = true;
 
-  tb.width = 3;
+  tb.width = 1;
   tb.height = 3;
   tb.paddingTop = "1%";
   tb.paddingLeft = "30px";
