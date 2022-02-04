@@ -63,6 +63,6 @@ Babylon JS 5.0 is in beta as of time of writing. With updates shipping often, it
 Install the latest Babylon JS 5.0 Preview
 
 ```
-npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-loaders@preview babylonjs-materials@Preview
+npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-loaders@preview
 
 ```

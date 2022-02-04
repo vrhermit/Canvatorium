@@ -29,7 +29,7 @@ const makeGrabbable = function (model) {
 
 export const createLabConsole = (scene) => {
   // The data that we will display in the VR console
-  let conLogData = reactive([""]);
+  let conLogData = reactive([]);
   let consoleIsVisible = ref(false);
 
   // A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
