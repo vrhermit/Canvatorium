@@ -12,6 +12,7 @@ import Lab008 from "../labs/Lab008.vue";
 import Lab009 from "../labs/Lab009.vue";
 import Lab010 from "../labs/Lab010.vue";
 import Lab011 from "../labs/Lab011.vue";
+import Lab012 from "../labs/Lab012.vue";
 
 const routes = [
   {
@@ -137,6 +138,16 @@ const routes = [
     meta: {
       title: "Lab 011",
       subtitle: "Shared Lab Player",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab012",
+    name: "Lab012",
+    component: Lab012,
+    meta: {
+      title: "Lab 012",
+      subtitle: "Gizmos!",
       status: "running"
     }
   },
