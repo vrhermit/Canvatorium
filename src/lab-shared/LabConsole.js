@@ -8,25 +8,6 @@ import * as GUI from "babylonjs-gui";
 import { ref, reactive, watch } from "@vue/runtime-core";
 import LabColors from "../lab-shared/LabColors";
 
-const makeGrabbable = function (model) {
-  Object.assign(model, {
-    startInteraction(pointerInfo, controllerMesh) {
-      this.props = this.props || {};
-      if (this.props.grabbedPointerId === undefined) {
-        this.props.originalParent = this.parent;
-      }
-      this.props.grabbedPointerId = pointerInfo.event.pointerId;
-      this.setParent(controllerMesh);
-    },
-    endInteraction(pointerInfo) {
-      if (this.props.grabbedPointerId === pointerInfo.event.pointerId) {
-        this.setParent(this.props.originalParent);
-        delete this.props.grabbedPointerId;
-      }
-    }
-  });
-};
-
 export const createLabConsole = (scene) => {
   // The data that we will display in the VR console
   let conLogData = reactive([]);
@@ -136,12 +117,36 @@ export const createLabConsole = (scene) => {
   });
   panel.addControl(clearButton);
 
-  makeGrabbable(grab);
-
   const setConsoleTransform = (position, rotateTo, scaling) => {
     grab.position = position;
     grab.lookAt(rotateTo, Math.PI, 0, 0);
     grab.scaling = scaling;
+  };
+
+  const toggleConsole = (xrController) => {
+    consoleIsVisible.value = !consoleIsVisible.value;
+
+    if (xrController.grip && consoleIsVisible.value) {
+      // Create an empty ray
+      const tmpRay = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3(), Infinity);
+
+      // Update the ray to use the controller's position and forward
+      xrController.getWorldPointerRayToRef(tmpRay, true);
+
+      // Calculate a position in front of the controller
+      const newPosition = new BABYLON.Vector3(tmpRay.origin.x + tmpRay.direction.x, tmpRay.origin.y, tmpRay.origin.z + tmpRay.direction.z);
+
+      // Use the current position of the controller as a vector to use with lookAt()
+      const newRotation = new BABYLON.Vector3(tmpRay.origin.x, tmpRay.origin.y, tmpRay.origin.z);
+
+      const newScale = new BABYLON.Vector3(0.5, 0.5, 0.5);
+      setConsoleTransform(
+        // Repacking these so I don't end up with a reference to the controller
+        newPosition,
+        newRotation,
+        newScale
+      );
+    }
   };
 
   // Watch the labLog data and update the text in the GUI
@@ -161,5 +166,5 @@ export const createLabConsole = (scene) => {
     plane.isVisible = newValue;
   });
 
-  return { consoleIsVisible, setConsoleTransform };
+  return { consoleIsVisible, setConsoleTransform, toggleConsole };
 };

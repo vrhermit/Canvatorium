@@ -30,14 +30,7 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  const { consoleIsVisible, setConsoleTransform } = createLabConsole(scene);
-
-  consoleIsVisible.value = false;
-  setConsoleTransform(
-    new BABYLON.Vector3(0, 1, 0),
-    new BABYLON.Vector3(0, 1, -2),
-    new BABYLON.Vector3(0.5, 0.5, 0.5)
-  );
+  const { toggleConsole } = createLabConsole(scene);
 
   console.log("Lab 010 - Grab Lab");
 
@@ -59,115 +52,11 @@ const createScene = async (canvas) => {
   xr.input.onControllerAddedObservable.add((controller) => {
     controller.onMotionControllerInitObservable.add((motionController) => {
       if (motionController.handness === "left") {
-        // console.log("grip", controller.grip);
         const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Left Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Left Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Left Thumbstick Pressed");
-          }
-        });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Left Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //x-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("X Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("Y Button Pressed");
-            consoleIsVisible.value = !consoleIsVisible.value;
-
-            if (controller.grip && consoleIsVisible.value) {
-              // Create an empty ray
-              const tmpRay = new BABYLON.Ray(
-                new BABYLON.Vector3(),
-                new BABYLON.Vector3(),
-                Infinity
-              );
-
-              // Update the ray to use the controller's position and forward
-              controller.getWorldPointerRayToRef(tmpRay, true);
-
-              // Calculate a position in front of the controller
-              const newPosition = new BABYLON.Vector3(
-                tmpRay.origin.x + tmpRay.direction.x,
-                tmpRay.origin.y,
-                tmpRay.origin.z + tmpRay.direction.z
-              );
-
-              // Use the current position of the controller as a vector to use with lookAt()
-              const newRotation = new BABYLON.Vector3(
-                tmpRay.origin.x,
-                tmpRay.origin.y,
-                tmpRay.origin.z
-              );
-
-              const newScale = new BABYLON.Vector3(0.5, 0.5, 0.5);
-              setConsoleTransform(
-                // Repacking these so I don't end up with a reference to the controller
-                newPosition,
-                newRotation,
-                newScale
-              );
-            }
-          }
-        });
-      }
-
-      // END LEFT CONTROLLER ------------------------------------------------------------
-
-      if (motionController.handness === "right") {
-        const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Right Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Right Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Right Thumbstick Pressed");
-          }
-        });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Right Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //a-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("A Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //b-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("B Button Pressed");
+        let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
+        yButtonComponent.onButtonStateChangedObservable.add(() => {
+          if (yButtonComponent.pressed) {
+            toggleConsole(controller);
           }
         });
       }

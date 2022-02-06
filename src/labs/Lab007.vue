@@ -4,23 +4,44 @@ Explore the idea of overriding console.log() so I can view the log in VR
 - This is just a proof-of-concept, not a full-fledged solution
 - Override console.log() and stash the message in a reactive variable
 - watch the variable and display the message in VR by updating the text in a scroll view
-- Updated on 2022.01.27 - Move the Console Log features to src/lab-shared/LabConsole.js
 `;
 
 import * as BABYLON from "babylonjs";
+import * as GUI from "babylonjs-gui";
+
 import "babylonjs-loaders";
-import { ref, onMounted } from "@vue/runtime-core";
+import { ref, reactive, watch, onMounted } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import { createLabConsole } from "../lab-shared/LabConsole";
+import LabColors from "../lab-shared/LabColors";
 
 const bjsCanvas = ref(null);
 
 let engine;
 let scene;
+
+let conLogData = reactive([]);
+
+// A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
+let scrollViewer;
+
+// A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
+let loggerText;
+
+// Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+const overrideConsole = () => {
+  // Save the original method in a private variable
+  let _privateLog = console.log;
+  // Redefine console.log method with a custom function
+  console.log = function (message) {
+    conLogData.push(message.toString());
+    _privateLog.apply(console, arguments);
+  };
+};
+overrideConsole();
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -32,19 +53,76 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  const { consoleIsVisible, setConsoleTransform } = createLabConsole(scene);
 
-  consoleIsVisible.value = true;
-  setConsoleTransform(
-    new BABYLON.Vector3(0, 1, 0),
-    new BABYLON.Vector3(0, 1, -2),
-    new BABYLON.Vector3(0.5, 0.5, 0.5)
+  // GUI
+
+  const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
+    height: 2.1,
+    width: 3.1,
+    depth: 0.2,
+  });
+  // card.position = new BABYLON.Vector3(-1, 1, 1);
+  card.position = new BABYLON.Vector3(0, 1, 0);
+  card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  const cardMaterial = new BABYLON.StandardMaterial("card-material", scene);
+  cardMaterial.diffuseColor = LabColors["light1"];
+  cardMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  card.material = cardMaterial;
+
+  const plane = BABYLON.MeshBuilder.CreatePlane(
+    "detail-plane",
+    { height: 2, width: 3 },
+    scene
   );
+  plane.position.z = -0.11;
+  plane.parent = card;
+
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
+    plane,
+    3 * 1024,
+    2 * 1024
+  );
+  advancedTexture.name = "logger-texture";
+
+  var panel = new GUI.StackPanel();
+  advancedTexture.addControl(panel);
+
+  var sv = new GUI.ScrollViewer("logger-scroll");
+  scrollViewer = sv;
+  sv.thickness = 48;
+  sv.color = "#3e4a5d";
+  sv.background = "#3e4a5d";
+  sv.opacity = 1;
+  sv.width = `${3 * 1024}px`;
+  sv.height = `${2 * 1024 - 128}px`;
+  sv.barSize = 60;
+  sv.barColor = "#53637b";
+  sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+  panel.addControl(sv);
+
+  var tb = new GUI.TextBlock("logger-text");
+  loggerText = tb;
+  tb.textWrapping = true;
+
+  tb.width = 1;
+  tb.height = 3;
+  tb.paddingTop = "1%";
+  tb.paddingLeft = "30px";
+  tb.paddingRight = "20px";
+  tb.paddingBottom = "1%";
+  tb.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.color = "#d3d9e1";
+  tb.fontSize = "96px";
+
+  sv.addControl(tb);
 
   console.log("WebXR Console Logging in Babylon JS");
-  console.log("Press the Y button to show/hide the console");
   console.log(
-    "When the console shows, it will appear in front of your left controller."
+    "This concept was turned into a reusable tool. You can find it in `src/lab-shared/LabConsole.js`"
   );
 
   // START WebXR ------------------------------------------------------------
@@ -61,170 +139,23 @@ const createScene = async (canvas) => {
     xrCamera.position.z = -2;
   });
 
-  //controller input
-  xr.input.onControllerAddedObservable.add((controller) => {
-    controller.onMotionControllerInitObservable.add((motionController) => {
-      if (motionController.handness === "left") {
-        // console.log("grip", controller.grip);
-        const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Left Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Left Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Left Thumbstick Pressed");
-          }
-        });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Left Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //x-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("X Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("Y Button Pressed");
-            consoleIsVisible.value = !consoleIsVisible.value;
-
-            if (controller.grip && consoleIsVisible.value) {
-              // Create an empty ray
-              const tmpRay = new BABYLON.Ray(
-                new BABYLON.Vector3(),
-                new BABYLON.Vector3(),
-                Infinity
-              );
-
-              // Update the ray to use the controller's position and forward
-              controller.getWorldPointerRayToRef(tmpRay, true);
-
-              // Calculate a position in front of the controller
-              const newPosition = new BABYLON.Vector3(
-                tmpRay.origin.x + tmpRay.direction.x,
-                tmpRay.origin.y,
-                tmpRay.origin.z + tmpRay.direction.z
-              );
-
-              // Use the current position of the controller as a vector to use with lookAt()
-              const newRotation = new BABYLON.Vector3(
-                tmpRay.origin.x,
-                tmpRay.origin.y,
-                tmpRay.origin.z
-              );
-
-              const newScale = new BABYLON.Vector3(0.5, 0.5, 0.5);
-              setConsoleTransform(
-                // Repacking these so I don't end up with a reference to the controller
-                newPosition,
-                newRotation,
-                newScale
-              );
-            }
-          }
-        });
-      }
-
-      // END LEFT CONTROLLER ------------------------------------------------------------
-
-      if (motionController.handness === "right") {
-        const xr_ids = motionController.getComponentIds();
-        let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Right Trigger Pressed");
-          }
-        });
-        let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Right Grip Pressed");
-          }
-        });
-        let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Right Thumbstick Pressed");
-          }
-        });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Right Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //a-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("A Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //b-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("B Button Pressed");
-          }
-        });
-      }
-    });
-  });
-
-  // TEST GRABBING
-  const selectedMeshes = {};
-  // POINTERDOWN
-  scene.onPointerObservable.add((pointerInfo) => {
-    const { pickInfo } = pointerInfo;
-    const { hit } = pickInfo;
-    const { pickedMesh } = pickInfo;
-    if (!hit) return;
-    if (!pickedMesh) return;
-    if (!pickedMesh.startInteraction) return;
-    selectedMeshes[pointerInfo.event.pointerId] = pickedMesh;
-    if (
-      xr.baseExperience &&
-      xr.baseExperience.state === BABYLON.WebXRState.IN_XR
-    ) {
-      // XR Mode
-      const xrInput = xr.pointerSelection.getXRControllerByPointerId(
-        pointerInfo.event.pointerId
-      );
-      if (!xrInput) return;
-      const motionController = xrInput.motionController;
-      if (!motionController) return;
-      pickedMesh.startInteraction(pointerInfo, motionController.rootMesh);
-    } else {
-      pickedMesh.startInteraction(pointerInfo, scene.activeCamera);
-    }
-  }, BABYLON.PointerEventTypes.POINTERDOWN);
-
-  // POINTERUP
-  scene.onPointerObservable.add((pointerInfo) => {
-    const pickedMesh = selectedMeshes[pointerInfo.event.pointerId];
-    if (pickedMesh) {
-      if (pickedMesh.endInteraction) {
-        pickedMesh.endInteraction(pointerInfo);
-      }
-      delete selectedMeshes[pointerInfo.event.pointerId];
-    }
-  }, BABYLON.PointerEventTypes.POINTERUP);
-
   // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {
     scene.render();
   });
 };
+
+// Watch the labLog data and update the text in the GUI
+// TODO: Refactor this to append only the new eleements to the text block
+watch(conLogData, (newValue) => {
+  const logData = [...newValue];
+  if (scrollViewer && loggerText) {
+    loggerText.text = logData.join("\n");
+    loggerText.resizeToFit = true;
+    scrollViewer.verticalBar.value = 1;
+  }
+});
 
 onMounted(() => {
   if (bjsCanvas.value) {
