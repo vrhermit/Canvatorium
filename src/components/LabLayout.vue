@@ -21,6 +21,12 @@ export default {
       return marked.parse(this.labNotes);
     },
   },
+  mounted() {
+    console.log(
+      `Welcome to ${this.$route?.meta?.title} - ${this.$route?.meta?.subtitle}`
+    );
+    console.log(this.labNotes);
+  },
 };
 </script>
 

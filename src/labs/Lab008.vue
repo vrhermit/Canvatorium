@@ -17,7 +17,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import { createLabConsole } from "../lab-shared/LabConsole";
+import { createLabPlayer } from "../lab-shared/LabPlayer";
 const bjsCanvas = ref(null);
 
 let engine;
@@ -35,8 +35,6 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 2, -3);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-
-  createLabConsole(scene);
 
   // Create the 3D UI manager
   anchor = new BABYLON.AbstractMesh("anchor", scene);
@@ -78,100 +76,9 @@ const createScene = async (canvas) => {
   console.log("Near ", near.mesh);
 
   // START WebXR ------------------------------------------------------------
-  // WebXRDefaultExperience
 
-  // Create the default experience
-  let xr = await scene.createDefaultXRExperienceAsync({
-    floorMeshes: [ground],
-  });
-
-  // Move the player when thet enter immersive mode
-  xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    xrCamera.position.z = -2;
-  });
-
-  //controller input
-  xr.input.onControllerAddedObservable.add((controller) => {
-    controller.onMotionControllerInitObservable.add((motionController) => {
-      if (motionController.handness === "left") {
-        const xr_ids = motionController.getComponentIds();
-        // let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        // triggerComponent.onButtonStateChangedObservable.add(() => {
-        //   if (triggerComponent.pressed) {
-        //     console.log("Left Trigger Pressed");
-        //   }
-        // });
-        // let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        // squeezeComponent.onButtonStateChangedObservable.add(() => {
-        //   if (squeezeComponent.pressed) {
-        //     console.log("Left Grip Pressed");
-        //   }
-        // });
-        // let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        // thumbstickComponent.onButtonStateChangedObservable.add(() => {
-        //   if (thumbstickComponent.pressed) {
-        //     console.log("Left Thumbstick Pressed");
-        //   }
-        // });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Left Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //x-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("X Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("Y Button Pressed");
-          }
-        });
-      }
-
-      // END LEFT CONTROLLER ------------------------------------------------------------
-
-      if (motionController.handness === "right") {
-        const xr_ids = motionController.getComponentIds();
-        // let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        // triggerComponent.onButtonStateChangedObservable.add(() => {
-        //   if (triggerComponent.pressed) {
-        //     console.log("Right Trigger Pressed");
-        //   }
-        // });
-        // let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        // squeezeComponent.onButtonStateChangedObservable.add(() => {
-        //   if (squeezeComponent.pressed) {
-        //     console.log("Right Grip Pressed");
-        //   }
-        // });
-        // let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        // thumbstickComponent.onButtonStateChangedObservable.add(() => {
-        //   if (thumbstickComponent.pressed) {
-        //     console.log("Right Thumbstick Pressed");
-        //   }
-        // });
-        // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
-        //   console.log("Right Axis Values: " + axes.x + " " + axes.y);
-        // });
-
-        let abuttonComponent = motionController.getComponent(xr_ids[3]); //a-button
-        abuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (abuttonComponent.pressed) {
-            console.log("A Button Pressed");
-          }
-        });
-        let bbuttonComponent = motionController.getComponent(xr_ids[4]); //b-button
-        bbuttonComponent.onButtonStateChangedObservable.add(() => {
-          if (bbuttonComponent.pressed) {
-            console.log("B Button Pressed");
-          }
-        });
-      }
-    });
-  });
+  // Use the LabPlayer
+  createLabPlayer(scene, [ground]);
 
   // END WebXR --------------------------------------------------
 

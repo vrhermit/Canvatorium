@@ -97,7 +97,7 @@ const routes = [
     meta: {
       title: "Lab 007",
       subtitle: "Console... Log(?)",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -107,7 +107,7 @@ const routes = [
     meta: {
       title: "Lab 008",
       subtitle: "Near Menu",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -117,7 +117,7 @@ const routes = [
     meta: {
       title: "Lab 009",
       subtitle: "Title Card & Vue 3 Composables",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -136,7 +136,7 @@ const routes = [
     component: Lab011,
     meta: {
       title: "Lab 011",
-      subtitle: "TBD",
+      subtitle: "Shared Lab Player",
       status: "running"
     }
   },

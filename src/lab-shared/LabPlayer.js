@@ -1,3 +1,12 @@
+/*
+This is a shared component used across labs.
+Current features
+- WebXR default experience
+- Teleport system
+- Console log common WebXR buttons
+- Imports and uses LabConsole for debugging in VR
+*/
+
 // import * as BABYLON from "babylonjs");
 // import { ref, reactive, watch } from "@vue/runtime-core");
 import { createLabConsole } from "../lab-shared/LabConsole";

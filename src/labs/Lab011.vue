@@ -34,8 +34,6 @@ const createScene = async (canvas) => {
   // Use the LabPlayer
   createLabPlayer(scene, [ground]);
 
-  console.log("Lab 011 - Shared Lab Player");
-
   engine.runRenderLoop(() => {
     scene.render();
   });

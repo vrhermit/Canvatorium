@@ -16,7 +16,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import { createLabConsole } from "../lab-shared/LabConsole";
+import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 import createTitleCard from "../composables/TitleCard";
 
@@ -37,9 +37,6 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 2, -3);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-
-  //   addLabConsole();
-  createLabConsole(scene);
 
   const { title, subtitle } = createTitleCard(scene);
 
@@ -85,15 +82,8 @@ const createScene = async (canvas) => {
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 
-  // Create the default experience
-  let xr = await scene.createDefaultXRExperienceAsync({
-    floorMeshes: [ground],
-  });
-
-  // Move the player when thet enter immersive mode
-  xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    xrCamera.position.z = -2;
-  });
+  // Use the LabPlayer
+  createLabPlayer(scene, [ground]);
 
   // END WebXR --------------------------------------------------
 
