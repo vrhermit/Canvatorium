@@ -81,6 +81,10 @@ canvas {
   color: #2d98da;
 }
 
+a {
+  color: #2d98da;
+}
+
 .nav-button {
   color: white;
   text-decoration: none;

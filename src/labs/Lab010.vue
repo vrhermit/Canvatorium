@@ -1,6 +1,7 @@
 <script setup>
 const labNotes = `
-Grabbing objects and moveing them around.
+Grabbing objects and moving them around.
+- Pointer Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2)
 `;
 
 import * as BABYLON from "babylonjs";

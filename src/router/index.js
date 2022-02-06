@@ -11,6 +11,7 @@ import Lab007 from "../labs/Lab007.vue";
 import Lab008 from "../labs/Lab008.vue";
 import Lab009 from "../labs/Lab009.vue";
 import Lab010 from "../labs/Lab010.vue";
+import Lab011 from "../labs/Lab011.vue";
 
 const routes = [
   {
@@ -126,6 +127,16 @@ const routes = [
     meta: {
       title: "Lab 010",
       subtitle: "Grag Lab",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab011",
+    name: "Lab011",
+    component: Lab011,
+    meta: {
+      title: "Lab 011",
+      subtitle: "TBD",
       status: "running"
     }
   },
