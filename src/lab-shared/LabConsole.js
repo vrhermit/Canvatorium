@@ -166,5 +166,5 @@ export const createLabConsole = (scene) => {
     plane.isVisible = newValue;
   });
 
-  return { consoleIsVisible, setConsoleTransform, toggleConsole };
+  return { toggleConsole };
 };

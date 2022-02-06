@@ -17,6 +17,7 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
+import { createLabConsole } from "../lab-shared/LabConsole";
 
 const bjsCanvas = ref(null);
 
@@ -53,10 +54,11 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
+  const { toggleConsole } = createLabConsole(scene);
 
   // GUI
 
-  const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
+  const card = BABYLON.MeshBuilder.CreateBox("console-card", {
     height: 2.1,
     width: 3.1,
     depth: 0.2,
@@ -70,7 +72,7 @@ const createScene = async (canvas) => {
   card.material = cardMaterial;
 
   const plane = BABYLON.MeshBuilder.CreatePlane(
-    "detail-plane",
+    "console-plane",
     { height: 2, width: 3 },
     scene
   );
@@ -124,6 +126,9 @@ const createScene = async (canvas) => {
   console.log(
     "This concept was turned into a reusable tool. You can find it in `src/lab-shared/LabConsole.js`"
   );
+  console.log(
+    "This lab also imported the shared LabConsole. Toggle it on with the Y button"
+  );
 
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
@@ -137,6 +142,21 @@ const createScene = async (canvas) => {
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
     xrCamera.position.z = -2;
+  });
+
+  //controller input
+  xr.input.onControllerAddedObservable.add((controller) => {
+    controller.onMotionControllerInitObservable.add((motionController) => {
+      if (motionController.handness === "left") {
+        const xr_ids = motionController.getComponentIds();
+        let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
+        yButtonComponent.onButtonStateChangedObservable.add(() => {
+          if (yButtonComponent.pressed) {
+            toggleConsole(controller);
+          }
+        });
+      }
+    });
   });
 
   // END WebXR --------------------------------------------------
