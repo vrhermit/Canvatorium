@@ -2,9 +2,9 @@
 const labNotes = `
 Grabbing objects and moving them around.
 - Example 1: Mesh Picking and Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2). 
-- Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this new method in Babylon JS 5.0 is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
+- Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
 - Example 3: Pointer Dragging along an axis
-- Example 4: Pointer Dragging along a plane
+- Example 4: Pointer Dragging along a plane. This [playground](https://playground.babylonjs.com/#YD11CG#6) was helpful for understanding how to clamp the bounds of the drag region. It uses a plane to define the region, but this would just as well be done with vectors.
 `;
 
 import * as BABYLON from "babylonjs";
@@ -206,21 +206,46 @@ const createScene = async (canvas) => {
   var pointerDragBehavior = new BABYLON.PointerDragBehavior({
     dragAxis: new BABYLON.Vector3(0, 1, 0),
   });
+
   grab5.addBehavior(pointerDragBehavior);
 
   console.log(
     "Example 4 (plane and box) using PointerDragBehavior along a plane/normal"
   );
-  const planeMat = new BABYLON.StandardMaterial("plane-mat", scene);
-  planeMat.diffuseColor = LabColors["dark1"];
-  planeMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const dragPlane = BABYLON.MeshBuilder.CreatePlane(
-    "dragPlane",
-    { width: 1.5, height: 1.5 },
+
+  // This playground was helpful for understanding bounds https://playground.babylonjs.com/#YD11CG#6
+
+  const cardMat = new BABYLON.StandardMaterial("card-mat", scene);
+  cardMat.diffuseColor = LabColors["dark3"];
+  cardMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const cardWidth = 1.5;
+  const cardHeight = 1.6;
+  const cardThickness = 0.1;
+  const card = BABYLON.MeshBuilder.CreateBox(
+    "card",
+    { width: cardWidth, height: cardHeight, depth: cardThickness },
     scene
   );
-  dragPlane.position = new BABYLON.Vector3(2.5, 1.5, 0);
-  dragPlane.material = planeMat;
+  card.isPickable = false;
+  card.material = cardMat;
+  card.position = new BABYLON.Vector3(2.5, 1.5, 0);
+
+  const boundsWidth = 0.2;
+  const boundsHeight = 0.2;
+  // create plane in front of card for bounds checking
+  const boundsPlane = BABYLON.MeshBuilder.CreatePlane(
+    "boundsPlane",
+    { width: cardWidth - boundsWidth, height: cardHeight - boundsHeight },
+    scene
+  );
+  boundsPlane.isPickable = false;
+  boundsPlane.position.x = card.position.x;
+  boundsPlane.position.y = card.position.y;
+  boundsPlane.position.z = -cardThickness / 2;
+  boundsPlane.isVisible = false;
+  // boundsPlane.overlayColor = LabColors["dark4"];
+  // boundsPlane.renderOverlay = true;
 
   const grabMat6 = new BABYLON.StandardMaterial("grab-mat6", scene);
   grabMat6.diffuseColor = LabColors["purple"];
@@ -230,17 +255,33 @@ const createScene = async (canvas) => {
     width: 0.5,
     depth: 0.5,
   });
-  grab6.material = grabMat5;
+  grab6.material = grabMat6;
   grab6.position = new BABYLON.Vector3(
-    dragPlane.position.x,
-    dragPlane.position.y,
-    dragPlane.position.z
+    boundsPlane.position.x,
+    boundsPlane.position.y,
+    boundsPlane.position.z
   );
   grab6.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
 
   var planeDragBehavior = new BABYLON.PointerDragBehavior({
-    dragPlaneNormal: dragPlane.forward,
+    dragPlaneNormal: boundsPlane.forward,
   });
+  planeDragBehavior.useObjectOrientationForDragging = true;
+
+  planeDragBehavior.validateDrag = (targetPosition) => {
+    const bounds = boundsPlane.getBoundingInfo().boundingBox;
+    targetPosition.x = BABYLON.Scalar.Clamp(
+      targetPosition.x,
+      bounds.minimum.x + boundsPlane.position.x,
+      bounds.maximum.x + boundsPlane.position.x
+    );
+    targetPosition.y = BABYLON.Scalar.Clamp(
+      targetPosition.y,
+      bounds.minimum.y + boundsPlane.position.y,
+      bounds.maximum.y + boundsPlane.position.y
+    );
+    return true;
+  };
 
   grab6.addBehavior(planeDragBehavior);
 
