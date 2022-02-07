@@ -31,6 +31,7 @@ const createScene = async (canvas) => {
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
+
   // scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);

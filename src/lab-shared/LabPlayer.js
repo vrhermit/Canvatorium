@@ -7,7 +7,7 @@ Current features
 - Imports and uses LabConsole for debugging in VR
 */
 
-// import * as BABYLON from "babylonjs");
+// import * as BABYLON from "babylonjs";
 // import { ref, reactive, watch } from "@vue/runtime-core");
 import { createLabConsole } from "../lab-shared/LabConsole";
 
