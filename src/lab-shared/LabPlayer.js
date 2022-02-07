@@ -108,5 +108,7 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
     });
   });
 
+  return { xr };
+
   // END WebXR --------------------------------------------------
 };

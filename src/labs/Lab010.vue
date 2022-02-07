@@ -176,6 +176,7 @@ const createScene = async (canvas) => {
 
   var boundingBox =
     BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(grab4);
+  // boundingBox.scaleRatio = 1.5;
 
   // // Create bounding box positionGizmo
   // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
@@ -185,50 +186,13 @@ const createScene = async (canvas) => {
   //   utilLayer
   // );
   // positionGizmo.attachedMesh = boundingBox;
+  // // positionGizmo.scaleRatio = 0.5;
 
   // // Create behaviors to drag and scale with pointers in VR
   var sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
   boundingBox.addBehavior(sixDofDragBehavior);
   var multiPointerScaleBehavior = new BABYLON.MultiPointerScaleBehavior();
   boundingBox.addBehavior(multiPointerScaleBehavior);
-
-  const grabMat5 = new BABYLON.StandardMaterial("grab-mat5", scene);
-  grabMat5.diffuseColor = LabColors["cyan"];
-  grabMat5.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const grab5 = BABYLON.MeshBuilder.CreateBox("grab5", {
-    height: 0.5,
-    width: 0.5,
-    depth: 0.5,
-  });
-  grab5.material = grabMat5;
-  grab5.position = new BABYLON.Vector3(1, 1.2, 0);
-
-  // Create utility layer the positionGizmo will be rendered on
-  var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-
-  // Create the positionGizmo and attach to the sphere
-  var positionGizmo = new BABYLON.PositionGizmo(utilLayer);
-  positionGizmo.attachedMesh = grab5;
-  positionGizmo.scaleRatio = 2;
-
-  // Keep the positionGizmo fixed to world rotation
-  positionGizmo.updateGizmoRotationToMatchAttachedMesh = false;
-  positionGizmo.updateGizmoPositionToMatchAttachedMesh = true;
-
-  var rotationGizmo = new BABYLON.RotationGizmo(utilLayer);
-  rotationGizmo.attachedMesh = grab5;
-
-  // Keep the rotationGizmo fixed to world rotation
-  rotationGizmo.updateGizmoRotationToMatchAttachedMesh = false;
-  rotationGizmo.updateGizmoPositionToMatchAttachedMesh = true;
-
-  // Create the scaleGizmo and attach to the box
-  var scaleGizmo = new BABYLON.ScaleGizmo(utilLayer);
-  scaleGizmo.attachedMesh = grab5;
-
-  // Keep the scaleGizmo fixed to local rotation
-  scaleGizmo.updateGizmoRotationToMatchAttachedMesh = true;
-  scaleGizmo.updateGizmoPositionToMatchAttachedMesh = true;
 
   // END WebXR --------------------------------------------------
 
