@@ -1,6 +1,8 @@
 <script setup>
 const labNotes = `
 Follow Behaviors
+- Purple sphere can place itself anywhere in my view
+- Green sphere is constrained to a fixed pitch of -35 degrees
 
 `;
 
@@ -37,38 +39,23 @@ const createScene = async (canvas) => {
   // WebXRDefaultExperience
 
   // Use the LabPlayer
-  const { xr } = await createLabPlayer(scene, [ground]);
-  // Just a quick hack to add an action to the X button
-  xr.input.onControllerAddedObservable.add((controller) => {
-    controller.onMotionControllerInitObservable.add((motionController) => {
-      const xr_ids = motionController.getComponentIds();
-      if (motionController.handness === "left") {
-        let xButtonComponent = motionController.getComponent(xr_ids[3]); //x-positionButton
-        xButtonComponent.onButtonStateChangedObservable.add(() => {
-          if (xButtonComponent.pressed) {
-            console.log("X Button Pressed");
-          }
-        });
-      }
-    });
-  });
+  await createLabPlayer(scene, [ground]);
 
-  // Example 1: Manual creation of a gizmos on a mesh
-  const boxMat = new BABYLON.StandardMaterial("subject-mat", scene);
-  boxMat.diffuseColor = LabColors["purple"];
-  boxMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  console.log("Example 1: Free to follow");
+  const subjectMat = new BABYLON.StandardMaterial("subject-mat", scene);
+  subjectMat.diffuseColor = LabColors["purple"];
+  subjectMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
   const subject = BABYLON.MeshBuilder.CreateSphere("subject", {
     diameter: 0.25,
   });
-  subject.material = boxMat;
+  subject.material = subjectMat;
   subject.position = new BABYLON.Vector3(0, 1.0, 0);
 
   var followBehavior = new BABYLON.FollowBehavior();
-  followBehavior.defaultDistance = 1;
-  followBehavior.minimumDistance = 1;
-  followBehavior.maximumDistance = 2;
-  followBehavior.ignoreAngleClamp = true;
+  followBehavior.defaultDistance = 1.5;
+  followBehavior.minimumDistance = 1.2;
+  followBehavior.maximumDistance = 2.4;
   followBehavior.lerpTime = 1000;
   followBehavior.attach(subject);
 
@@ -76,6 +63,31 @@ const createScene = async (canvas) => {
   var sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
   sixDofDragBehavior.allowMultiPointers = true;
   subject.addBehavior(sixDofDragBehavior);
+
+  console.log("Example 2: Constrained to the bottom of the scene.");
+  const subjectMat2 = new BABYLON.StandardMaterial("subject-mat2", scene);
+  subjectMat2.diffuseColor = LabColors["green"];
+  subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const subject2 = BABYLON.MeshBuilder.CreateSphere("subject2", {
+    diameter: 0.25,
+  });
+  subject2.material = subjectMat2;
+  subject2.position = new BABYLON.Vector3(0, 1.0, 0);
+
+  var followBehavior2 = new BABYLON.FollowBehavior();
+  followBehavior2.defaultDistance = 1.2;
+  followBehavior2.minimumDistance = 1;
+  followBehavior2.maximumDistance = 2;
+  followBehavior2.ignoreCameraPitchAndRoll = true;
+  followBehavior2.pitchOffset = -35;
+  followBehavior2.lerpTime = 1000;
+  followBehavior2.attach(subject2);
+
+  // // Create behaviors to drag and scale with pointers in VR
+  var sixDofDragBehavior2 = new BABYLON.SixDofDragBehavior();
+  sixDofDragBehavior2.allowMultiPointers = true;
+  subject2.addBehavior(sixDofDragBehavior2);
 
   engine.runRenderLoop(() => {
     scene.render();
