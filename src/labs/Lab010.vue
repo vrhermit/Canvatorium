@@ -1,7 +1,10 @@
 <script setup>
 const labNotes = `
 Grabbing objects and moving them around.
-- Pointer Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2)
+- Example 1: Mesh Picking and Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2). 
+- Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this new method in Babylon JS 5.0 is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
+- Example 3: Pointer Dragging along an axis
+- Example 4: Pointer Dragging along a plane
 `;
 
 import * as BABYLON from "babylonjs";
@@ -28,7 +31,7 @@ const createScene = async (canvas) => {
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
-  scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
+  // scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
   const { toggleConsole } = createLabConsole(scene);
@@ -64,9 +67,10 @@ const createScene = async (canvas) => {
     });
   });
 
-  // TEST GRABBING
+  console.log(
+    "Example 1 (three stacked boxes) using pointer picking. This is more complext and may not be needed anymore since the new SixDofDragBehavior is now available."
+  );
   const makeGrabbable = function (model) {
-    console.log("model", model);
     Object.assign(model, {
       startInteraction(pointerInfo, controllerMesh) {
         console.log("props", this.props);
@@ -133,7 +137,7 @@ const createScene = async (canvas) => {
     depth: 0.4,
   });
   grab1.material = grabMat1;
-  grab1.position = new BABYLON.Vector3(0.3, 1, 0);
+  grab1.position = new BABYLON.Vector3(-0.6, 1, 0);
 
   const grabMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
   grabMat2.diffuseColor = LabColors["green"];
@@ -163,8 +167,9 @@ const createScene = async (canvas) => {
   makeGrabbable(grab2);
   makeGrabbable(grab3);
 
+  console.log("Example 2 (orange box) using SixDofDragBehavior ");
   const grabMat4 = new BABYLON.StandardMaterial("grab-mat4", scene);
-  grabMat4.diffuseColor = LabColors["purple"];
+  grabMat4.diffuseColor = LabColors["orange"];
   grabMat4.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const grab4 = BABYLON.MeshBuilder.CreateBox("grab4", {
     height: 0.5,
@@ -172,27 +177,72 @@ const createScene = async (canvas) => {
     depth: 0.5,
   });
   grab4.material = grabMat4;
-  grab4.position = new BABYLON.Vector3(-0.6, 1.2, 0);
+  grab4.position = new BABYLON.Vector3(0.25, 1.2, 0);
 
   var boundingBox =
     BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(grab4);
-  // boundingBox.scaleRatio = 1.5;
-
-  // // Create bounding box positionGizmo
-  // var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-  // utilLayer.utilityLayerScene.autoClearDepthAndStencil = false;
-  // var positionGizmo = new BABYLON.BoundingBoxGizmo(
-  //   BABYLON.Color3.FromHexString("#0984e3"),
-  //   utilLayer
-  // );
-  // positionGizmo.attachedMesh = boundingBox;
-  // // positionGizmo.scaleRatio = 0.5;
 
   // // Create behaviors to drag and scale with pointers in VR
   var sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
+  sixDofDragBehavior.allowMultiPointers = true;
   boundingBox.addBehavior(sixDofDragBehavior);
+  // I haven't been able to get this working
   var multiPointerScaleBehavior = new BABYLON.MultiPointerScaleBehavior();
   boundingBox.addBehavior(multiPointerScaleBehavior);
+
+  console.log("Example 3 (red box) using PointerDragBehavior along an axis");
+
+  const grabMat5 = new BABYLON.StandardMaterial("grab-mat5", scene);
+  grabMat5.diffuseColor = LabColors["red"];
+  grabMat5.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const grab5 = BABYLON.MeshBuilder.CreateBox("grab5", {
+    height: 0.5,
+    width: 0.5,
+    depth: 0.5,
+  });
+  grab5.material = grabMat5;
+  grab5.position = new BABYLON.Vector3(1, 1.2, 0);
+
+  var pointerDragBehavior = new BABYLON.PointerDragBehavior({
+    dragAxis: new BABYLON.Vector3(0, 1, 0),
+  });
+  grab5.addBehavior(pointerDragBehavior);
+
+  console.log(
+    "Example 4 (plane and box) using PointerDragBehavior along a plane/normal"
+  );
+  const planeMat = new BABYLON.StandardMaterial("plane-mat", scene);
+  planeMat.diffuseColor = LabColors["dark1"];
+  planeMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const dragPlane = BABYLON.MeshBuilder.CreatePlane(
+    "dragPlane",
+    { width: 1.5, height: 1.5 },
+    scene
+  );
+  dragPlane.position = new BABYLON.Vector3(2.5, 1.5, 0);
+  dragPlane.material = planeMat;
+
+  const grabMat6 = new BABYLON.StandardMaterial("grab-mat6", scene);
+  grabMat6.diffuseColor = LabColors["purple"];
+  grabMat6.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const grab6 = BABYLON.MeshBuilder.CreateBox("grab6", {
+    height: 0.5,
+    width: 0.5,
+    depth: 0.5,
+  });
+  grab6.material = grabMat5;
+  grab6.position = new BABYLON.Vector3(
+    dragPlane.position.x,
+    dragPlane.position.y,
+    dragPlane.position.z
+  );
+  grab6.scaling = new BABYLON.Vector3(0.2, 0.2, 0.2);
+
+  var planeDragBehavior = new BABYLON.PointerDragBehavior({
+    dragPlaneNormal: dragPlane.forward,
+  });
+
+  grab6.addBehavior(planeDragBehavior);
 
   // END WebXR --------------------------------------------------
 

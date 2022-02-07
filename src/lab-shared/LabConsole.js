@@ -42,6 +42,12 @@ export const createLabConsole = (scene) => {
   });
   grab.material = grabMaterial;
   grab.position = new BABYLON.Vector3(0, 1, 0);
+  // var boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(grab);
+  // boundingBox.ignoreChildren = true;
+  const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
+  // sixDofDragBehavior.allowMultiPointers = true;
+  grab.addBehavior(sixDofDragBehavior);
+
   const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
     height: 2.1,
     width: 3.1,
