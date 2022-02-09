@@ -1,6 +1,7 @@
 <script setup>
 const labNotes = `
 Resizable GUI Cards
+Spacebar or VR X button to cycle gizmos / examples.
 - Example 1: Scale the card while keeping the aspect ratio
 - Example 2: Scale the card while streaching the content
 - Example 3: Scale the card while streaching the content, with snapping
@@ -10,7 +11,7 @@ Resizable GUI Cards
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import "babylonjs-loaders";
-import { ref, onMounted } from "@vue/runtime-core";
+import { ref, onMounted, watch } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
@@ -30,6 +31,7 @@ const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
+  const gizMode = ref(0);
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
@@ -44,7 +46,6 @@ const createScene = async (canvas) => {
     depth: 0.2,
   });
   card.position = new BABYLON.Vector3(0, 1, 0);
-  //   card.scaling = new BABYLON.Vector3(0.8, 0.8, 0.8);
 
   const cardMaterial = new BABYLON.StandardMaterial("card-material", scene);
   cardMaterial.diffuseColor = LabColors["dark3"];
@@ -69,42 +70,40 @@ const createScene = async (canvas) => {
   );
   advancedTexture.name = "title-card-texture";
 
-  var grid = new GUI.Grid();
-  //   grid.background = "#a5b1c2";
-  advancedTexture.addControl(grid);
+  var sv = new GUI.ScrollViewer("logger-scroll");
+  sv.thickness = 48;
+  sv.color = "#3e4a5d";
+  sv.background = "#3e4a5d";
+  sv.opacity = 1;
+  sv.width = "100%";
+  sv.height = "100%";
+  sv.barSize = 20;
+  sv.barColor = "#53637b";
+  sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
-  //   grid.width = "100%";
-  //   grid.setPadding(40);
+  advancedTexture.addControl(sv);
 
-  grid.addColumnDefinition(0.5, false);
-  //   grid.addColumnDefinition(1);
-  //   grid.addColumnDefinition(1);
-  grid.addColumnDefinition(0.5, false);
-  grid.addRowDefinition(0.5);
-  grid.addRowDefinition(0.5);
+  var tb = new GUI.TextBlock("logger-text");
+  tb.text = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+  But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?
+    `;
+  tb.textWrapping = true;
 
-  var rect = new GUI.Rectangle();
-  rect.background = "#8854d0";
-  rect.thickness = 0;
-  grid.addControl(rect, 0, 0);
+  tb.width = 1;
+  tb.height = 3;
+  tb.paddingTop = "1%";
+  tb.paddingLeft = "30px";
+  tb.paddingRight = "20px";
+  tb.paddingBottom = "1%";
+  tb.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.color = "#d3d9e1";
+  tb.fontSize = "36px";
 
-  rect = new GUI.Rectangle();
-  rect.background = "#3867d6";
-  rect.thickness = 0;
-  grid.addControl(rect, 0, 1);
-
-  rect = new GUI.Rectangle();
-  rect.background = "#0fb9b1";
-  rect.thickness = 0;
-  grid.addControl(rect, 1, 0);
-
-  var text1 = new GUI.TextBlock();
-  text1.text =
-    "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?";
-  text1.color = "white";
-  text1.fontSize = 36;
-  text1.textWrapping = true;
-  grid.addControl(text1, 1, 1);
+  sv.addControl(tb);
 
   // Create utility layer the gizmos will be rendered on
   var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
@@ -141,7 +140,7 @@ const createScene = async (canvas) => {
     utilLayer
   );
   gizmo4.setEnabledRotationAxis("");
-  gizmo4.scaleBoxSize = 0.025;
+  gizmo4.scaleBoxSize = 0.05;
   gizmo4.onScaleBoxDragEndObservable.add(() => {
     console.log("start scale", advancedTexture.getSize());
 
@@ -154,8 +153,79 @@ const createScene = async (canvas) => {
   });
   gizmo4.attachedMesh = card;
 
+  gizmo1.attachedMesh = null;
+  gizmo2.attachedMesh = null;
+  gizmo3.attachedMesh = null;
+  gizmo4.attachedMesh = null;
+
   // Use the LabPlayer
-  createLabPlayer(scene, [ground]);
+  const { xr } = await createLabPlayer(scene, [ground]);
+  // Just a quick hack to add an action to the X button
+  xr.input.onControllerAddedObservable.add((controller) => {
+    controller.onMotionControllerInitObservable.add((motionController) => {
+      const xr_ids = motionController.getComponentIds();
+      if (motionController.handness === "left") {
+        let xButtonComponent = motionController.getComponent(xr_ids[3]); //x-positionButton
+        xButtonComponent.onButtonStateChangedObservable.add(() => {
+          if (xButtonComponent.pressed) {
+            console.log("X Button Pressed");
+            if (gizMode.value === 0) {
+              gizMode.value = 1;
+            } else if (gizMode.value === 1) {
+              gizMode.value = 2;
+            } else if (gizMode.value === 2) {
+              gizMode.value = 3;
+            } else {
+              gizMode.value = 0;
+            }
+            console.log("gizMode", gizMode.value);
+          }
+        });
+      }
+    });
+  });
+
+  document.onkeydown = (e) => {
+    if (e.code == "Space") {
+      if (gizMode.value === 0) {
+        gizMode.value = 1;
+      } else if (gizMode.value === 1) {
+        gizMode.value = 2;
+      } else if (gizMode.value === 2) {
+        gizMode.value = 3;
+      } else {
+        gizMode.value = 0;
+      }
+    }
+  };
+
+  watch(gizMode, (newVal) => {
+    if (newVal === 0) {
+      // Toggle gizmos for Example 1
+      gizmo1.attachedMesh = !gizmo1.attachedMesh ? card : null;
+      gizmo2.attachedMesh = null;
+      gizmo3.attachedMesh = null;
+      gizmo4.attachedMesh = null;
+    } else if (newVal === 1) {
+      // Toggle gizmos for Example 1
+      gizmo1.attachedMesh = null;
+      gizmo2.attachedMesh = !gizmo2.attachedMesh ? card : null;
+      gizmo3.attachedMesh = null;
+      gizmo4.attachedMesh = null;
+    } else if (newVal === 2) {
+      // Toggle gizmos for Example 1
+      gizmo1.attachedMesh = null;
+      gizmo2.attachedMesh = null;
+      gizmo3.attachedMesh = !gizmo3.attachedMesh ? card : null;
+      gizmo4.attachedMesh = null;
+    } else {
+      // Toggle gizmos for Example 1
+      gizmo1.attachedMesh = null;
+      gizmo2.attachedMesh = null;
+      gizmo3.attachedMesh = null;
+      gizmo4.attachedMesh = !gizmo4.attachedMesh ? card : null;
+    }
+  });
 
   engine.runRenderLoop(() => {
     scene.render();
