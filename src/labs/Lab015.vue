@@ -1,7 +1,10 @@
 <script setup>
 const labNotes = `
 Resizable GUI Cards
-
+- Example 1: Scale the card while keeping the aspect ratio
+- Example 2: Scale the card while streaching the content
+- Example 3: Scale the card while streaching the content, with snapping
+- Example 4: Attempt at scaling the card while maintaining the aspect ratio (failed, so far)
 `;
 
 import * as BABYLON from "babylonjs";
@@ -36,12 +39,12 @@ const createScene = async (canvas) => {
   const ground = addLabRoom(scene);
 
   const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
+    width: 1,
     height: 1,
-    width: 1.6,
     depth: 0.2,
   });
   card.position = new BABYLON.Vector3(0, 1, 0);
-  card.scaling = new BABYLON.Vector3(0.8, 0.8, 0.8);
+  //   card.scaling = new BABYLON.Vector3(0.8, 0.8, 0.8);
 
   const cardMaterial = new BABYLON.StandardMaterial("card-material", scene);
   cardMaterial.diffuseColor = LabColors["dark3"];
@@ -50,7 +53,10 @@ const createScene = async (canvas) => {
 
   const plane = BABYLON.MeshBuilder.CreatePlane(
     "detail-plane",
-    { height: 1, width: 1.6 },
+    {
+      width: 1,
+      height: 1,
+    },
     scene
   );
   plane.position.z = -0.11;
@@ -58,43 +64,47 @@ const createScene = async (canvas) => {
 
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
     plane,
-    1.6 * 1024,
+    1 * 1024,
     1 * 1024
   );
   advancedTexture.name = "title-card-texture";
-  //   advancedTexture.renderAtIdealSize = true;
-  //   advancedTexture.idealWidth = 1.6 * 1024;
-  //   advancedTexture.idealHeight = 1 * 1024;
-  //   advancedTexture.useSmallestIdeal = true;
 
   var grid = new GUI.Grid();
-  grid.background = "#a5b1c2";
+  //   grid.background = "#a5b1c2";
   advancedTexture.addControl(grid);
 
-  grid.width = "100%";
-  grid.setPadding(40);
+  //   grid.width = "100%";
+  //   grid.setPadding(40);
 
-  grid.addColumnDefinition(100, true);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(100, true);
+  grid.addColumnDefinition(0.5, false);
+  //   grid.addColumnDefinition(1);
+  //   grid.addColumnDefinition(1);
+  grid.addColumnDefinition(0.5, false);
   grid.addRowDefinition(0.5);
   grid.addRowDefinition(0.5);
 
   var rect = new GUI.Rectangle();
   rect.background = "#8854d0";
   rect.thickness = 0;
-  grid.addControl(rect, 0, 1);
+  grid.addControl(rect, 0, 0);
 
   rect = new GUI.Rectangle();
   rect.background = "#3867d6";
   rect.thickness = 0;
-  grid.addControl(rect, 1, 2);
+  grid.addControl(rect, 0, 1);
 
   rect = new GUI.Rectangle();
   rect.background = "#0fb9b1";
   rect.thickness = 0;
-  grid.addControl(rect, 1, 1);
+  grid.addControl(rect, 1, 0);
+
+  var text1 = new GUI.TextBlock();
+  text1.text =
+    "But I must explain to you how all this mistaken idea of denouncing pleasure and praising pain was born and I will give you a complete account of the system, and expound the actual teachings of the great explorer of the truth, the master-builder of human happiness. No one rejects, dislikes, or avoids pleasure itself, because it is pleasure, but because those who do not know how to pursue pleasure rationally encounter consequences that are extremely painful. Nor again is there anyone who loves or pursues or desires to obtain pain of itself, because it is pain, but because occasionally circumstances occur in which toil and pain can procure him some great pleasure. To take a trivial example, which of us ever undertakes laborious physical exercise, except to obtain some advantage from it? But who has any right to find fault with a man who chooses to enjoy a pleasure that has no annoying consequences, or one who avoids a pain that produces no resultant pleasure?";
+  text1.color = "white";
+  text1.fontSize = 36;
+  text1.textWrapping = true;
+  grid.addControl(text1, 1, 1);
 
   // Create utility layer the gizmos will be rendered on
   var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
@@ -133,28 +143,17 @@ const createScene = async (canvas) => {
   gizmo4.setEnabledRotationAxis("");
   gizmo4.scaleBoxSize = 0.025;
   gizmo4.onScaleBoxDragEndObservable.add(() => {
-    // console.log("scale", card.scaling);
-    console.log("at scale", advancedTexture.getSize());
-    // advancedTexture.scaleTo(
-    //   Math.round(1024 * 1.6 * card.scaling.x),
-    //   Math.round(1024 * 1 * card.scaling.y)
-    // );
+    console.log("start scale", advancedTexture.getSize());
+
     advancedTexture.scaleTo(
-      Math.round(1.6 * card.scaling.x),
-      Math.round(1 * card.scaling.y)
+      Math.round(1024 * card.scaling.x),
+      Math.round(1024 * card.scaling.y)
     );
-    console.log("at scale", advancedTexture.getSize());
-    console.log(
-      "scale to",
-      Math.round(1024 * 1.6 * card.scaling.x),
-      Math.round(1024 * 1 * card.scaling.y)
-    );
-    advancedTexture.update();
+    // Mark as dirty to force redraw - may not be needed in latest version
+    advancedTexture.markAsDirty();
   });
   gizmo4.attachedMesh = card;
 
-  //   setTimeout(() => advancedTexture.scaleTo(1024, 1024), 2000);
-  //   setTimeout(() => advancedTexture.scaleTo(512, 1024), 3000);
   // Use the LabPlayer
   createLabPlayer(scene, [ground]);
 
