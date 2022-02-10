@@ -16,6 +16,7 @@ import Lab012 from "../labs/Lab012.vue";
 // import Lab013 from "../labs/Lab013.vue";
 import Lab014 from "../labs/Lab014.vue";
 import Lab015 from "../labs/Lab015.vue";
+import Lab016 from "../labs/Lab016.vue";
 
 const routes = [
   {
@@ -181,6 +182,16 @@ const routes = [
     meta: {
       title: "Lab 015",
       subtitle: "Resizable GUI Cards",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab016",
+    name: "Lab016",
+    component: Lab016,
+    meta: {
+      title: "Lab 016",
+      subtitle: "Snapping and History",
       status: "running"
     }
   },
