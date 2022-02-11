@@ -29,6 +29,8 @@ const { undo, redo } = useRefHistory(dragX);
 let engine;
 let scene;
 
+// Adding a small change in the main branch
+
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
