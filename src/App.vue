@@ -1,11 +1,19 @@
 <template>
   <div class="flex-grid">
-    <div id="nav" class="sidebar">
-      <h1>Canvatorium</h1>
-      <p>An experimental design lab for spatial computing.</p>
-
-      <SidebarNavVue />
-    </div>
+    <aside class="sidebar" style="padding: 0.25rem">
+      <hgroup>
+        <h2>Canvatorium</h2>
+        <h3>An experimental design lab for spatial computing.</h3>
+      </hgroup>
+      <details open>
+        <summary>Active Labs</summary>
+        <SidebarNavVue showActive="true" />
+      </details>
+      <details>
+        <summary>All Labs</summary>
+        <SidebarNavVue />
+      </details>
+    </aside>
     <div class="main">
       <router-view />
     </div>
@@ -22,23 +30,10 @@ export default {
 </script>
 
 <style>
-body,
-html {
-  overflow: hidden;
-  background: #0b0d10;
-}
 canvas {
   width: 100%;
   height: calc(100vh - 10rem);
   touch-action: none;
-  /* padding: auto; */
-}
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: white;
 }
 
 .flex-grid {
@@ -55,43 +50,11 @@ canvas {
   flex: 1;
   height: 100vh;
   overflow-y: auto;
+  padding: 0.25rem;
 }
 
 .main {
   flex: 4;
-  /* padding: 1rem; */
-}
-
-.fail {
-  background: #eb3b5a;
-  padding: 2px 4px;
-  margin-left: 6px;
-  border-radius: 8px;
-  color: white;
-}
-
-#nav {
-  padding: 0px;
-}
-
-#nav a {
-  color: #d3d9e1;
-}
-
-#nav a.router-link-exact-active {
-  color: #2d98da;
-}
-
-a {
-  color: #2d98da;
-}
-
-.nav-button {
-  color: white;
-  text-decoration: none;
-  padding: 1rem;
-  display: block;
-  border-bottom: 1px solid #b4becc;
 }
 
 /* width */
@@ -112,9 +75,5 @@ a {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #53637b;
-}
-
-.babylonVRicon {
-  top: 100px;
 }
 </style>

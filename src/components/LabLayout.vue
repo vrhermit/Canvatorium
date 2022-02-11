@@ -1,7 +1,7 @@
 <template>
   <article class="lab-wrapper">
     <slot name="scene">No Scene</slot>
-    <h2>{{ this.$route?.meta?.title }} - {{ this.$route?.meta?.subtitle }}</h2>
+    <h3>{{ this.$route?.meta?.title }} - {{ this.$route?.meta?.subtitle }}</h3>
     <div v-html="unmarkedLabNotes"></div>
   </article>
 </template>
