@@ -1,7 +1,7 @@
 <script setup>
 const labNotes = `
 Resizable GUI Cards
-Spacebar or VR X button to cycle gizmos / examples.
+Press X key (keyboard) or the X button (controller) to cycle gizmos / examples.
 - Example 1: Scale the card while keeping the aspect ratio
 - Example 2: Scale the card while streaching the content
 - Example 3: Scale the card while streaching the content, with snapping
@@ -186,7 +186,7 @@ const createScene = async (canvas) => {
   });
 
   document.onkeydown = (e) => {
-    if (e.code == "Space") {
+    if (e.code == "KeyX") {
       if (gizMode.value === 0) {
         gizMode.value = 1;
       } else if (gizMode.value === 1) {

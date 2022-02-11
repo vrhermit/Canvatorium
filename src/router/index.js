@@ -21,7 +21,7 @@ import Lab016 from "../labs/Lab016.vue";
 const routes = [
   {
     path: "/",
-    name: "Home",
+    name: "Overview",
     component: Home
   },
   {
@@ -131,8 +131,8 @@ const routes = [
     component: Lab010,
     meta: {
       title: "Lab 010",
-      subtitle: "Grag Lab",
-      status: "running"
+      subtitle: "Grab Lab",
+      status: "complete"
     }
   },
   {
@@ -142,7 +142,7 @@ const routes = [
     meta: {
       title: "Lab 011",
       subtitle: "Shared Lab Player",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -152,7 +152,7 @@ const routes = [
     meta: {
       title: "Lab 012",
       subtitle: "Gizmos!",
-      status: "running"
+      status: "complete"
     }
   },
   // {
@@ -172,7 +172,7 @@ const routes = [
     meta: {
       title: "Lab 014",
       subtitle: "Follow Behaviors",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -192,16 +192,8 @@ const routes = [
     meta: {
       title: "Lab 016",
       subtitle: "Snapping and History",
-      status: "running"
+      status: "complete"
     }
-  },
-  {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
   }
 ];
 

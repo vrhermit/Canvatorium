@@ -1,9 +1,13 @@
 <template>
-  <article class="lab-wrapper">
+  <div class="lab-wrapper">
     <slot name="scene">No Scene</slot>
-    <h2>{{ this.$route?.meta?.title }} - {{ this.$route?.meta?.subtitle }}</h2>
-    <div v-html="unmarkedLabNotes"></div>
-  </article>
+    <article>
+      <h3>
+        {{ this.$route?.meta?.title }} - {{ this.$route?.meta?.subtitle }}
+      </h3>
+      <div v-html="unmarkedLabNotes"></div>
+    </article>
+  </div>
 </template>
 
 <script>
@@ -26,6 +30,13 @@ export default {
       `Welcome to ${this.$route?.meta?.title} - ${this.$route?.meta?.subtitle}`
     );
     console.log(this.labNotes);
+    document.getElementById("bjsCanvas").onwheel = function (event) {
+      event.preventDefault();
+    };
+
+    document.getElementById("bjsCanvas").onmousewheel = function (event) {
+      event.preventDefault();
+    };
   },
 };
 </script>

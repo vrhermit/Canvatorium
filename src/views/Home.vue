@@ -36,6 +36,11 @@
       Check the code for each lap for more details. The repo is
       <a href="https://github.com/vrhermit/Canvatorium">here</a>
     </p>
+    <p>
+      I have a GitHub Project
+      <a href="https://github.com/users/vrhermit/projects/3/views/4">Board</a>
+      setup that I use to track the status of each lab and idea.
+    </p>
   </div>
 </template>
 
@@ -48,12 +53,8 @@ export default {
 
 <style scoped>
 .home {
-  background: #2a323e;
   padding: 1rem;
   margin: 1rem;
   height: calc(100vh - 5rem);
-}
-a {
-  color: #3867d6;
 }
 </style>
