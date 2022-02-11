@@ -26,6 +26,13 @@ export default {
       `Welcome to ${this.$route?.meta?.title} - ${this.$route?.meta?.subtitle}`
     );
     console.log(this.labNotes);
+    document.getElementById("bjsCanvas").onwheel = function (event) {
+      event.preventDefault();
+    };
+
+    document.getElementById("bjsCanvas").onmousewheel = function (event) {
+      event.preventDefault();
+    };
   },
 };
 </script>

@@ -30,6 +30,7 @@ html {
 canvas {
   width: 100%;
   height: calc(100vh - 10rem);
+  touch-action: none;
   /* padding: auto; */
 }
 
