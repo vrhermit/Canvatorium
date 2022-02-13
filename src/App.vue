@@ -1,13 +1,15 @@
 <template>
   <div class="flex-grid">
     <aside class="sidebar" style="padding: 0.25rem">
-      <hgroup>
-        <h2>Canvatorium</h2>
-        <h3>An experimental design lab for spatial computing.</h3>
-      </hgroup>
+      <router-link to="/">
+        <div class="headings">
+          <h2>Canvatorium</h2>
+          <h3>An experimental design lab for spatial computing.</h3>
+        </div>
+      </router-link>
       <details open>
         <summary>Active Labs</summary>
-        <SidebarNavVue showActive="true" />
+        <SidebarNavVue :showActive="true" />
       </details>
       <details>
         <summary>All Labs</summary>
@@ -75,5 +77,11 @@ canvas {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #53637b;
+}
+</style>
+
+<style scoped>
+a {
+  text-decoration: none;
 }
 </style>
