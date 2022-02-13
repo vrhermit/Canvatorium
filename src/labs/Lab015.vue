@@ -3,8 +3,8 @@ const labNotes = `
 Resizable GUI Cards
 Press X key (keyboard) or the X button (controller) to cycle gizmos / examples.
 - Example 1: Scale the card while keeping the aspect ratio
-- Example 2: Scale the card while streaching the content
-- Example 3: Scale the card while streaching the content, with snapping
+- Example 2: Scale the card while streching the content
+- Example 3: Scale the card while streching the content, with snapping
 - Example 4: Attempt at scaling the card while maintaining the aspect ratio (failed, so far)
 `;
 
@@ -229,6 +229,9 @@ const createScene = async (canvas) => {
 
   engine.runRenderLoop(() => {
     scene.render();
+  });
+  window.addEventListener("resize", function () {
+    engine.resize();
   });
 };
 

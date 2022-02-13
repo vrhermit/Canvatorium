@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <article class="home">
     <p>Everything about this project is a work in progress.</p>
     <p>
       This loosely structured project is a place where I can prototype and
@@ -41,7 +41,7 @@
       <a href="https://github.com/users/vrhermit/projects/3/views/4">Board</a>
       setup that I use to track the status of each lab and idea.
     </p>
-  </div>
+  </article>
 </template>
 
 <script>
