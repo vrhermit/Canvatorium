@@ -60,6 +60,9 @@ const createScene = async (canvas) => {
   engine.runRenderLoop(() => {
     scene.render();
   });
+  window.addEventListener("resize", function () {
+    engine.resize();
+  });
 };
 
 const makeBox = (colorName, parent, scene) => {

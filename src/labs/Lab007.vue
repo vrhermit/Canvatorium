@@ -164,6 +164,9 @@ const createScene = async (canvas) => {
   engine.runRenderLoop(() => {
     scene.render();
   });
+  window.addEventListener("resize", function () {
+    engine.resize();
+  });
 };
 
 // Watch the labLog data and update the text in the GUI
