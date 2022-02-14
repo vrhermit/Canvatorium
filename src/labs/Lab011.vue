@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Shared VR Player
 - Imports the LabPlayer
 - Test scene for features of the LabPlayer

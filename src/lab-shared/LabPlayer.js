@@ -9,10 +9,10 @@ Current features
 
 // import * as BABYLON from "babylonjs";
 // import { ref, reactive, watch } from "@vue/runtime-core");
-// import { createLabConsole } from "../lab-shared/LabConsole";
+import { createLabMenu } from "../lab-shared/LabMenu";
 
 export const createLabPlayer = async (scene, teleportMeshes) => {
-  // const { toggleConsole } = createLabConsole(scene);
+  const { toggleMenu } = createLabMenu(scene);
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     floorMeshes: teleportMeshes
@@ -60,7 +60,7 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         yButtonComponent.onButtonStateChangedObservable.add(() => {
           if (yButtonComponent.pressed) {
             console.log("Y Button Pressed");
-            // toggleConsole(controller);
+            toggleMenu(controller);
           }
         });
       }
