@@ -44,7 +44,8 @@ export const createLabMenu = (scene) => {
   // var boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(grab);
   // boundingBox.ignoreChildren = true;
   const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
-  // sixDofDragBehavior.allowMultiPointers = true;
+  sixDofDragBehavior.draggableMeshes = [grab];
+
   grab.addBehavior(sixDofDragBehavior);
 
   const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
