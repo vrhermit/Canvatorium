@@ -30,9 +30,11 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   addLabLights(scene);
   const ground = addLabRoom(scene);
+  console.log(ground);
 
   // Use the LabPlayer
-  createLabPlayer(scene, [ground]);
+  const { xr } = await createLabPlayer(scene, [ground]);
+  console.log(xr);
 
   engine.runRenderLoop(() => {
     scene.render();

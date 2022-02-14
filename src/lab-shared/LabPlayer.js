@@ -9,16 +9,15 @@ Current features
 
 // import * as BABYLON from "babylonjs";
 // import { ref, reactive, watch } from "@vue/runtime-core");
-import { createLabConsole } from "../lab-shared/LabConsole";
+// import { createLabConsole } from "../lab-shared/LabConsole";
 
 export const createLabPlayer = async (scene, teleportMeshes) => {
-  const { toggleConsole } = createLabConsole(scene);
+  // const { toggleConsole } = createLabConsole(scene);
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     floorMeshes: teleportMeshes
   });
 
-  // let vrCamera;
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
     xrCamera.position.z = -2;
@@ -61,7 +60,7 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         yButtonComponent.onButtonStateChangedObservable.add(() => {
           if (yButtonComponent.pressed) {
             console.log("Y Button Pressed");
-            toggleConsole(controller);
+            // toggleConsole(controller);
           }
         });
       }
