@@ -4,33 +4,20 @@ Lots to do before this is a robust tool: https://github.com/vrhermit/Canvatorium
 */
 
 import * as BABYLON from "babylonjs";
-import { ref, reactive, watch } from "@vue/runtime-core";
+import * as GUI from "babylonjs-gui";
+
+import { ref, watch } from "@vue/runtime-core";
 import LabColors from "../lab-shared/LabColors";
+import { createLabConsole } from "../lab-shared/LabConsole";
+import createLabNotesPanel from "../lab-shared/LabNotes";
 
 export const createLabMenu = (scene) => {
-  // The data that we will display in the VR console
-  let conLogData = reactive([]);
-  let consoleIsVisible = ref(false);
+  const { toggleConsole } = createLabConsole(scene);
+  console.log(toggleConsole);
 
-  // A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
-  let scrollViewer;
+  let menuIsVisible = ref(false);
 
-  // A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
-  let loggerText;
-
-  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
-  const overrideConsole = () => {
-    // Save the original method in a private variable
-    let _privateLog = console.log;
-    // Redefine console.log method with a custom function
-    console.log = function (message) {
-      conLogData.push(message.toString());
-      _privateLog.apply(console, arguments);
-    };
-  };
-  overrideConsole();
-
-  // GUI
+  // Grab Handle
   const grabMaterial = new BABYLON.StandardMaterial("card-material", scene);
   grabMaterial.diffuseColor = LabColors["purple"];
   grabMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
@@ -41,27 +28,69 @@ export const createLabMenu = (scene) => {
   });
   grab.material = grabMaterial;
   grab.position = new BABYLON.Vector3(0, 1, 0);
-  // var boundingBox = BABYLON.BoundingBoxGizmo.MakeNotPickableAndWrapInBoundingBox(grab);
-  // boundingBox.ignoreChildren = true;
+
   const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
   sixDofDragBehavior.draggableMeshes = [grab];
-
   grab.addBehavior(sixDofDragBehavior);
 
-  const card = BABYLON.MeshBuilder.CreateBox("detail-card", {
-    height: 2.1,
-    width: 3.1,
-    depth: 0.2
-  });
-  // card.parent = grab;
-  grab.addChild(card);
-  // card.position = new BABYLON.Vector3(-1, 1, 1);
-  card.position = new BABYLON.Vector3(0, 0.6, 0);
-  card.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-  const cardMaterial = new BABYLON.StandardMaterial("card-material", scene);
+  // Card
+  const cardMaterial = new BABYLON.StandardMaterial("menu-card-material", scene);
   cardMaterial.diffuseColor = LabColors["light1"];
   cardMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const card = BABYLON.MeshBuilder.CreateBox("menu-card", {
+    width: 1,
+    height: 1,
+    depth: 0.1
+  });
   card.material = cardMaterial;
+  grab.addChild(card);
+  card.position = new BABYLON.Vector3(0, 0.6, 0);
+
+  // UI Plane
+  const plane = BABYLON.MeshBuilder.CreatePlane(
+    "menu-plane",
+    {
+      width: 1,
+      height: 1
+    },
+    scene
+  );
+  plane.position.z = -0.055;
+  plane.parent = card;
+
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(plane, 1 * 1024, 1 * 1024);
+  advancedTexture.name = "menu-texture";
+
+  var vStack = new GUI.StackPanel();
+  advancedTexture.addControl(vStack);
+
+  var hStack = new GUI.StackPanel();
+  hStack.isVertical = false;
+  hStack.height = "128px";
+
+  var buttonInfo = GUI.Button.CreateSimpleButton("buttonInfo", "Lab Info");
+  buttonInfo.width = "512px";
+  buttonInfo.height = "128px";
+  buttonInfo.paddingBottomInPixels = "12px";
+  buttonInfo.background = "#3e4a5d";
+  buttonInfo.color = "white";
+  buttonInfo.fontSize = "48px";
+  buttonInfo.left = "-256px";
+  hStack.addControl(buttonInfo);
+
+  var buttonConsole = GUI.Button.CreateSimpleButton("buttonConsole", "Console");
+  buttonConsole.width = "512px";
+  buttonConsole.height = "128px";
+  buttonConsole.paddingBottomInPixels = "12px";
+  buttonConsole.background = "#3e4a5d";
+  buttonConsole.color = "white";
+  buttonConsole.fontSize = "48px";
+  buttonConsole.left = "256px";
+  hStack.addControl(buttonConsole);
+
+  vStack.addControl(hStack);
+  vStack.addControl(createLabNotesPanel());
 
   const setConsoleTransform = (position, rotateTo, scaling) => {
     grab.position = position;
@@ -70,9 +99,9 @@ export const createLabMenu = (scene) => {
   };
 
   const toggleMenu = (xrController) => {
-    consoleIsVisible.value = !consoleIsVisible.value;
+    menuIsVisible.value = !menuIsVisible.value;
 
-    if (xrController.grip && consoleIsVisible.value) {
+    if (xrController.grip && menuIsVisible.value) {
       // Create an empty ray
       const tmpRay = new BABYLON.Ray(new BABYLON.Vector3(), new BABYLON.Vector3(), Infinity);
 
@@ -95,20 +124,10 @@ export const createLabMenu = (scene) => {
     }
   };
 
-  // Watch the labLog data and update the text in the GUI
-  // TODO: Refactor this to append only the new eleements to the text block
-  watch(conLogData, (newValue) => {
-    const logData = [...newValue];
-    if (scrollViewer && loggerText) {
-      loggerText.text = logData.join("\n");
-      loggerText.resizeToFit = true;
-      scrollViewer.verticalBar.value = 1;
-    }
-  });
-
-  watch(consoleIsVisible, (newValue) => {
+  watch(menuIsVisible, (newValue) => {
     grab.isVisible = newValue;
     card.isVisible = newValue;
+    advancedTexture.isVisible = newValue;
   });
 
   return { toggleMenu };
