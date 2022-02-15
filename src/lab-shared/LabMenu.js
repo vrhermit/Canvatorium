@@ -8,14 +8,16 @@ import * as GUI from "babylonjs-gui";
 
 import { ref, watch } from "@vue/runtime-core";
 import LabColors from "../lab-shared/LabColors";
-import { createLabConsole } from "../lab-shared/LabConsole";
+import { createLabConsolePanel } from "../lab-shared/LabConsole";
 import createLabNotesPanel from "../lab-shared/LabNotes";
 
 export const createLabMenu = (scene) => {
-  const { toggleConsole } = createLabConsole(scene);
-  console.log(toggleConsole);
-
   let menuIsVisible = ref(false);
+  let currentTabContent = ref("tab1");
+
+  const tabContent1 = createLabNotesPanel();
+  const tabContent2 = createLabConsolePanel();
+  console.log("tab content ready", tabContent1, tabContent2);
 
   // Grab Handle
   const grabMaterial = new BABYLON.StandardMaterial("card-material", scene);
@@ -77,6 +79,9 @@ export const createLabMenu = (scene) => {
   buttonInfo.color = "white";
   buttonInfo.fontSize = "48px";
   buttonInfo.left = "-256px";
+  buttonInfo.onPointerDownObservable.add(() => {
+    currentTabContent.value = "tab1";
+  });
   hStack.addControl(buttonInfo);
 
   var buttonConsole = GUI.Button.CreateSimpleButton("buttonConsole", "Console");
@@ -87,10 +92,16 @@ export const createLabMenu = (scene) => {
   buttonConsole.color = "white";
   buttonConsole.fontSize = "48px";
   buttonConsole.left = "256px";
+  buttonConsole.onPointerDownObservable.add(() => {
+    currentTabContent.value = "tab2";
+  });
   hStack.addControl(buttonConsole);
 
   vStack.addControl(hStack);
-  vStack.addControl(createLabNotesPanel());
+
+  vStack.addControl(tabContent1);
+  tabContent2.isVisible = false;
+  vStack.addControl(tabContent2);
 
   const setConsoleTransform = (position, rotateTo, scaling) => {
     grab.position = position;
@@ -124,10 +135,32 @@ export const createLabMenu = (scene) => {
     }
   };
 
+  grab.isVisible = false;
+  card.isVisible = false;
+  plane.isVisible = false;
+
+  document.onkeydown = (e) => {
+    if (e.code == "KeyY") {
+      menuIsVisible.value = !menuIsVisible.value;
+    }
+  };
+
   watch(menuIsVisible, (newValue) => {
     grab.isVisible = newValue;
     card.isVisible = newValue;
-    advancedTexture.isVisible = newValue;
+    plane.isVisible = newValue;
+  });
+
+  watch(currentTabContent, (newValue) => {
+    if (newValue === "tab1") {
+      console.log("tab1");
+      tabContent2.isVisible = false;
+      tabContent1.isVisible = true;
+    } else if (newValue === "tab2") {
+      console.log("tab2");
+      tabContent1.isVisible = false;
+      tabContent2.isVisible = true;
+    }
   });
 
   return { toggleMenu };

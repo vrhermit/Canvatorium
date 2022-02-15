@@ -4,6 +4,9 @@ labNotes.value = `
 Shared VR Player
 - Imports the LabPlayer
 - Test scene for features of the LabPlayer
+- Press the Y button on the controller to open the Lab Menu
+- Lab Info displays title, subtitle, and description
+- Lab Console displays strings from \`console.log()\`
 `;
 
 import * as BABYLON from "babylonjs";

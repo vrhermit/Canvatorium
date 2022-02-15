@@ -8,6 +8,91 @@ import * as GUI from "babylonjs-gui";
 import { ref, reactive, watch } from "@vue/runtime-core";
 import LabColors from "../lab-shared/LabColors";
 
+export const createLabConsolePanel = () => {
+  // The data that we will display in the VR console
+  let conLogData = reactive([]);
+
+  // A reference to the BJS GUI Scroll Viewer, too lazy to query this in the graph...
+  let scrollViewer;
+
+  // A reference to the BJS GUI TextBlock, too lazy to query this in the graph...
+  let loggerText;
+
+  // Adapted from https://ourcodeworld.com/articles/read/104/how-to-override-the-console-methods-in-javascript
+  const overrideConsole = () => {
+    // Save the original method in a private variable
+    let _privateLog = console.log;
+    // Redefine console.log method with a custom function
+    console.log = function (message) {
+      conLogData.push(message.toString());
+      _privateLog.apply(console, arguments);
+    };
+  };
+  overrideConsole();
+
+  var panel = new GUI.StackPanel();
+  panel.height = `${1024 - 128}px`;
+
+  var sv = new GUI.ScrollViewer("logger-scroll");
+  scrollViewer = sv;
+  sv.thickness = 12;
+  sv.color = "#3e4a5d";
+  sv.background = "#3e4a5d";
+  sv.opacity = 1;
+  sv.width = `${1024}px`;
+  sv.height = `${1024 - 196}px`;
+  sv.barSize = 20;
+  sv.barColor = "#53637b";
+  sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+  panel.addControl(sv);
+
+  var tb = new GUI.TextBlock("logger-text");
+  loggerText = tb;
+  tb.textWrapping = true;
+
+  tb.width = 1;
+  tb.height = 3;
+  tb.paddingTop = "1%";
+  tb.paddingLeft = "12px";
+  tb.paddingRight = "12px";
+  tb.paddingBottom = "1%";
+  tb.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  tb.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  tb.color = "#d3d9e1";
+  tb.fontSize = "36px";
+
+  sv.addControl(tb);
+
+  var clearButton = GUI.Button.CreateSimpleButton("clear-button", "clear");
+  clearButton.width = "128px";
+  clearButton.height = "64px";
+  clearButton.color = "white";
+  clearButton.background = "#eb3b5a";
+  clearButton.fontSize = "48px";
+  clearButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+  clearButton.onPointerClickObservable.add(() => {
+    conLogData.splice(0, conLogData.length);
+    console.log("console cleared");
+  });
+  panel.addControl(clearButton);
+
+  // Watch the labLog data and update the text in the GUI
+  // TODO: Refactor this to append only the new eleements to the text block
+  watch(conLogData, (newValue) => {
+    const logData = [...newValue];
+    if (scrollViewer && loggerText) {
+      loggerText.text = logData.join("\n");
+      loggerText.resizeToFit = true;
+      scrollViewer.verticalBar.value = 1;
+    }
+  });
+
+  return panel;
+};
+
 export const createLabConsole = (scene) => {
   // The data that we will display in the VR console
   let conLogData = reactive([]);
