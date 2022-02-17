@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Continuing from lab 3 with controller input and buttons
 - Explore the xr object with async/await
 - Print a message when the visitor enters immersive mode

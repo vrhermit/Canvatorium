@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Router Nav to Lab 006 (not working). 
 Testing cross-scene navigation with Router and Window.location.
 - I'm not sure if the issue is in Vue Router or on Babylon JS.

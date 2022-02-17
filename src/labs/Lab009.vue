@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Playing with Vue 3 composables as a way of updating BabylonJS objects
 - Created a folder called \`composables\`
 - New composable called \`TitleCard\`

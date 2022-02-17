@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Follow Behaviors
 - Purple sphere can place itself anywhere in my view
 - Green sphere is constrained to a fixed pitch of -35 degrees

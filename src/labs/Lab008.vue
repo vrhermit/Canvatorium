@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Explore the new Near Menu in Babylon JS 5.0
 - Based on the Holohraphic Menu with limited customizations
 - Using manage.controlScaling to scale the menu

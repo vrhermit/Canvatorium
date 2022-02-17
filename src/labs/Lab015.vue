@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Resizable GUI Cards
 Press X key (keyboard) or the X button (controller) to cycle gizmos / examples.
 - Example 1: Scale the card while keeping the aspect ratio

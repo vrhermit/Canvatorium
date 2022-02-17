@@ -1,8 +1,12 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Shared VR Player
 - Imports the LabPlayer
 - Test scene for features of the LabPlayer
+- Press the Y button on the controller to open the Lab Menu
+- Lab Info displays title, subtitle, and description
+- Lab Console displays strings from \`console.log()\`
 `;
 
 import * as BABYLON from "babylonjs";
@@ -30,9 +34,11 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   addLabLights(scene);
   const ground = addLabRoom(scene);
+  console.log(ground);
 
   // Use the LabPlayer
-  createLabPlayer(scene, [ground]);
+  const { xr } = await createLabPlayer(scene, [ground]);
+  console.log(xr);
 
   engine.runRenderLoop(() => {
     scene.render();
