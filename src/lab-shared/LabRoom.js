@@ -7,7 +7,7 @@ const addLabRoom = (scene) => {
   const ground = BABYLON.MeshBuilder.CreateGround("ground", { height: 20, width: 20, subdivisions: 4 }, scene);
   // ground.position.y = 10;
   ground.sideOrientation = "DOUBLESIDE";
-  const groundMaterial = new MAT.GridMaterial("groundMaterial", scene);
+  const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
   groundMaterial.majorUnitFrequency = 5;
   groundMaterial.minorUnitFrequency = 0.1;
   groundMaterial.gridRatio = 1;
