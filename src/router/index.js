@@ -17,6 +17,7 @@ import Lab012 from "../labs/Lab012.vue";
 import Lab014 from "../labs/Lab014.vue";
 import Lab015 from "../labs/Lab015.vue";
 import Lab016 from "../labs/Lab016.vue";
+import Lab017 from "../labs/Lab017.vue";
 
 const routes = [
   {
@@ -193,6 +194,16 @@ const routes = [
       title: "Lab 016",
       subtitle: "Snapping and History",
       status: "complete"
+    }
+  },
+  {
+    path: "/Lab017",
+    name: "Lab017",
+    component: Lab017,
+    meta: {
+      title: "Lab 017",
+      subtitle: "Surface Magnetism Behavior",
+      status: "running"
     }
   }
 ];
