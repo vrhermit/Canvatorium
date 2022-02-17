@@ -4,6 +4,7 @@ import * as GUI from "babylonjs-gui";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
+import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 const Lab000Wrapper = {
   engine: null,
@@ -26,12 +27,9 @@ const Lab000Wrapper = {
 
     makeCard();
 
-    // WebXRDefaultExperience
-    const xrDefault = await scene.createDefaultXRExperienceAsync({
-      floorMeshes: [ground]
-    });
-    const xrHelper = xrDefault.baseExperience;
-    console.info("webxr:", xrHelper);
+    // Use the LabPlayer
+    const { xr } = await createLabPlayer(scene, [ground]);
+    console.log(xr);
 
     engine.runRenderLoop(() => {
       scene.render();

@@ -1,6 +1,21 @@
 <template>
   <div class="home">
     <article>
+      <h3>How to</h3>
+      <ul>
+        <li>
+          Use the sidebar to select a Lab. "Active" labs are the ones I'm
+          working on.
+        </li>
+        <li>
+          Use the VR button to try the lab on a headset. Most labs are made for
+          VR amd may not make sense outside of VR.
+        </li>
+        <li>
+          Toggle the Lab Menu (Oculus Y button) to view Lab Notes and other menu
+          options.
+        </li>
+      </ul>
       <h3>A few notes</h3>
       <p>Everything about this project is a work in progress.</p>
       <p>
