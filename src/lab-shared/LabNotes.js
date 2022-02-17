@@ -28,7 +28,7 @@ const createLabNotesPanel = () => {
   sv.opacity = 1;
   sv.height = `${1024 - 128}px`;
   sv.width = `${1024}px`;
-  sv.barSize = 20;
+  sv.barSize = 30;
   sv.barColor = "#53637b";
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
@@ -67,19 +67,15 @@ const createLabNotesPanel = () => {
   notesText = notesTextBlock;
 
   notesTextBlock.text = labNotes.value;
-  notesTextBlock.textWrapping = true;
-  notesTextBlock.width = "1024px";
+  notesTextBlock.width = "96%";
   notesTextBlock.height = "2048px";
-  notesTextBlock.paddingTop = "1%";
-  notesTextBlock.paddingLeft = "30px";
-  notesTextBlock.paddingRight = "20px";
-  notesTextBlock.paddingBottom = "1%";
   notesTextBlock.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
   notesTextBlock.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   notesTextBlock.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
   notesTextBlock.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   notesTextBlock.color = "#d3d9e1";
   notesTextBlock.fontSize = "36px";
+  notesTextBlock.textWrapping = true;
 
   panel.addControl(notesTextBlock);
 
