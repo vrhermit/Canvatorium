@@ -7,6 +7,6 @@ const addLabLights = (scene) => {
   ambientLight1.intensity = 0.8;
   const ambientLight2 = new BABYLON.HemisphericLight("light-02", new BABYLON.Vector3(-5, 5, -5), scene);
   ambientLight2.intensity = 0.8;
-  scene.clearColor = LabColors.dark1;
+  scene.clearColor = LabColors["dark1"];
 };
 export default addLabLights;
