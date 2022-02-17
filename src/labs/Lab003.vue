@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Continuing from lab 2 with reactive data
 - Explore the xr object with async/await
 - Print a message when the visitor enters immersive mode

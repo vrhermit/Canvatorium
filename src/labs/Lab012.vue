@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Gizmos!
 - Example 1 creates a gizmo for a single mesh. This option takes a bit more work but offers much more control. I also found these gizmos easier to use in VR than the ones created by GizmoManager.
 - Example 2 uses GizmoManager to create a gizmo for a group of meshes.

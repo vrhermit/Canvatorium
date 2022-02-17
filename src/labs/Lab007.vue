@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Explore the idea of overriding console.log() so I can view the log in VR
 - This is just a proof-of-concept, not a full-fledged solution
 - Override console.log() and stash the message in a reactive variable
@@ -17,7 +18,7 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
-import { createLabConsole } from "../lab-shared/LabConsole";
+import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 const bjsCanvas = ref(null);
 
@@ -54,7 +55,6 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  const { toggleConsole } = createLabConsole(scene);
 
   // GUI
 
@@ -133,31 +133,9 @@ const createScene = async (canvas) => {
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 
-  // Create the default experience
-  let xr = await scene.createDefaultXRExperienceAsync({
-    floorMeshes: [ground],
-  });
-
-  // let vrCamera;
-  // Move the player when thet enter immersive mode
-  xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    xrCamera.position.z = -2;
-  });
-
-  //controller input
-  xr.input.onControllerAddedObservable.add((controller) => {
-    controller.onMotionControllerInitObservable.add((motionController) => {
-      if (motionController.handness === "left") {
-        const xr_ids = motionController.getComponentIds();
-        let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        yButtonComponent.onButtonStateChangedObservable.add(() => {
-          if (yButtonComponent.pressed) {
-            toggleConsole(controller);
-          }
-        });
-      }
-    });
-  });
+  // Use the LabPlayer
+  const { xr } = await createLabPlayer(scene, [ground]);
+  console.log(xr);
 
   // END WebXR --------------------------------------------------
 

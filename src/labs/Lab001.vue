@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 This lab uses Vue 3 script setup. It replaces the interface object by combining it with the vue component for the lab.
 I picked out some colors to use throughout the labs in the future.
 I created a box for each color and used the standard BabylonJS material.

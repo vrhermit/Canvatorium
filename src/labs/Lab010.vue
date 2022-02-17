@@ -1,5 +1,6 @@
 <script setup>
-const labNotes = `
+import { labNotes } from "../composables/LabData";
+labNotes.value = `
 Grabbing objects and moving them around.
 - Example 1: Mesh Picking and Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2). 
 - Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
@@ -15,8 +16,7 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
-import { createLabConsole } from "../lab-shared/LabConsole";
-
+import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
 const bjsCanvas = ref(null);
@@ -35,38 +35,16 @@ const createScene = async (canvas) => {
   // scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  const { toggleConsole } = createLabConsole(scene);
+  // const { toggleConsole } = createLabConsole(scene);
 
   console.log("Lab 010 - Grab Lab");
 
   // START WebXR ------------------------------------------------------------
   // WebXRDefaultExperience
 
-  // Create the default experience
-  let xr = await scene.createDefaultXRExperienceAsync({
-    floorMeshes: [ground],
-  });
-
-  // let vrCamera;
-  // Move the player when thet enter immersive mode
-  xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    xrCamera.position.z = -2;
-  });
-
-  //controller input
-  xr.input.onControllerAddedObservable.add((controller) => {
-    controller.onMotionControllerInitObservable.add((motionController) => {
-      if (motionController.handness === "left") {
-        const xr_ids = motionController.getComponentIds();
-        let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        yButtonComponent.onButtonStateChangedObservable.add(() => {
-          if (yButtonComponent.pressed) {
-            toggleConsole(controller);
-          }
-        });
-      }
-    });
-  });
+  // Use the LabPlayer
+  const { xr } = await createLabPlayer(scene, [ground]);
+  console.log(xr);
 
   console.log(
     "Example 1 (three stacked boxes) using pointer picking. This is more complext and may not be needed anymore since the new SixDofDragBehavior is now available."
