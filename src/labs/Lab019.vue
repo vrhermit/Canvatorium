@@ -1,8 +1,24 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
 labNotes.value = `
-Advanced Action Triggers
-- Drag the subject (purple box) over the card to change color while intersecting.
+Action Triggers in WebXR
+- Subject 1: Use \`ExecuteCodeAction\` to test available triggers.
+  - Working Triggers: 
+    - OnPickOutTrigger
+    - OnPickTrigger
+    - OnPickDownTrigger
+    - OnPickUpTrigger
+    - OnPickOutTrigger
+    - OnLeftPickTrigger
+    - OnPointerOverTrigger
+    - OnPointerOutTrigger
+    - OnIntersectionEnterTrigger
+    - OnIntersectionExitTrigger
+  - Non-Working Triggers:
+    - OnDoublePickTrigger
+    - OnRightPickTrigger
+    - OnCenterPickTrigger
+    - OnLongPressTrigger
 `;
 
 import * as BABYLON from "babylonjs";
@@ -35,18 +51,6 @@ const createScene = async (canvas) => {
   cardMat.diffuseColor = LabColors["dark3"];
   cardMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
-  const cardWidth = 1.5;
-  const cardHeight = 1.6;
-  const cardThickness = 0.1;
-  const card = BABYLON.MeshBuilder.CreateBox(
-    "card",
-    { width: cardWidth, height: cardHeight, depth: cardThickness },
-    scene
-  );
-  card.isPickable = false;
-  card.material = cardMat;
-  card.position = new BABYLON.Vector3(0, 1.5, 1);
-
   const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
   subjectMat1.diffuseColor = LabColors["purple"];
   subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
@@ -56,50 +60,16 @@ const createScene = async (canvas) => {
     depth: 0.4,
   });
   subject1.material = subjectMat1;
-  subject1.position = new BABYLON.Vector3(-1, 1, 0);
-  subject1.addBehavior(new BABYLON.SixDofDragBehavior());
+  subject1.position = new BABYLON.Vector3(0, 1, 0);
+  // Subject 1 Action: ExecuteCodeAction -> OnPickTrigger
+  // Run code when the trigger is activated
   subject1.actionManager = new BABYLON.ActionManager(scene);
-
-  // Example 2: OnDoublePickTrigger - failed
-  // OnDoublePickTrigger is just like double clicking a mouse. Works on a computer but not on Quest
-  const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
-  subjectMat2.diffuseColor = LabColors["red"];
-  subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
-    height: 0.4,
-    width: 0.4,
-    depth: 0.4,
-  });
-  subject2.material = subjectMat2;
-  subject2.position = new BABYLON.Vector3(0, 1, 0);
-  subject2.actionManager = new BABYLON.ActionManager(scene);
-  subject2.actionManager.registerAction(
+  subject1.actionManager.registerAction(
     new BABYLON.ExecuteCodeAction(
+      // Change this to other triggers to see different effects
       BABYLON.ActionManager.OnDoublePickTrigger,
       () => {
-        console.log("Subject 2: ExecuteCodeAction -> OnDoublePickTrigger");
-      }
-    )
-  );
-
-  // Subject 3: OnLongPressTrigger
-  // Click and hold to trigger. Works on a computer but not on Quest
-  const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
-  subjectMat3.diffuseColor = LabColors["blue"];
-  subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
-    height: 0.4,
-    width: 0.4,
-    depth: 0.4,
-  });
-  subject3.material = subjectMat3;
-  subject3.position = new BABYLON.Vector3(1, 1, 0);
-  subject3.actionManager = new BABYLON.ActionManager(scene);
-  subject3.actionManager.registerAction(
-    new BABYLON.ExecuteCodeAction(
-      BABYLON.ActionManager.OnLongPressTrigger,
-      () => {
-        console.log("Subject 3: ExecuteCodeAction -> OnLongPressTrigger");
+        console.log("Subject 1: ExecuteCodeAction -> OnDoublePickTrigger");
       }
     )
   );

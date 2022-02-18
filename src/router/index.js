@@ -224,7 +224,7 @@ const routes = [
     component: Lab019,
     meta: {
       title: "Lab 019",
-      subtitle: "Advanced Action Triggers",
+      subtitle: "Action Triggers in WebXR",
       status: "running"
     }
   }
