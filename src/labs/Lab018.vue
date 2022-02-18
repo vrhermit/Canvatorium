@@ -5,6 +5,7 @@ Intro to Actions
 - Subject 1: (purple) - Execute code when the OnPickTrigger is fired (console logs a string)
 - Subject 2: (yellow/red) Interpolate between two colors
 - Subject 3: (blue) - Change the scene from dark mode and back, running multiple actions
+- Subject 4: (orange/green) can intersect with the card, causing a color change
 `;
 
 import * as BABYLON from "babylonjs";
@@ -161,6 +162,64 @@ const createScene = async (canvas) => {
         1000
       )
     );
+
+  const cardMat = new BABYLON.StandardMaterial("card-mat", scene);
+  cardMat.diffuseColor = LabColors["dark3"];
+  cardMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const cardWidth = 1.5;
+  const cardHeight = 1.6;
+  const cardThickness = 0.1;
+  const card = BABYLON.MeshBuilder.CreateBox(
+    "card",
+    { width: cardWidth, height: cardHeight, depth: cardThickness },
+    scene
+  );
+  card.isPickable = false;
+  card.material = cardMat;
+  card.position = new BABYLON.Vector3(2, 1.5, 1);
+
+  // Subject 4: SetValueAction -> On Intersection Enter/Exit Triggers
+  // Subject 4 (orange/green) can intersect with the card, causing a color change
+  const subjectMat4 = new BABYLON.StandardMaterial("grab-mat1", scene);
+  subjectMat4.diffuseColor = LabColors["orange"];
+  subjectMat4.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const subject4 = BABYLON.MeshBuilder.CreateBox("subject4", {
+    height: 0.4,
+    width: 0.4,
+    depth: 0.4,
+  });
+  subject4.material = subjectMat4;
+  subject4.position = new BABYLON.Vector3(2, 1, 0);
+  subject4.addBehavior(new BABYLON.SixDofDragBehavior());
+  subject4.actionManager = new BABYLON.ActionManager(scene);
+
+  const turnGreen = new BABYLON.SetValueAction(
+    {
+      trigger: BABYLON.ActionManager.OnIntersectionEnterTrigger,
+      parameter: {
+        mesh: card,
+        usePreciseIntersection: true,
+      },
+    },
+    subjectMat4,
+    "diffuseColor",
+    LabColors["green"]
+  );
+  const turnOrange = new BABYLON.SetValueAction(
+    {
+      trigger: BABYLON.ActionManager.OnIntersectionExitTrigger,
+      parameter: {
+        mesh: card,
+        usePreciseIntersection: true,
+      },
+    },
+    subjectMat4,
+    "diffuseColor",
+    LabColors["orange"]
+  );
+  subject4.actionManager.registerAction(turnGreen);
+  subject4.actionManager.registerAction(turnOrange);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
