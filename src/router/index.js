@@ -20,6 +20,7 @@ import Lab016 from "../labs/Lab016.vue";
 import Lab017 from "../labs/Lab017.vue";
 import Lab018 from "../labs/Lab018.vue";
 import Lab019 from "../labs/Lab019.vue";
+import Lab020 from "../labs/Lab020.vue";
 
 const routes = [
   {
@@ -225,6 +226,16 @@ const routes = [
     meta: {
       title: "Lab 019",
       subtitle: "Action Triggers in WebXR",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab020",
+    name: "Lab020",
+    component: Lab020,
+    meta: {
+      title: "Lab 020",
+      subtitle: "Working with Assets",
       status: "running"
     }
   }
