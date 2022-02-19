@@ -95,6 +95,21 @@ const createScene = async (canvas) => {
     ecTexture.update();
   };
 
+  // BABYLON.SceneLoader.Append(
+  //   "./assets/",
+  //   "vrh-sandbox-001.glb",
+  //   scene,
+  //   function (newScene) {
+  //     // do something with the scene
+  //     console.log("model loaded", newScene);
+  //     let node;
+  //     for (node of scene.rootNodes) {
+  //       console.log(node);
+  //       node.scaling = new BABYLON.Vector3(10, 10, 10);
+  //     }
+  //   }
+  // );
+
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
   console.log(xr);
