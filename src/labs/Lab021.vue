@@ -34,10 +34,15 @@ const createScene = async (canvas) => {
 
   addLabLights(scene);
   const ground = addLabRoom(scene);
-  console.log(ground);
 
   const projects = tdprojects;
-  createProjectCard(projects[0]);
+  let project;
+  let startY = 2;
+  for (project of projects) {
+    const newProject = createProjectCard(project);
+    newProject.position = new BABYLON.Vector3(0, startY, 0);
+    startY -= 0.3;
+  }
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
@@ -130,6 +135,7 @@ const createProjectCard = (project) => {
   plane.material = mat;
 
   projectCard.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  projectCard.addBehavior(new BABYLON.SixDofDragBehavior());
   return projectCard;
 };
 
