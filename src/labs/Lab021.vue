@@ -2,7 +2,10 @@
 import { labNotes } from "../composables/LabData";
 labNotes.value = `
 ToDoist Project Object
+NOTE: This needs a lot of work. For now, I'm just doing the bare minimum to get project data loaded in a scene.
 - Use sample data to build 3D objects that represent tasks Project from ToDoist
+- Create a project card using the project data
+- Loop over sample data and make a card for each one. Layout is static, but cards are grabbable.
 `;
 
 import * as BABYLON from "babylonjs";
