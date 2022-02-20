@@ -15,12 +15,15 @@ import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
+import tdprojects from "../data/td-projects.json";
+import tdcolors from "../data/td-colors.json";
 const bjsCanvas = ref(null);
 
 let engine;
 let scene;
 
 const createScene = async (canvas) => {
+  console.log("sample data:", tdprojects, tdcolors);
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
@@ -33,17 +36,8 @@ const createScene = async (canvas) => {
   const ground = addLabRoom(scene);
   console.log(ground);
 
-  const sampleProject = {
-    projectName: "Project 1",
-    projectColor: "#b8256f",
-  };
-  createProjectCard(sampleProject);
-
-  const sampleProject2 = {
-    projectName: "Project 2",
-    projectColor: "#b8256f",
-  };
-  createProjectCard(sampleProject2).position = new BABYLON.Vector3(0, 0.7, 0);
+  const projects = tdprojects;
+  createProjectCard(projects[0]);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
@@ -58,11 +52,15 @@ const createScene = async (canvas) => {
 };
 
 const createProjectCard = (project) => {
-  const { projectName, projectColor } = project;
-  const projectCard = new BABYLON.MeshBuilder.CreateBox("projectCard", {
-    height: 0.5,
-    width: 2,
-    depth: 0.2,
+  const { id, name, color } = project;
+  const cardWidth = 2;
+  const cardHeight = 0.5;
+
+  // Card
+  const projectCard = new BABYLON.MeshBuilder.CreateBox(`project-card-${id}`, {
+    width: cardWidth,
+    height: cardHeight,
+    depth: 0.1,
   });
   projectCard.position = new BABYLON.Vector3(0, 1, 0);
 
@@ -70,49 +68,51 @@ const createProjectCard = (project) => {
     "projectCardMaterial",
     scene
   );
-  projectCardMaterial.diffuseColor = new BABYLON.Color3(0.5, 0.5, 0.5);
+  projectCardMaterial.diffuseColor = new BABYLON.Color3.FromHexString(
+    "#a5b1c2"
+  );
   projectCardMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   projectCard.material = projectCardMaterial;
 
-  const projectSphere = BABYLON.MeshBuilder.CreateSphere("projectSphere", {
-    diameter: 0.4,
-  });
+  // Card Content - Color Sphere
+  const projectSphere = BABYLON.MeshBuilder.CreateSphere(
+    `project-sphere-${id}`,
+    {
+      diameter: 0.4,
+    }
+  );
   const projectSphereMaterial = new BABYLON.StandardMaterial(
-    "projectSphereMaterial",
+    `project-sphere-mat-${id}`,
     scene
   );
   projectSphereMaterial.diffuseColor = new BABYLON.Color3.FromHexString(
-    projectColor
+    tdcolors[color]
   );
   projectSphereMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   projectSphere.material = projectSphereMaterial;
   projectSphere.parent = projectCard;
-  projectSphere.position = new BABYLON.Vector3(-0.75, 0, -0.1);
+  projectSphere.position = new BABYLON.Vector3(-0.75, 0, -0.056);
   projectSphere.scaling = new BABYLON.Vector3(1, 1, 0.5);
 
-  //Set width an height for plane
-  var planeWidth = 2;
-  var planeHeight = 0.5;
-
-  //Create plane
-  var plane = BABYLON.MeshBuilder.CreatePlane(
-    "plane",
-    { width: planeWidth, height: planeHeight },
+  // Card Content - Dynamic Texture
+  const plane = BABYLON.MeshBuilder.CreatePlane(
+    `plane-${id}`,
+    { width: cardWidth, height: cardHeight },
     scene
   );
   plane.parent = projectCard;
-  plane.position = new BABYLON.Vector3(0, 0, -0.11);
+  plane.position = new BABYLON.Vector3(0, 0, -0.056);
   //Set width and height for dynamic texture using same multiplier
-  const resolution = 512;
-  const DTWidth = planeWidth * resolution;
-  const DTHeight = planeHeight * resolution;
+  const dtResolution = 512;
+  const dtWidth = cardWidth * dtResolution;
+  const dtHeight = cardHeight * dtResolution;
 
   //Set text
 
   //Create dynamic texture
   var dynamicTexture = new BABYLON.DynamicTexture(
-    "DynamicTexture",
-    { width: DTWidth, height: DTHeight },
+    `project-dt-${id}`,
+    { width: dtWidth, height: dtHeight },
     scene
   );
 
@@ -120,15 +120,7 @@ const createProjectCard = (project) => {
   var font = "72px Tahoma";
 
   //Draw text
-  dynamicTexture.drawText(
-    projectName,
-    256,
-    null,
-    font,
-    "#000000",
-    "#ffffff",
-    true
-  );
+  dynamicTexture.drawText(name, 256, null, font, "#2a323e", "#d3d9e1", true);
 
   //create material
   var mat = new BABYLON.StandardMaterial("mat", scene);
