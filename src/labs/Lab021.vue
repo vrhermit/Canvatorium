@@ -38,14 +38,18 @@ const createScene = async (canvas) => {
   addLabLights(scene);
   const ground = addLabRoom(scene);
 
-  const projects = tdprojects;
-  let project;
-  let startY = 2;
-  for (project of projects) {
-    const newProject = createProjectCard(project);
-    newProject.position = new BABYLON.Vector3(0, startY, 0);
-    startY -= 0.3;
-  }
+  // const projects = tdprojects;
+  // let project;
+  // let startY = 2;
+  // for (project of projects) {
+  //   const newProject = createProjectCard(project);
+  //   newProject.position = new BABYLON.Vector3(0, startY, 0);
+  //   startY -= 0.3;
+  // }
+
+  // babylon js random positions
+
+  parseProjects(tdprojects);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
@@ -59,6 +63,15 @@ const createScene = async (canvas) => {
   });
 };
 
+const parseProjects = (projects) => {
+  let project;
+  let startY = 2;
+  for (project of projects) {
+    const newProject = createProjectCard(project);
+    newProject.position = new BABYLON.Vector3(0, startY, 1);
+    startY -= 0.3;
+  }
+};
 const createProjectCard = (project) => {
   const { id, name, color } = project;
   const cardWidth = 2;
@@ -100,7 +113,7 @@ const createProjectCard = (project) => {
   projectSphere.material = projectSphereMaterial;
   projectSphere.parent = projectCard;
   projectSphere.position = new BABYLON.Vector3(-0.75, 0, -0.056);
-  projectSphere.scaling = new BABYLON.Vector3(1, 1, 0.5);
+  projectSphere.scaling = new BABYLON.Vector3(0.8, 0.8, 0.5);
 
   // Card Content - Dynamic Texture
   const plane = BABYLON.MeshBuilder.CreatePlane(
@@ -137,7 +150,7 @@ const createProjectCard = (project) => {
   //apply material
   plane.material = mat;
 
-  projectCard.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
+  projectCard.scaling = new BABYLON.Vector3(0.4, 0.4, 0.4);
   projectCard.addBehavior(new BABYLON.SixDofDragBehavior());
   return projectCard;
 };
