@@ -44,25 +44,25 @@
     "url": "https://todoist.com/showProject?id=2285539058"
   },
   {
-    "id": 2285537972,
-    "order": 4,
-    "color": 33,
-    "name": "Personal",
+    "id": 2285797146,
+    "order": 5,
+    "color": 46,
+    "name": "Canvatorium",
     "commentCount": 0,
-    "shared": false,
+    "shared": true,
     "favorite": false,
-    "syncId": 0,
-    "url": "https://todoist.com/showProject?id=2285537972"
+    "syncId": 9385368,
+    "url": "https://todoist.com/showProject?id=2285797146&sync_id=9385368"
   },
   {
-    "id": 2285537980,
-    "order": 5,
-    "color": 32,
-    "name": "Work",
+    "id": 2285797183,
+    "order": 6,
+    "color": 46,
+    "name": "Extended Collection",
     "commentCount": 0,
-    "shared": false,
+    "shared": true,
     "favorite": false,
-    "syncId": 0,
-    "url": "https://todoist.com/showProject?id=2285537980"
+    "syncId": 9385383,
+    "url": "https://todoist.com/showProject?id=2285797183&sync_id=9385383"
   }
 ]

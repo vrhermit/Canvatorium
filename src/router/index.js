@@ -22,6 +22,7 @@ import Lab018 from "../labs/Lab018.vue";
 import Lab019 from "../labs/Lab019.vue";
 import Lab020 from "../labs/Lab020.vue";
 import Lab021 from "../labs/Lab021.vue";
+import Lab022 from "../labs/Lab022.vue";
 
 const routes = [
   {
@@ -247,6 +248,16 @@ const routes = [
     meta: {
       title: "Lab 021",
       subtitle: "ToDoist Project Object",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab022",
+    name: "Lab022",
+    component: Lab022,
+    meta: {
+      title: "Lab 022",
+      subtitle: "ToDoist Project List (2D)",
       status: "running"
     }
   }
