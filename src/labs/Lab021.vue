@@ -2,10 +2,13 @@
 import { labNotes } from "../composables/LabData";
 labNotes.value = `
 ToDoist Project Object
-NOTE: This needs a lot of work. For now, I'm just doing the bare minimum to get project data loaded in a scene.
+The idea behind this lab is to create a reusable todoist project object for a project-picker scene. I could use Advanced Dynamic Texture for the GUI on these cards, but those are pretty heave objects and I can only add around 12 of them to a scene at any given time before running into performance issues.
 - Use sample data to build 3D objects that represent tasks Project from ToDoist
-- Create a project card using the project data
+- Create a project card with view-only UI based on Dynamic Texture instead of Advanced Dynamic Texture
 - Loop over sample data and make a card for each one. Layout is static, but cards are grabbable.
+
+Follow up:
+I've tested this scene with 20-60 cards. ~40 seems to be the max I can handle without impacting performance.
 `;
 
 import * as BABYLON from "babylonjs";
@@ -37,17 +40,6 @@ const createScene = async (canvas) => {
 
   addLabLights(scene);
   const ground = addLabRoom(scene);
-
-  // const projects = tdprojects;
-  // let project;
-  // let startY = 2;
-  // for (project of projects) {
-  //   const newProject = createProjectCard(project);
-  //   newProject.position = new BABYLON.Vector3(0, startY, 0);
-  //   startY -= 0.3;
-  // }
-
-  // babylon js random positions
 
   parseProjects(tdprojects);
 
