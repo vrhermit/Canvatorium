@@ -188,7 +188,7 @@ const routes = [
     meta: {
       title: "Lab 015",
       subtitle: "Resizable GUI Cards",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -208,7 +208,7 @@ const routes = [
     meta: {
       title: "Lab 017",
       subtitle: "Surface Magnetism Behavior",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -218,7 +218,7 @@ const routes = [
     meta: {
       title: "Lab 018",
       subtitle: "Intro to Actions",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -228,7 +228,7 @@ const routes = [
     meta: {
       title: "Lab 019",
       subtitle: "Action Triggers in WebXR",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -238,7 +238,7 @@ const routes = [
     meta: {
       title: "Lab 020",
       subtitle: "Working with Assets",
-      status: "running"
+      status: "complete"
     }
   },
   {
