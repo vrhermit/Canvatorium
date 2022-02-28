@@ -1,11 +1,11 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
 labNotes.value = `
-Intro to Actions
-- Subject 1: (purple) - Execute code when the OnPickTrigger is fired (console logs a string)
-- Subject 2: (yellow/red) Interpolate between two colors
-- Subject 3: (blue) - Change the scene from dark mode and back, running multiple actions
-- Subject 4: (orange/green) can intersect with the card, causing a color change
+Save Object Transform
+- Subject 1: (purple) - Move the object around the scene
+- When letting go of subject 1, save the object's transform to local storage
+- Uses '/useStorage'/ from VueUse
+- Click the the red cube to reset the object's transform and the local storage value
 `;
 
 import * as BABYLON from "babylonjs";
@@ -23,15 +23,17 @@ const bjsCanvas = ref(null);
 
 let engine;
 let scene;
+
+// Initial object to use with local storage
 const saveObject = {
-  name: "",
+  name: "", // unused
   position: { x: 0, y: 0, z: 0 },
   rotationQuaternion: { x: 0, y: 0, z: 0, w: 1 },
   scale: { x: 1, y: 1, z: 1 },
 };
 let subject1data = useStorage("lab023", { ...saveObject });
-
 console.log("subject1data", subject1data);
+
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
@@ -42,6 +44,7 @@ const createScene = async (canvas) => {
   addLabLights(scene);
   const ground = addLabRoom(scene);
 
+  // Subject 1: (purple) - Move the object around the scene
   const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
   subjectMat1.diffuseColor = LabColors["purple"];
   subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
@@ -52,6 +55,8 @@ const createScene = async (canvas) => {
     depth: 0.4,
   });
   subject1.material = subjectMat1;
+
+  // Set initial transform using local storage or default data
   subject1.position = new BABYLON.Vector3(
     subject1data.value.position.x,
     subject1data.value.position.y,
@@ -72,14 +77,12 @@ const createScene = async (canvas) => {
   );
 
   const moveSubject1 = new BABYLON.SixDofDragBehavior();
-  // moveSubject1.rotateDraggedObject = false;
   moveSubject1.rotateWithMotionController = true;
-  // moveSubject1.rotateAroundYOnly = true;
 
+  // On drag end, save the transform to local storage using useStorage
   moveSubject1.onDragEndObservable.add(() => {
-    // These values are all set to 0 after the drag ends
     console.log(
-      "rotation",
+      "rotationQuaternion values",
       subject1.rotationQuaternion.x,
       subject1.rotationQuaternion.y,
       subject1.rotationQuaternion.z,
@@ -90,17 +93,18 @@ const createScene = async (canvas) => {
     subject1data.value.position.y = subject1.position.y;
     subject1data.value.position.z = subject1.position.z;
 
-    subject1data.value.rotationQuaternion.x = subject1.rotationQuaternion.x;
-    subject1data.value.rotationQuaternion.y = subject1.rotationQuaternion.y;
-    subject1data.value.rotationQuaternion.z = subject1.rotationQuaternion.z;
-    subject1data.value.rotationQuaternion.w = subject1.rotationQuaternion.w;
-
     // Example of how to save the data as a vector 3 instead of a quaternion
     // const saveRot = subject1.rotationQuaternion.toEulerAngles();
     // console.log("rotation", saveRot.x, saveRot.y, saveRot.z);
     // subject1data.value.rotation.x = saveRot.x;
     // subject1data.value.rotation.y = saveRot.y;
     // subject1data.value.rotation.z = saveRot.z;
+
+    // Switching to quaternion values because the SixDofDragBehavior uses them instead of Euler angles
+    subject1data.value.rotationQuaternion.x = subject1.rotationQuaternion.x;
+    subject1data.value.rotationQuaternion.y = subject1.rotationQuaternion.y;
+    subject1data.value.rotationQuaternion.z = subject1.rotationQuaternion.z;
+    subject1data.value.rotationQuaternion.w = subject1.rotationQuaternion.w;
 
     subject1data.value.scale.x = subject1.scaling.x;
     subject1data.value.scale.y = subject1.scaling.y;
@@ -132,9 +136,9 @@ const createScene = async (canvas) => {
         subject1data.value.position.z
       );
       subject1.rotationQuaternion = new BABYLON.Quaternion(
-        subject1data.value.rotation.x,
-        subject1data.value.rotation.y,
-        subject1data.value.rotation.z
+        subject1data.value.rotationQuaternion.x,
+        subject1data.value.rotationQuaternion.y,
+        subject1data.value.rotationQuaternion.z
       );
       subject1.scaling = new BABYLON.Vector3(
         subject1data.value.scale.x,
