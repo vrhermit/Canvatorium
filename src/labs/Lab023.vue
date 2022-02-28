@@ -26,7 +26,7 @@ let scene;
 const saveObject = {
   name: "",
   position: { x: 0, y: 0, z: 0 },
-  rotation: { x: 0, y: 0, z: 0 },
+  rotationQuaternion: { x: 0, y: 0, z: 0, w: 1 },
   scale: { x: 1, y: 1, z: 1 },
 };
 let subject1data = useStorage("lab023", { ...saveObject });
@@ -58,10 +58,11 @@ const createScene = async (canvas) => {
     subject1data.value.position.z
   );
 
-  subject1.rotation = new BABYLON.Vector3(
-    subject1data.value.rotation.x,
-    subject1data.value.rotation.y,
-    subject1data.value.rotation.z
+  subject1.rotationQuaternion = new BABYLON.Quaternion(
+    subject1data.value.rotationQuaternion.x,
+    subject1data.value.rotationQuaternion.y,
+    subject1data.value.rotationQuaternion.z,
+    subject1data.value.rotationQuaternion.w
   );
 
   subject1.scaling = new BABYLON.Vector3(
@@ -79,26 +80,27 @@ const createScene = async (canvas) => {
     // These values are all set to 0 after the drag ends
     console.log(
       "rotation",
-      subject1.rotation.x,
-      subject1.rotation.y,
-      subject1.rotation.z
-    );
-    console.log(
-      "rotation",
       subject1.rotationQuaternion.x,
       subject1.rotationQuaternion.y,
-      subject1.rotationQuaternion.z
+      subject1.rotationQuaternion.z,
+      subject1.rotationQuaternion.w
     );
 
     subject1data.value.position.x = subject1.position.x;
     subject1data.value.position.y = subject1.position.y;
     subject1data.value.position.z = subject1.position.z;
 
-    const saveRot = subject1.rotationQuaternion.toEulerAngles();
-    console.log("rotation", saveRot.x, saveRot.y, saveRot.z);
-    subject1data.value.rotation.x = saveRot.x;
-    subject1data.value.rotation.y = saveRot.y;
-    subject1data.value.rotation.z = saveRot.z;
+    subject1data.value.rotationQuaternion.x = subject1.rotationQuaternion.x;
+    subject1data.value.rotationQuaternion.y = subject1.rotationQuaternion.y;
+    subject1data.value.rotationQuaternion.z = subject1.rotationQuaternion.z;
+    subject1data.value.rotationQuaternion.w = subject1.rotationQuaternion.w;
+
+    // Example of how to save the data as a vector 3 instead of a quaternion
+    // const saveRot = subject1.rotationQuaternion.toEulerAngles();
+    // console.log("rotation", saveRot.x, saveRot.y, saveRot.z);
+    // subject1data.value.rotation.x = saveRot.x;
+    // subject1data.value.rotation.y = saveRot.y;
+    // subject1data.value.rotation.z = saveRot.z;
 
     subject1data.value.scale.x = subject1.scaling.x;
     subject1data.value.scale.y = subject1.scaling.y;
