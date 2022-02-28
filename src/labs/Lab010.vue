@@ -264,6 +264,37 @@ const createScene = async (canvas) => {
 
   grab6.addBehavior(planeDragBehavior);
 
+  // Used to check to see if Grab One demo was updating the rotation of grab1. Working on Lab 023, I ran into some issues where rotation was not updating.
+  // const saveMat = new BABYLON.StandardMaterial("grab-mat1", scene);
+  // saveMat.diffuseColor = LabColors["green"];
+  // saveMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  // const save = BABYLON.MeshBuilder.CreateBox("reset", {
+  //   height: 0.4,
+  //   width: 0.4,
+  //   depth: 0.4,
+  // });
+  // save.material = saveMat;
+  // save.position = new BABYLON.Vector3(-1.4, 1, 0);
+
+  // save.actionManager = new BABYLON.ActionManager(scene);
+  // save.actionManager.registerAction(
+  //   new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, () => {
+  //     console.log("saving data");
+  //     console.log(
+  //       "rotation",
+  //       grab1.rotation.x,
+  //       grab1.rotation.y,
+  //       grab1.rotation.z
+  //     );
+  //     console.log(
+  //       "rotation",
+  //       grab1.rotationQuaternion.x,
+  //       grab1.rotationQuaternion.y,
+  //       grab1.rotationQuaternion.z
+  //     );
+  //   })
+  // );
+
   // END WebXR --------------------------------------------------
 
   engine.runRenderLoop(() => {

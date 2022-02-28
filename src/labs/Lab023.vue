@@ -57,11 +57,13 @@ const createScene = async (canvas) => {
     subject1data.value.position.y,
     subject1data.value.position.z
   );
-  subject1.rotationQuaternion = new BABYLON.Quaternion(
+
+  subject1.rotation = new BABYLON.Vector3(
     subject1data.value.rotation.x,
     subject1data.value.rotation.y,
     subject1data.value.rotation.z
   );
+
   subject1.scaling = new BABYLON.Vector3(
     subject1data.value.scale.x,
     subject1data.value.scale.y,
@@ -69,21 +71,34 @@ const createScene = async (canvas) => {
   );
 
   const moveSubject1 = new BABYLON.SixDofDragBehavior();
-  moveSubject1.rotateDraggedObject = true;
-  moveSubject1.rotateAroundYOnly = true;
+  // moveSubject1.rotateDraggedObject = false;
+  moveSubject1.rotateWithMotionController = true;
+  // moveSubject1.rotateAroundYOnly = true;
 
   moveSubject1.onDragEndObservable.add(() => {
-    console.log("rotation", subject1.rotation);
-    console.log("rotation", subject1.rotationQuaternion);
-    console.log("scaling", subject1.scaling);
+    // These values are all set to 0 after the drag ends
+    console.log(
+      "rotation",
+      subject1.rotation.x,
+      subject1.rotation.y,
+      subject1.rotation.z
+    );
+    console.log(
+      "rotation",
+      subject1.rotationQuaternion.x,
+      subject1.rotationQuaternion.y,
+      subject1.rotationQuaternion.z
+    );
 
     subject1data.value.position.x = subject1.position.x;
     subject1data.value.position.y = subject1.position.y;
     subject1data.value.position.z = subject1.position.z;
 
-    subject1data.value.rotation.x = subject1.rotationQuaternion.x;
-    subject1data.value.rotation.y = subject1.rotationQuaternion.y;
-    subject1data.value.rotation.z = subject1.rotationQuaternion.z;
+    const saveRot = subject1.rotationQuaternion.toEulerAngles();
+    console.log("rotation", saveRot.x, saveRot.y, saveRot.z);
+    subject1data.value.rotation.x = saveRot.x;
+    subject1data.value.rotation.y = saveRot.y;
+    subject1data.value.rotation.z = saveRot.z;
 
     subject1data.value.scale.x = subject1.scaling.x;
     subject1data.value.scale.y = subject1.scaling.y;
@@ -102,8 +117,8 @@ const createScene = async (canvas) => {
   reset.material = resetMat;
   reset.position = new BABYLON.Vector3(-1, 1, 0);
 
-  // Subject 1 Action: ExecuteCodeAction -> OnPickTrigger
-  // Run code when the trigger is activated
+  // Reset the data saved in local storage and reset the object.
+  // For some reason, this only works once. Then I need to refresh the page to use it again.
   reset.actionManager = new BABYLON.ActionManager(scene);
   reset.actionManager.registerAction(
     new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, () => {
@@ -126,28 +141,6 @@ const createScene = async (canvas) => {
       );
     })
   );
-
-  //   const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
-  //   subjectMat2.diffuseColor = LabColors["green"];
-  //   subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  //   const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
-  //     height: 0.4,
-  //     width: 0.4,
-  //     depth: 0.4,
-  //   });
-  //   subject2.material = subjectMat2;
-  //   subject2.position = new BABYLON.Vector3(0, 1, 0);
-
-  //   const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
-  //   subjectMat3.diffuseColor = LabColors["blue"];
-  //   subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  //   const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
-  //     height: 0.4,
-  //     width: 0.4,
-  //     depth: 0.4,
-  //   });
-  //   subject3.material = subjectMat3;
-  //   subject3.position = new BABYLON.Vector3(1, 1, 0);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
