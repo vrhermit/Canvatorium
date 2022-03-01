@@ -15,13 +15,23 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
   const { toggleMenu } = createLabMenu(scene);
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
-    floorMeshes: teleportMeshes
+    floorMeshes: teleportMeshes,
+    pointerSelectionOptions: {
+      enablePointerSelectionOnAllControllers: true
+    }
   });
 
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
     xrCamera.position.z = -2;
   });
+
+  // const featuresManager = xr.featuresManager;
+  // featuresManager.enableFeature(BABYLON.WebXRFeatureName.POINTER_SELECTION, "stable", {
+  //   enablePointerSelectionOnAllControllers: true
+  // });
+
+  console.log("xrdir", xr);
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {

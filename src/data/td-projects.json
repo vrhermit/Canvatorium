@@ -1,0 +1,68 @@
+[
+  {
+    "id": 2285537901,
+    "color": 48,
+    "name": "Inbox",
+    "commentCount": 0,
+    "shared": false,
+    "favorite": false,
+    "syncId": 0,
+    "inboxProject": true,
+    "url": "https://todoist.com/showProject?id=2285537901"
+  },
+  {
+    "id": 2285537936,
+    "order": 1,
+    "color": 42,
+    "name": "Chambers",
+    "commentCount": 0,
+    "shared": false,
+    "favorite": false,
+    "syncId": 0,
+    "url": "https://todoist.com/showProject?id=2285537936"
+  },
+  {
+    "id": 2285537965,
+    "order": 2,
+    "color": 38,
+    "name": "ToDoist API Features",
+    "commentCount": 0,
+    "shared": false,
+    "favorite": false,
+    "syncId": 0,
+    "url": "https://todoist.com/showProject?id=2285537965"
+  },
+  {
+    "id": 2285539058,
+    "order": 3,
+    "color": 41,
+    "name": "Scene Features",
+    "commentCount": 0,
+    "shared": false,
+    "favorite": false,
+    "syncId": 0,
+    "url": "https://todoist.com/showProject?id=2285539058"
+  },
+  {
+    "id": 2285797146,
+    "order": 5,
+    "color": 46,
+    "name": "Canvatorium",
+    "commentCount": 0,
+    "shared": true,
+    "favorite": false,
+    "syncId": 9385368,
+    "url": "https://todoist.com/showProject?id=2285797146&sync_id=9385368"
+  },
+  {
+    "id": 2285797183,
+    "order": 6,
+    "color": 46,
+    "name": "Extended Collection",
+    "commentCount": 0,
+    "shared": true,
+    "favorite": false,
+    "syncId": 9385383,
+    "url": "https://todoist.com/showProject?id=2285797183&sync_id=9385383"
+  }
+]

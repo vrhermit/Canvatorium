@@ -20,6 +20,10 @@ import Lab016 from "../labs/Lab016.vue";
 import Lab017 from "../labs/Lab017.vue";
 import Lab018 from "../labs/Lab018.vue";
 import Lab019 from "../labs/Lab019.vue";
+import Lab020 from "../labs/Lab020.vue";
+import Lab021 from "../labs/Lab021.vue";
+import Lab022 from "../labs/Lab022.vue";
+import Lab023 from "../labs/Lab023.vue";
 
 const routes = [
   {
@@ -185,7 +189,7 @@ const routes = [
     meta: {
       title: "Lab 015",
       subtitle: "Resizable GUI Cards",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -205,7 +209,7 @@ const routes = [
     meta: {
       title: "Lab 017",
       subtitle: "Surface Magnetism Behavior",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -215,7 +219,7 @@ const routes = [
     meta: {
       title: "Lab 018",
       subtitle: "Intro to Actions",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -225,6 +229,46 @@ const routes = [
     meta: {
       title: "Lab 019",
       subtitle: "Action Triggers in WebXR",
+      status: "complete"
+    }
+  },
+  {
+    path: "/Lab020",
+    name: "Lab020",
+    component: Lab020,
+    meta: {
+      title: "Lab 020",
+      subtitle: "Working with Assets",
+      status: "complete"
+    }
+  },
+  {
+    path: "/Lab021",
+    name: "Lab021",
+    component: Lab021,
+    meta: {
+      title: "Lab 021",
+      subtitle: "ToDoist Project Object",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab022",
+    name: "Lab022",
+    component: Lab022,
+    meta: {
+      title: "Lab 022",
+      subtitle: "ToDoist Project List (2D)",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab023",
+    name: "Lab023",
+    component: Lab023,
+    meta: {
+      title: "Lab 023",
+      subtitle: "Save Object Transform",
       status: "running"
     }
   }
