@@ -1,13 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Resizable GUI Cards
-Press X key (keyboard) or the X button (controller) to cycle gizmos / examples.
-- Example 1: Scale the card while keeping the aspect ratio
-- Example 2: Scale the card while streching the content
-- Example 3: Scale the card while streching the content, with snapping
-- Example 4: Attempt at scaling the card while maintaining the aspect ratio (failed, so far)
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -23,6 +15,14 @@ import LabColors from "../lab-shared/LabColors";
 // Import the LabPlayer
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
+labNotes.value = `
+Resizable GUI Cards
+Press X key (keyboard) or the X button (controller) to cycle gizmos / examples.
+- Example 1: Scale the card while keeping the aspect ratio
+- Example 2: Scale the card while streching the content
+- Example 3: Scale the card while streching the content, with snapping
+- Example 4: Attempt at scaling the card while maintaining the aspect ratio (failed, so far)
+`;
 const bjsCanvas = ref(null);
 
 let engine;

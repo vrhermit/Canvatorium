@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Surface Magnetism Behavior
-- The subject (purple box) can grapped and moved.
-- Dropping it over the card will snap it to the card using Surface Magnetism.
-- The subject will follow the pointer around the surface of the card.
-- Toggle the follow behavior with the X button on the controller.
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -21,6 +14,13 @@ import LabColors from "../lab-shared/LabColors";
 // Import the LabPlayer
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
+labNotes.value = `
+Surface Magnetism Behavior
+- The subject (purple box) can grapped and moved.
+- Dropping it over the card will snap it to the card using Surface Magnetism.
+- The subject will follow the pointer around the surface of the card.
+- Toggle the follow behavior with the X button on the controller.
+`;
 const bjsCanvas = ref(null);
 
 let engine;

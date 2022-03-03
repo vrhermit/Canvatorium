@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Snapping and History
-- Simple box with a drag widget, snapping to the grid
-- Uses VueUse \`useRefHistory()\` to add Undo / Redo
-- Keyboard: z = undo, x = redo
-- VR Controller: a = undo, b = redo
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -20,6 +13,13 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Snapping and History
+- Simple box with a drag widget, snapping to the grid
+- Uses VueUse \`useRefHistory()\` to add Undo / Redo
+- Keyboard: z = undo, x = redo
+- VR Controller: a = undo, b = redo
+`;
 const bjsCanvas = ref(null);
 
 // A ref to store the current box X position

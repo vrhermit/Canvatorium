@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Working with Assets
-- Example 1: vrhermit image loaded from the public/assets folder
-- Example 2: ec logo loaded from the src/assets folder
-  - import it from the src/assets folder
-  - use the import name to reference it in the scene
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -21,6 +14,13 @@ import { createLabPlayer } from "../lab-shared/LabPlayer";
 import ecLogo from "../assets/ec-logo.png";
 console.log(ecLogo);
 
+labNotes.value = `
+Working with Assets
+- Example 1: vrhermit image loaded from the public/assets folder
+- Example 2: ec logo loaded from the src/assets folder
+  - import it from the src/assets folder
+  - use the import name to reference it in the scene
+`;
 const bjsCanvas = ref(null);
 
 let engine;

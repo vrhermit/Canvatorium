@@ -1,13 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Continuing from lab 3 with controller input and buttons
-- Explore the xr object with async/await
-- Print a message when the visitor enters immersive mode
-- Reposition the camera when the user enters immersive mode
-- Added controller button logging to a message value. Adapted from this playground: https://playground.babylonjs.com/#28EKWI#37
-- Tested with Oculus Quest 2 Controllers
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -19,6 +11,14 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
+labNotes.value = `
+Continuing from lab 3 with controller input and buttons
+- Explore the xr object with async/await
+- Print a message when the visitor enters immersive mode
+- Reposition the camera when the user enters immersive mode
+- Added controller button logging to a message value. Adapted from this playground: https://playground.babylonjs.com/#28EKWI#37
+- Tested with Oculus Quest 2 Controllers
+`;
 const bjsCanvas = ref(null);
 
 const count = ref(0);

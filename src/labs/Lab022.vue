@@ -1,13 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-ToDoist Project List (2D)
-The idea for this lab is to create a 2D list of all projects, then use it to populate a 3D scene with cards.
-- Project List: scroll view with a dynamic grid of cards
-- Project Color, Name, and Button
-- The button will spawn a card in the scene for the selected project
-- The 3D cards are a direct copy of Lab 021. I'll refactor this into use a reusable card object at some point.
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -25,6 +17,14 @@ import tdprojects from "../data/td-projects.json";
 import tdcolors from "../data/td-colors.json";
 import { createProjectCard } from "../composables/TDProjectCard";
 
+labNotes.value = `
+ToDoist Project List (2D)
+The idea for this lab is to create a 2D list of all projects, then use it to populate a 3D scene with cards.
+- Project List: scroll view with a dynamic grid of cards
+- Project Color, Name, and Button
+- The button will spawn a card in the scene for the selected project
+- The 3D cards are a direct copy of Lab 021. I'll refactor this into use a reusable card object at some point.
+`;
 const bjsCanvas = ref(null);
 
 let engine;

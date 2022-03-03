@@ -1,13 +1,7 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-This lab uses Vue 3 script setup. It replaces the interface object by combining it with the vue component for the lab.
-I picked out some colors to use throughout the labs in the future.
-I created a box for each color and used the standard BabylonJS material.
-`;
 
 import * as BABYLON from "babylonjs";
-
 import LabLayout from "../components/LabLayout.vue";
 import LabColors from "../lab-shared/LabColors";
 import addLabCamera from "../lab-shared/LabCamera";
@@ -15,6 +9,11 @@ import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import { ref, onMounted } from "@vue/runtime-core";
 
+labNotes.value = `
+This lab uses Vue 3 script setup. It replaces the interface object by combining it with the vue component for the lab.
+I picked out some colors to use throughout the labs in the future.
+I created a box for each color and used the standard BabylonJS material.
+`;
 const bjsCanvas = ref(null);
 
 const createScene = async (canvas) => {

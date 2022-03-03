@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Playing with Vue 3 composables as a way of updating BabylonJS objects
-- Created a folder called \`composables\`
-- New composable called \`TitleCard\`
-- Titlecard exports a function called \`createCreateTitle\`, which returns two reactive refs as an object
-- The scene destructures this object and uses the refs to update the title card
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -21,6 +14,13 @@ import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 import createTitleCard from "../composables/TitleCard";
 
+labNotes.value = `
+Playing with Vue 3 composables as a way of updating BabylonJS objects
+- Created a folder called \`composables\`
+- New composable called \`TitleCard\`
+- Titlecard exports a function called \`createCreateTitle\`, which returns two reactive refs as an object
+- The scene destructures this object and uses the refs to update the title card
+`;
 const bjsCanvas = ref(null);
 
 let engine;

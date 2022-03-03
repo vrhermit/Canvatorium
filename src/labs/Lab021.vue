@@ -1,15 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-ToDoist Project Object
-The idea behind this lab is to create a reusable todoist project object for a project-picker scene. I could use Advanced Dynamic Texture for the GUI on these cards, but those are pretty heave objects and I can only add around 12 of them to a scene at any given time before running into performance issues.
-- Use sample data to build 3D objects that represent tasks Project from ToDoist
-- Create a project card with view-only UI based on Dynamic Texture instead of Advanced Dynamic Texture
-- Loop over sample data and make a card for each one. Layout is static, but cards are grabbable.
-
-Follow up:
-I've tested this scene with 20-60 cards. ~40 seems to be the max I can handle without impacting performance.
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -23,6 +13,17 @@ import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 import tdprojects from "../data/td-projects.json";
 import tdcolors from "../data/td-colors.json";
+
+labNotes.value = `
+ToDoist Project Object
+The idea behind this lab is to create a reusable todoist project object for a project-picker scene. I could use Advanced Dynamic Texture for the GUI on these cards, but those are pretty heave objects and I can only add around 12 of them to a scene at any given time before running into performance issues.
+- Use sample data to build 3D objects that represent tasks Project from ToDoist
+- Create a project card with view-only UI based on Dynamic Texture instead of Advanced Dynamic Texture
+- Loop over sample data and make a card for each one. Layout is static, but cards are grabbable.
+
+Follow up:
+I've tested this scene with 20-60 cards. ~40 seems to be the max I can handle without impacting performance.
+`;
 const bjsCanvas = ref(null);
 
 let engine;

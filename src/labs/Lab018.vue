@@ -1,17 +1,8 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Intro to Actions
-- Subject 1: (purple) - Execute code when the OnPickTrigger is fired (console logs a string)
-- Subject 2: (yellow/red) Interpolate between two colors
-- Subject 3: (blue) - Change the scene from dark mode and back, running multiple actions
-- Subject 4: (orange/green) can intersect with the card, causing a color change
-`;
-
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { ref, onMounted } from "@vue/runtime-core";
-
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -19,6 +10,13 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Intro to Actions
+- Subject 1: (purple) - Execute code when the OnPickTrigger is fired (console logs a string)
+- Subject 2: (yellow/red) Interpolate between two colors
+- Subject 3: (blue) - Change the scene from dark mode and back, running multiple actions
+- Subject 4: (orange/green) can intersect with the card, causing a color change
+`;
 const bjsCanvas = ref(null);
 
 let engine;

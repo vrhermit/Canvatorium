@@ -1,13 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Explore the new Near Menu in Babylon JS 5.0
-- Based on the Holohraphic Menu with limited customizations
-- Using manage.controlScaling to scale the menu
-- Using some properties on the follow behavior to adjust the relative position
-- Bug: [Near Menu Dragging does not work in WebXR on Quest 2](https://forum.babylonjs.com/t/near-menu-dragging-does-not-work-in-oculus-quest-2/27152)
-- Bug: [Scaling the controls does not update the scale of mouseover effects](https://forum.babylonjs.com/t/3d-gui-manage-control-scaling-does-not-scale-the-mouse-over-effects-on-holograph-ui/27150)
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -19,6 +11,15 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
+
+labNotes.value = `
+Explore the new Near Menu in Babylon JS 5.0
+- Based on the Holohraphic Menu with limited customizations
+- Using manage.controlScaling to scale the menu
+- Using some properties on the follow behavior to adjust the relative position
+- Bug: [Near Menu Dragging does not work in WebXR on Quest 2](https://forum.babylonjs.com/t/near-menu-dragging-does-not-work-in-oculus-quest-2/27152)
+- Bug: [Scaling the controls does not update the scale of mouseover effects](https://forum.babylonjs.com/t/3d-gui-manage-control-scaling-does-not-scale-the-mouse-over-effects-on-holograph-ui/27150)
+`;
 const bjsCanvas = ref(null);
 
 let engine;

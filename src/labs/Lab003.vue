@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Continuing from lab 2 with reactive data
-- Explore the xr object with async/await
-- Print a message when the visitor enters immersive mode
-- Reposition the camera when the user enters immersive mode
-- Add some button events to the trigger, these update the count value --/++
-`;
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
@@ -17,6 +10,13 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
+labNotes.value = `
+Continuing from lab 2 with reactive data
+- Explore the xr object with async/await
+- Print a message when the visitor enters immersive mode
+- Reposition the camera when the user enters immersive mode
+- Add some button events to the trigger, these update the count value --/++
+`;
 const bjsCanvas = ref(null);
 
 const count = ref(0);

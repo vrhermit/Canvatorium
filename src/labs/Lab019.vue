@@ -1,5 +1,17 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
+
+import * as BABYLON from "babylonjs";
+import "babylonjs-loaders";
+import { ref, onMounted } from "@vue/runtime-core";
+
+import LabLayout from "../components/LabLayout.vue";
+import addLabCamera from "../lab-shared/LabCamera";
+import addLabLights from "../lab-shared/LabLights";
+import addLabRoom from "../lab-shared/LabRoom";
+import { createLabPlayer } from "../lab-shared/LabPlayer";
+import LabColors from "../lab-shared/LabColors";
+
 labNotes.value = `
 Action Triggers in WebXR
 - Subject 1: Use \`ExecuteCodeAction\` to test available triggers.
@@ -20,18 +32,6 @@ Action Triggers in WebXR
     - OnCenterPickTrigger
     - OnLongPressTrigger
 `;
-
-import * as BABYLON from "babylonjs";
-import "babylonjs-loaders";
-import { ref, onMounted } from "@vue/runtime-core";
-
-import LabLayout from "../components/LabLayout.vue";
-import addLabCamera from "../lab-shared/LabCamera";
-import addLabLights from "../lab-shared/LabLights";
-import addLabRoom from "../lab-shared/LabRoom";
-import { createLabPlayer } from "../lab-shared/LabPlayer";
-import LabColors from "../lab-shared/LabColors";
-
 const bjsCanvas = ref(null);
 
 let engine;
