@@ -18,7 +18,7 @@ import tdcolors from "../data/td-colors.json";
 import { createProjectCard } from "../composables/TDProjectCard";
 
 labNotes.value = `
-ToDoist Project List (2D)
+3D Cards pop out from 2D GUI
 The idea for this lab is to create a 2D list of all projects, then use it to populate a 3D scene with cards.
 - Project List: scroll view with a dynamic grid of cards
 - Project Color, Name, and Button

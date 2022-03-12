@@ -15,8 +15,8 @@ import tdprojects from "../data/td-projects.json";
 import tdcolors from "../data/td-colors.json";
 
 labNotes.value = `
-ToDoist Project Object
-The idea behind this lab is to create a reusable todoist project object for a project-picker scene. I could use Advanced Dynamic Texture for the GUI on these cards, but those are pretty heave objects and I can only add around 12 of them to a scene at any given time before running into performance issues.
+Dynamic Texture Cards
+A 3D card with a 2D texture, used for values lists of large lists of similar items. I could use Advanced Dynamic Texture for the GUI on these cards, but those are pretty heave objects and I can only add around 12 of them to a scene at any given time before running into performance issues.
 - Use sample data to build 3D objects that represent tasks Project from ToDoist
 - Create a project card with view-only UI based on Dynamic Texture instead of Advanced Dynamic Texture
 - Loop over sample data and make a card for each one. Layout is static, but cards are grabbable.

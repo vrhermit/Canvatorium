@@ -24,6 +24,7 @@ import Lab020 from "../labs/Lab020.vue";
 import Lab021 from "../labs/Lab021.vue";
 import Lab022 from "../labs/Lab022.vue";
 import Lab023 from "../labs/Lab023.vue";
+import Lab024 from "../labs/Lab024.vue";
 
 const routes = [
   {
@@ -248,7 +249,7 @@ const routes = [
     component: Lab021,
     meta: {
       title: "Lab 021",
-      subtitle: "ToDoist Project Object",
+      subtitle: "Dynamic Texture Cards",
       status: "running"
     }
   },
@@ -258,7 +259,7 @@ const routes = [
     component: Lab022,
     meta: {
       title: "Lab 022",
-      subtitle: "ToDoist Project List (2D)",
+      subtitle: "3D Cards pop out from 2D GUI",
       status: "running"
     }
   },
@@ -269,6 +270,16 @@ const routes = [
     meta: {
       title: "Lab 023",
       subtitle: "Save Object Transform",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab024",
+    name: "Lab024",
+    component: Lab024,
+    meta: {
+      title: "Lab 024",
+      subtitle: "Movement Controls",
       status: "running"
     }
   }

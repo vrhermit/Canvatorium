@@ -7,7 +7,7 @@ Current features
 - Imports and uses LabConsole for debugging in VR
 */
 
-import * as BABYLON from "babylonjs";
+// import * as BABYLON from "babylonjs";
 // import { ref, reactive, watch } from "@vue/runtime-core");
 import { createLabMenu } from "../lab-shared/LabMenu";
 
@@ -16,7 +16,6 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     floorMeshes: teleportMeshes,
-    disableTeleportation: true,
     pointerSelectionOptions: {
       enablePointerSelectionOnAllControllers: true
     }
@@ -26,59 +25,6 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
     xrCamera.position.z = -2;
   });
-
-  // const xrInput = xr.input;
-  const swappedHandednessConfiguration = [
-    {
-      allowedComponentTypes: [BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE, BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE],
-      forceHandedness: "right",
-      axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
-        console.log(xrInput);
-        movementState.rotateX = Math.abs(axes.x) > featureContext.rotationThreshold ? axes.x : 0;
-        movementState.rotateY = Math.abs(axes.y) > featureContext.rotationThreshold ? axes.y : 0;
-      }
-    },
-    {
-      allowedComponentTypes: [BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE, BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE],
-      forceHandedness: "left",
-      axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
-        console.log(xrInput);
-        movementState.moveX = Math.abs(axes.x) > featureContext.movementThreshold ? axes.x : 0;
-        movementState.moveY = Math.abs(axes.y) > featureContext.movementThreshold ? axes.y : 0;
-      }
-    }
-  ];
-
-  function setupCameraForCollisions(camera) {
-    camera.checkCollisions = true;
-    camera.applyGravity = true;
-    camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
-    camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
-  }
-
-  setupCameraForCollisions(xr.input.xrCamera);
-
-  const featureManager = xr.baseExperience.featuresManager;
-
-  const movementFeature = featureManager.enableFeature(BABYLON.WebXRFeatureName.MOVEMENT, "latest", {
-    xrInput: xr.input,
-    customRegistrationConfigurations: swappedHandednessConfiguration,
-
-    // add options here
-    movementOrientationFollowsViewerPose: true // default true
-  });
-  movementFeature.movementSpeed = 0.5;
-  // movementFeature.rotationEnabled = false;
-  // movementFeature.rotationSpeed = 2;
-
-  console.log(movementFeature);
-
-  // const featuresManager = xr.featuresManager;
-  // featuresManager.enableFeature(BABYLON.WebXRFeatureName.POINTER_SELECTION, "stable", {
-  //   enablePointerSelectionOnAllControllers: true
-  // });
-
-  console.log("xrdir", xr);
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
