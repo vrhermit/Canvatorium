@@ -1,11 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Explore the idea of overriding console.log() so I can view the log in VR
-- This is just a proof-of-concept, not a full-fledged solution
-- Override console.log() and stash the message in a reactive variable
-- watch the variable and display the message in VR by updating the text in a scroll view
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -20,6 +14,12 @@ import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
+labNotes.value = `
+Explore the idea of overriding console.log() so I can view the log in VR
+- This is just a proof-of-concept, not a full-fledged solution
+- Override console.log() and stash the message in a reactive variable
+- watch the variable and display the message in VR by updating the text in a scroll view
+`;
 const bjsCanvas = ref(null);
 
 let engine;

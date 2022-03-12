@@ -1,8 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Testing cross-scene navigaiton with Router and Window.location
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -14,6 +11,9 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
+labNotes.value = `
+Testing cross-scene navigaiton with Router and Window.location
+`;
 const bjsCanvas = ref(null);
 
 const router = useRouter();

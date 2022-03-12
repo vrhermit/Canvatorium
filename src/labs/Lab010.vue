@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Grabbing objects and moving them around.
-- Example 1: Mesh Picking and Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2). 
-- Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
-- Example 3: Pointer Dragging along an axis
-- Example 4: Pointer Dragging along a plane. This [playground](https://playground.babylonjs.com/#YD11CG#6) was helpful for understanding how to clamp the bounds of the drag region. It uses a plane to define the region, but this would just as well be done with vectors.
-`;
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
@@ -19,6 +12,13 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Grabbing objects and moving them around.
+- Example 1: Mesh Picking and Grabbing adapted from this [post](https://forum.babylonjs.com/t/webxr-grab-a-mesh-multiple-controller-support/14251) and this [playground](https://www.babylonjs-playground.com/#LABFNA#2). 
+- Example 2: Six Dof Dragging [docs](https://doc.babylonjs.com/divingDeeper/behaviors/meshBehaviors#sixdofdragbehavior) - this is super easy to use. For complext meshes, wrap them in a bounding box and add a SixDofDragBehavior to that instead of the mesh.
+- Example 3: Pointer Dragging along an axis
+- Example 4: Pointer Dragging along a plane. This [playground](https://playground.babylonjs.com/#YD11CG#6) was helpful for understanding how to clamp the bounds of the drag region. It uses a plane to define the region, but this would just as well be done with vectors.
+`;
 const bjsCanvas = ref(null);
 
 let engine;

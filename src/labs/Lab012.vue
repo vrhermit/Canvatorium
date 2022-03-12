@@ -1,11 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Gizmos!
-- Example 1 creates a gizmo for a single mesh. This option takes a bit more work but offers much more control. I also found these gizmos easier to use in VR than the ones created by GizmoManager.
-- Example 2 uses GizmoManager to create a gizmo for a group of meshes.
-- Spacebar or VR X button to cycle gizmos.
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -20,6 +14,12 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Gizmos!
+- Example 1 creates a gizmo for a single mesh. This option takes a bit more work but offers much more control. I also found these gizmos easier to use in VR than the ones created by GizmoManager.
+- Example 2 uses GizmoManager to create a gizmo for a group of meshes.
+- Spacebar or VR X button to cycle gizmos.
+`;
 const bjsCanvas = ref(null);
 
 let engine;

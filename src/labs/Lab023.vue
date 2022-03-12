@@ -1,13 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Save Object Transform
-- Subject 1: (purple) - Move the object around the scene
-- When letting go of subject 1, save the object's transform to local storage
-- Uses '/useStorage'/ from VueUse
-- Click the the red cube to reset the object's transform and the local storage value
-`;
-
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { ref, onMounted } from "@vue/runtime-core";
@@ -19,6 +11,13 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Save Object Transform
+- Subject 1: (purple) - Move the object around the scene
+- When letting go of subject 1, save the object's transform to local storage
+- Uses '/useStorage'/ from VueUse
+- Click the the red cube to reset the object's transform and the local storage value
+`;
 const bjsCanvas = ref(null);
 
 let engine;

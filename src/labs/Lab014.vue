@@ -1,11 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Follow Behaviors
-- Purple sphere can place itself anywhere in my view
-- Green sphere is constrained to a fixed pitch of -35 degrees
-
-`;
 
 import * as BABYLON from "babylonjs";
 
@@ -19,6 +13,12 @@ import addLabRoom from "../lab-shared/LabRoom";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 import LabColors from "../lab-shared/LabColors";
 
+labNotes.value = `
+Follow Behaviors
+- Purple sphere can place itself anywhere in my view
+- Green sphere is constrained to a fixed pitch of -35 degrees
+
+`;
 const bjsCanvas = ref(null);
 
 let engine;

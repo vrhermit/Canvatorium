@@ -26,32 +26,25 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
     xrCamera.position.z = -2;
   });
 
-  // const featuresManager = xr.featuresManager;
-  // featuresManager.enableFeature(BABYLON.WebXRFeatureName.POINTER_SELECTION, "stable", {
-  //   enablePointerSelectionOnAllControllers: true
-  // });
-
-  console.log("xrdir", xr);
-
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
     controller.onMotionControllerInitObservable.add((motionController) => {
       if (motionController.handness === "left") {
         const xr_ids = motionController.getComponentIds();
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
+        triggerComponent?.onButtonStateChangedObservable.add(() => {
           if (triggerComponent.pressed) {
             console.log("Left Trigger Pressed");
           }
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
+        squeezeComponent?.onButtonStateChangedObservable.add(() => {
           if (squeezeComponent.pressed) {
             console.log("Left Grip Pressed");
           }
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
+        thumbstickComponent?.onButtonStateChangedObservable.add(() => {
           if (thumbstickComponent.pressed) {
             console.log("Left Thumbstick Pressed");
           }
@@ -61,13 +54,13 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         // });
 
         let xButtonComponent = motionController.getComponent(xr_ids[3]); //x-button
-        xButtonComponent.onButtonStateChangedObservable.add(() => {
+        xButtonComponent?.onButtonStateChangedObservable.add(() => {
           if (xButtonComponent.pressed) {
             console.log("X Button Pressed");
           }
         });
         let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
-        yButtonComponent.onButtonStateChangedObservable.add(() => {
+        yButtonComponent?.onButtonStateChangedObservable.add(() => {
           if (yButtonComponent.pressed) {
             console.log("Y Button Pressed");
             toggleMenu(controller);
@@ -80,19 +73,19 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
       if (motionController.handness === "right") {
         const xr_ids = motionController.getComponentIds();
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
-        triggerComponent.onButtonStateChangedObservable.add(() => {
+        triggerComponent?.onButtonStateChangedObservable.add(() => {
           if (triggerComponent.pressed) {
             console.log("Right Trigger Pressed");
           }
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
-        squeezeComponent.onButtonStateChangedObservable.add(() => {
+        squeezeComponent?.onButtonStateChangedObservable.add(() => {
           if (squeezeComponent.pressed) {
             console.log("Right Grip Pressed");
           }
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
-        thumbstickComponent.onButtonStateChangedObservable.add(() => {
+        thumbstickComponent?.onButtonStateChangedObservable.add(() => {
           if (thumbstickComponent.pressed) {
             console.log("Right Thumbstick Pressed");
           }
@@ -102,13 +95,13 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         // });
 
         let aButtonComponent = motionController.getComponent(xr_ids[3]); //a-button
-        aButtonComponent.onButtonStateChangedObservable.add(() => {
+        aButtonComponent?.onButtonStateChangedObservable.add(() => {
           if (aButtonComponent.pressed) {
             console.log("A Button Pressed");
           }
         });
         let bButtonComponent = motionController.getComponent(xr_ids[4]); //b-button
-        bButtonComponent.onButtonStateChangedObservable.add(() => {
+        bButtonComponent?.onButtonStateChangedObservable.add(() => {
           if (bButtonComponent.pressed) {
             console.log("B Button Pressed");
           }

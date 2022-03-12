@@ -1,12 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-labNotes.value = `
-Router Nav to Lab 006 (not working). 
-Testing cross-scene navigation with Router and Window.location.
-- I'm not sure if the issue is in Vue Router or on Babylon JS.
-- Placing this idea on hold for now.
-- While Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
-`;
 
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
@@ -18,6 +11,13 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 
+labNotes.value = `
+Router Nav to Lab 006 (not working). 
+Testing cross-scene navigation with Router and Window.location.
+- I'm not sure if the issue is in Vue Router or on Babylon JS.
+- Placing this idea on hold for now.
+- While Router may not work, I can brute force my way to other scenes with \`window.location.assign("/lab006")\`
+`;
 const bjsCanvas = ref(null);
 const router = useRouter();
 
