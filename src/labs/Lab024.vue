@@ -2,6 +2,7 @@
 import { labNotes } from "../composables/LabData";
 
 import * as BABYLON from "babylonjs";
+import * as GUI from "babylonjs-gui";
 import * as MAT from "babylonjs-materials";
 import "babylonjs-loaders";
 import { ref, reactive, onMounted, watch } from "@vue/runtime-core";
@@ -12,8 +13,13 @@ import LabColors from "../lab-shared/LabColors";
 
 labNotes.value = `
 Movement Controls
-- Try out the new Movement Controls in Babylon JS 5.0
-
+Checking out the new Movement Controls in Babylon JS 5.0
+- Swapped the left and right thumbsticks based on the example in the docs
+- Right stick: movement
+- Left stick: rotation
+- Menu to customize the movement control options, with a Follow Behavior attached.
+- Reset button
+- Bonus: Hold the trigger on the left controller for a 3X speed boost
 
 Resources
 - Documentation for [Movement Controls](https://doc.babylonjs.com/divingDeeper/webXR/WebXRSelectedFeatures#movement-module)
@@ -23,27 +29,36 @@ const bjsCanvas = ref(null);
 
 let engine;
 let scene;
+let mainCamera; // a refecence to the XR camera, will be set after entering VR
 
 let movementControlManager; // a reference to the movement controls
 let movementSettings = reactive({
-  movementEnabled: true,
   movementOrientationFollowsViewerPose: true,
-  movementSpeed: 1,
+
+  movementEnabled: true,
+  movementSpeed: 0.5, // 1 is too fast most of the time
   movementThreshold: 0.25,
+
   rotationEnabled: true,
   rotationSpeed: 0.25,
   rotationThreshold: 0.25,
 });
 
 watch(movementSettings, (newValue) => {
-  console.log("watching movementSettings", newValue);
+  // console.log("watching movementSettings", newValue);
   if (movementControlManager) {
+    movementControlManager.movementOrientationFollowsViewerPose =
+      newValue.movementOrientationFollowsViewerPose;
+
+    movementControlManager.movementEnabled = newValue.movementEnabled;
     movementControlManager.movementSpeed = newValue.movementSpeed;
-    // movementControlManager.movementThreshold = newValue.movementThreshold;
+    movementControlManager.movementThreshold = newValue.movementThreshold;
+
+    movementControlManager.rotationEnabled = newValue.rotationEnabled;
+    movementControlManager.rotationSpeed = newValue.rotationSpeed;
+    movementControlManager.rotationThreshold = newValue.rotationThreshold;
   }
 });
-
-let mainCamera;
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -52,8 +67,9 @@ const createScene = async (canvas) => {
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
+  scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
-  addLabRoom(scene);
+  addLabRoomLocal(scene);
 
   const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
   subjectMat1.diffuseColor = LabColors["purple"];
@@ -62,34 +78,324 @@ const createScene = async (canvas) => {
     radius: 1,
   });
   subject1.material = subjectMat1;
-  subject1.position = new BABYLON.Vector3(0, 1.5, 0);
+  subject1.position = new BABYLON.Vector3(-5, 1.5, 0);
 
   const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
   sixDofDragBehavior.allowMultiPointers = true;
   subject1.addBehavior(sixDofDragBehavior);
 
-  const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
-  subjectMat2.diffuseColor = LabColors["blue"];
-  subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
-    height: 8,
-    width: 16,
-    depth: 0.2,
-  });
-  subject2.material = subjectMat2;
-  subject2.position = new BABYLON.Vector3(0, 4, 50);
+  createUICard();
 
-  const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
-  subjectMat3.diffuseColor = LabColors["green"];
-  subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
-    height: 8,
-    width: 16,
-    depth: 0.2,
-  });
-  subject3.material = subjectMat3;
-  subject3.position = new BABYLON.Vector3(0, 4, -50);
+  await addLabPlayerLocal(scene);
 
+  engine.runRenderLoop(() => {
+    scene.render();
+  });
+  window.addEventListener("resize", function () {
+    engine.resize();
+  });
+};
+
+onMounted(() => {
+  if (bjsCanvas.value) {
+    createScene(bjsCanvas.value);
+  }
+});
+
+const createUICard = (scene) => {
+  const cardMaterial = new BABYLON.StandardMaterial(
+    "menu-card-material",
+    scene
+  );
+  cardMaterial.diffuseColor = LabColors["light1"];
+  cardMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const card = BABYLON.MeshBuilder.CreateBox("menu-card", {
+    width: 1,
+    height: 1,
+    depth: 0.1,
+  });
+  card.material = cardMaterial;
+  card.position = new BABYLON.Vector3(0, 1, 0);
+
+  const followBehavior = new BABYLON.FollowBehavior();
+  followBehavior.defaultDistance = 1.2;
+  followBehavior.minimumDistance = 1;
+  followBehavior.maximumDistance = 2;
+  followBehavior.ignoreCameraPitchAndRoll = true;
+  followBehavior.pitchOffset = -10;
+  followBehavior.lerpTime = 250;
+  followBehavior.attach(card);
+
+  // UI Plane
+  const plane = BABYLON.MeshBuilder.CreatePlane(
+    "menu-plane",
+    {
+      width: 1,
+      height: 1,
+    },
+    scene
+  );
+  plane.position.z = -0.055;
+  plane.parent = card;
+
+  const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
+    plane,
+    1 * 1024,
+    1 * 1024
+  );
+  advancedTexture.name = "menu-texture";
+
+  const sv = new GUI.ScrollViewer("lab-info-scroll");
+  sv.thickness = 12;
+  sv.color = "#3e4a5d";
+  sv.background = "#3e4a5d";
+  sv.opacity = 1;
+  sv.height = `${1024}px`;
+  sv.width = `${1024}px`;
+  sv.barSize = 30;
+  sv.barColor = "#53637b";
+  sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+  advancedTexture.addControl(sv);
+
+  var grid = new GUI.Grid();
+  grid.addColumnDefinition(40, true);
+  grid.addColumnDefinition(0.5);
+  grid.addColumnDefinition(0.5);
+  grid.addColumnDefinition(40, true);
+
+  grid.addRowDefinition(72, true); // empty row
+
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  grid.addRowDefinition(72, true); // empty row
+
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  grid.addRowDefinition(72, true); // empty row
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  sv.addControl(grid);
+
+  const movementSpeedLabel = new GUI.TextBlock();
+  movementSpeedLabel.text = "Movement Speed: 0.5";
+  movementSpeedLabel.height = "60px";
+  movementSpeedLabel.fontSize = "40px";
+  movementSpeedLabel.color = "white";
+  movementSpeedLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  const movementSpeedSlider = new GUI.Slider();
+  movementSpeedSlider.minimum = 0.1;
+  movementSpeedSlider.maximum = 2;
+  movementSpeedSlider.value = 0.5;
+  movementSpeedSlider.height = "60px";
+  movementSpeedSlider.width = "100%";
+  movementSpeedSlider.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  movementSpeedSlider.color = "#8854d0";
+  movementSpeedSlider.background = "#53637b";
+  movementSpeedSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.movementSpeed = value;
+    movementSpeedLabel.text = `Movement Speed: ${value.toFixed(2)}`;
+  });
+
+  const movementThresholdLabel = new GUI.TextBlock();
+  movementThresholdLabel.text = "Axis Threshold: 0.25";
+  movementThresholdLabel.height = "60px";
+  movementThresholdLabel.fontSize = "40px";
+  movementThresholdLabel.color = "white";
+  movementThresholdLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  const movementThresholdSlider = new GUI.Slider();
+  movementThresholdSlider.minimum = 0;
+  movementThresholdSlider.maximum = 1;
+  movementThresholdSlider.value = 0.25;
+  movementThresholdSlider.height = "60px";
+  movementThresholdSlider.width = "100%";
+  movementThresholdSlider.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  movementThresholdSlider.color = "#8854d0";
+  movementThresholdSlider.background = "#53637b";
+  movementThresholdSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.movementThreshold = value;
+    movementThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
+  });
+
+  const movementEnabledLabel = new GUI.TextBlock();
+  movementEnabledLabel.text = "Movement Enabled";
+  movementEnabledLabel.height = "60px";
+  movementEnabledLabel.fontSize = "40px";
+  movementEnabledLabel.color = "white";
+  movementEnabledLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  const movementEnabledToggle = new GUI.Checkbox();
+  movementEnabledToggle.isChecked = true;
+  movementEnabledToggle.height = "60px";
+  movementEnabledToggle.width = "70px";
+  movementEnabledToggle.color = "#8854d0";
+  movementEnabledToggle.background = "#53637b";
+  movementEnabledToggle.paddingLeftInPixels = "10";
+  movementEnabledToggle.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  movementEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
+    movementSettings.movementEnabled = value;
+  });
+
+  const rotationSpeedLabel = new GUI.TextBlock();
+  rotationSpeedLabel.text = "Rotation Speed: 0.25";
+  rotationSpeedLabel.height = "60px";
+  rotationSpeedLabel.fontSize = "40px";
+  rotationSpeedLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  rotationSpeedLabel.color = "white";
+
+  const rotationSpeedSlider = new GUI.Slider();
+  rotationSpeedSlider.minimum = 0.1;
+  rotationSpeedSlider.maximum = 1;
+  rotationSpeedSlider.value = 0.25;
+  rotationSpeedSlider.height = "60px";
+  rotationSpeedSlider.width = "100%";
+  rotationSpeedSlider.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  rotationSpeedSlider.color = "#8854d0";
+  rotationSpeedSlider.background = "#53637b";
+  rotationSpeedSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.rotationSpeed = value;
+    rotationSpeedLabel.text = `Rotation Speed: ${value.toFixed(2)}`;
+  });
+
+  const rotationThresholdLabel = new GUI.TextBlock();
+  rotationThresholdLabel.text = "Axis Threshold: 0.25";
+  rotationThresholdLabel.height = "60px";
+  rotationThresholdLabel.fontSize = "40px";
+  rotationThresholdLabel.color = "white";
+  rotationThresholdLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  const rotationThresholdSlider = new GUI.Slider();
+  rotationThresholdSlider.minimum = 0;
+  rotationThresholdSlider.maximum = 1;
+  rotationThresholdSlider.value = 0.25;
+  rotationThresholdSlider.height = "60px";
+  rotationThresholdSlider.width = "100%";
+  rotationThresholdSlider.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  rotationThresholdSlider.color = "#8854d0";
+  rotationThresholdSlider.background = "#53637b";
+  rotationThresholdSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.rotationThreshold = value;
+    rotationThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
+  });
+
+  const rotationEnabledLabel = new GUI.TextBlock();
+  rotationEnabledLabel.text = "Rotation Enabled";
+  rotationEnabledLabel.height = "70px";
+  rotationEnabledLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  rotationEnabledLabel.fontSize = "40px";
+  rotationEnabledLabel.color = "white";
+
+  const rotationEnabledCheckbox = new GUI.Checkbox();
+  rotationEnabledCheckbox.isChecked = true;
+  rotationEnabledCheckbox.height = "60px";
+  rotationEnabledCheckbox.width = "70px";
+  rotationEnabledCheckbox.color = "#8854d0";
+  rotationEnabledCheckbox.background = "#53637b";
+  rotationEnabledCheckbox.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  rotationEnabledCheckbox.paddingLeftInPixels = "10";
+  rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
+    movementSettings.rotationEnabled = value;
+  });
+
+  const movementOrientationFollowsViewerPoseLabel = new GUI.TextBlock();
+  movementOrientationFollowsViewerPoseLabel.text = "Orientation Follows Pose";
+  movementOrientationFollowsViewerPoseLabel.height = "70px";
+  movementOrientationFollowsViewerPoseLabel.fontSize = "40px";
+  movementOrientationFollowsViewerPoseLabel.color = "white";
+  movementOrientationFollowsViewerPoseLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+
+  const movementOrientationFollowsViewerPoseCheckbox = new GUI.Checkbox();
+  movementOrientationFollowsViewerPoseCheckbox.isChecked = true;
+  movementOrientationFollowsViewerPoseCheckbox.height = "60px";
+  movementOrientationFollowsViewerPoseCheckbox.width = "70px";
+  movementOrientationFollowsViewerPoseCheckbox.color = "#8854d0";
+  movementOrientationFollowsViewerPoseCheckbox.background = "#53637b";
+  movementOrientationFollowsViewerPoseCheckbox.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  movementOrientationFollowsViewerPoseCheckbox.paddingLeftInPixels = "10";
+  movementOrientationFollowsViewerPoseCheckbox.onIsCheckedChangedObservable.add(
+    function (value) {
+      movementSettings.movementOrientationFollowsViewerPose = value;
+    }
+  );
+
+  var resetButton = GUI.Button.CreateSimpleButton("but", "Reset All");
+  resetButton.width = 0.2;
+  resetButton.height = "40px";
+
+  resetButton.color = "white";
+  resetButton.background = "#53637b";
+
+  resetButton.onPointerUpObservable.add(function () {
+    movementSettings.movementSpeed = 0.5;
+    movementSettings.movementThreshold = 0.25;
+    movementSettings.movementEnabled = true;
+    movementSettings.rotationSpeed = 0.25;
+    movementSettings.rotationThreshold = 0.25;
+    movementSettings.rotationEnabled = true;
+    movementSettings.movementOrientationFollowsViewerPose = true;
+
+    movementSpeedSlider.value = movementSettings.movementSpeed;
+    movementThresholdSlider.value = movementSettings.movementThreshold;
+    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
+    rotationSpeedSlider.value = movementSettings.rotationSpeed;
+    rotationThresholdSlider.value = movementSettings.rotationThreshold;
+    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
+    rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
+    movementOrientationFollowsViewerPoseCheckbox.isChecked =
+      movementSettings.movementOrientationFollowsViewerPose;
+  });
+
+  // Layout the grid content
+  grid.addControl(movementSpeedLabel, 1, 1);
+  grid.addControl(movementSpeedSlider, 1, 2);
+  grid.addControl(movementThresholdLabel, 2, 1);
+  grid.addControl(movementThresholdSlider, 2, 2);
+  grid.addControl(movementEnabledLabel, 3, 1);
+  grid.addControl(movementEnabledToggle, 3, 2);
+
+  grid.addControl(rotationSpeedLabel, 5, 1);
+  grid.addControl(rotationSpeedSlider, 5, 2);
+  grid.addControl(rotationThresholdLabel, 6, 1);
+  grid.addControl(rotationThresholdSlider, 6, 2);
+  grid.addControl(rotationEnabledLabel, 7, 1);
+  grid.addControl(rotationEnabledCheckbox, 7, 2);
+
+  grid.addControl(movementOrientationFollowsViewerPoseLabel, 9, 1);
+  grid.addControl(movementOrientationFollowsViewerPoseCheckbox, 9, 2);
+
+  grid.addControl(resetButton, 10, 1);
+};
+
+const setupCameraForCollisions = (camera) => {
+  camera.checkCollisions = true;
+  camera.applyGravity = true;
+  camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
+  camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
+};
+
+const addLabPlayerLocal = async (scene) => {
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     disableTeleportation: true,
@@ -144,14 +450,15 @@ const createScene = async (canvas) => {
     {
       xrInput: xr.input,
       customRegistrationConfigurations: swappedHandednessConfiguration,
-
-      // add options here
-      movementOrientationFollowsViewerPose: true, // default true
+      movementOrientationFollowsViewerPose: true,
+      movementEnabled: movementSettings.movementEnabled,
+      movementSpeed: movementSettings.movementSpeed,
+      movementThreshold: movementSettings.movementThreshold,
+      rotationEnabled: movementSettings.rotationEnabled,
+      rotationSpeed: movementSettings.rotationSpeed,
+      rotationThreshold: movementSettings.rotationThreshold,
     }
   );
-  movementControlManager.movementSpeed = movementSettings.movementSpeed;
-  // movementFeature.rotationEnabled = false;
-  // movementFeature.rotationSpeed = 2;
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
@@ -163,7 +470,7 @@ const createScene = async (canvas) => {
           if (triggerComponent.pressed) {
             console.log("Left Trigger Pressed");
             movementControlManager.movementSpeed =
-              movementSettings.movementSpeed * 2;
+              movementSettings.movementSpeed * 3;
           } else {
             console.log("Left Trigger Released");
             movementControlManager.movementSpeed =
@@ -240,33 +547,13 @@ const createScene = async (canvas) => {
       }
     });
   });
-
-  engine.runRenderLoop(() => {
-    scene.render();
-  });
-  window.addEventListener("resize", function () {
-    engine.resize();
-  });
 };
 
-onMounted(() => {
-  if (bjsCanvas.value) {
-    createScene(bjsCanvas.value);
-  }
-});
-
-const setupCameraForCollisions = (camera) => {
-  camera.checkCollisions = true;
-  camera.applyGravity = true;
-  camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
-  camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
-};
-
-const addLabRoom = (scene) => {
+const addLabRoomLocal = (scene) => {
   // Add a ground plane to the scene. Used for WebXR teleportation
   const ground = BABYLON.MeshBuilder.CreateGround(
     "ground",
-    { height: 100, width: 100, subdivisions: 4 },
+    { height: 200, width: 100, subdivisions: 4 },
     scene
   );
   // ground.position.y = 10;
@@ -286,7 +573,7 @@ const addLabRoom = (scene) => {
 
   const wall1 = BABYLON.MeshBuilder.CreateGround(
     "wall1",
-    { height: 10, width: 100, subdivisions: 4 },
+    { height: 10, width: 200, subdivisions: 4 },
     scene
   );
   wall1.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI / 2);
@@ -300,13 +587,44 @@ const addLabRoom = (scene) => {
   wall2.position = new BABYLON.Vector3(50, 5, 0);
 
   console.log("wall rotation", wall1.rotation, wall2.rotation);
-  const wall3 = wall1.clone("wall3");
+
+  const wall3 = BABYLON.MeshBuilder.CreateGround(
+    "wall1",
+    { height: 10, width: 100, subdivisions: 4 },
+    scene
+  );
+  wall3.material = groundMaterial;
+  wall3.sideOrientation = "DOUBLESIDE";
+  wall3.checkCollisions = true;
+  // const wall3 = wall1.clone("wall3");
   wall3.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2);
-  wall3.position = new BABYLON.Vector3(0, 5, -50);
+  wall3.position = new BABYLON.Vector3(0, 5, -100);
 
   const wall4 = wall3.clone("wall4");
   wall4.rotation.z = -Math.PI / 2;
-  wall4.position = new BABYLON.Vector3(0, 5, 50);
+  wall4.position = new BABYLON.Vector3(0, 5, 100);
+
+  const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
+  subjectMat2.diffuseColor = LabColors["blue"];
+  subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
+    height: 8,
+    width: 16,
+    depth: 0.2,
+  });
+  subject2.material = subjectMat2;
+  subject2.position = new BABYLON.Vector3(0, 4, 100);
+
+  const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
+  subjectMat3.diffuseColor = LabColors["green"];
+  subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
+    height: 8,
+    width: 16,
+    depth: 0.2,
+  });
+  subject3.material = subjectMat3;
+  subject3.position = new BABYLON.Vector3(0, 4, -100);
 };
 </script>
 
