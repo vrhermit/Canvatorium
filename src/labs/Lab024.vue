@@ -18,8 +18,10 @@ Checking out the new Movement Controls in Babylon JS 5.0
 - Right stick: movement
 - Left stick: rotation
 - Menu to customize the movement control options, with a Follow Behavior attached.
-- Reset button
+- Reset button - reset all values and restore default position
 - Bonus: Hold the trigger on the left controller for a 3X speed boost
+- Bonus: Toggle camera gravity
+- Y button to toggle the menu
 
 Resources
 - Documentation for [Movement Controls](https://doc.babylonjs.com/divingDeeper/webXR/WebXRSelectedFeatures#movement-module)
@@ -30,6 +32,7 @@ const bjsCanvas = ref(null);
 let engine;
 let scene;
 let mainCamera; // a refecence to the XR camera, will be set after entering VR
+let menuIsVisible = ref(true);
 
 let movementControlManager; // a reference to the movement controls
 let movementSettings = reactive({
@@ -84,9 +87,18 @@ const createScene = async (canvas) => {
   sixDofDragBehavior.allowMultiPointers = true;
   subject1.addBehavior(sixDofDragBehavior);
 
-  createUICard();
+  const platform = BABYLON.MeshBuilder.CreateBox("subject1", {
+    width: 20,
+    height: 0.2,
+    depth: 200,
+  });
+  platform.material = subjectMat1;
+  platform.position = new BABYLON.Vector3(60, 10, 0);
+  platform.checkCollisions = true;
 
-  await addLabPlayerLocal(scene);
+  const { toggleMenu } = createUICard();
+
+  await addLabPlayerLocal(scene, toggleMenu);
 
   engine.runRenderLoop(() => {
     scene.render();
@@ -103,6 +115,10 @@ onMounted(() => {
 });
 
 const createUICard = (scene) => {
+  const toggleMenu = () => {
+    menuIsVisible.value = !menuIsVisible.value;
+  };
+
   const cardMaterial = new BABYLON.StandardMaterial(
     "menu-card-material",
     scene
@@ -157,30 +173,6 @@ const createUICard = (scene) => {
   sv.barColor = "#53637b";
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
-
-  var grid = new GUI.Grid();
-  grid.addColumnDefinition(40, true);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(40, true);
-
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  sv.addControl(grid);
 
   const movementSpeedLabel = new GUI.TextBlock();
   movementSpeedLabel.text = "Movement Speed: 0.5";
@@ -340,10 +332,32 @@ const createUICard = (scene) => {
     }
   );
 
-  var resetButton = GUI.Button.CreateSimpleButton("but", "Reset All");
-  resetButton.width = 0.2;
-  resetButton.height = "40px";
+  const gravityLabel = new GUI.TextBlock();
+  gravityLabel.text = "Apply Gravity";
+  gravityLabel.height = "60px";
+  gravityLabel.fontSize = "40px";
+  gravityLabel.color = "white";
+  gravityLabel.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
+  const gravityCheckbox = new GUI.Checkbox();
+  gravityCheckbox.isChecked = true;
+  gravityCheckbox.height = "60px";
+  gravityCheckbox.width = "70px";
+  gravityCheckbox.color = "#8854d0";
+  gravityCheckbox.background = "#53637b";
+  gravityCheckbox.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  gravityCheckbox.paddingLeftInPixels = "10";
+  gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
+    mainCamera.applyGravity = value;
+  });
+
+  const resetButton = GUI.Button.CreateSimpleButton(
+    "reset-button",
+    "Reset All"
+  );
+  resetButton.width = 1;
+  resetButton.height = "60px";
+  resetButton.fontSize = "40px";
   resetButton.color = "white";
   resetButton.background = "#53637b";
 
@@ -365,7 +379,36 @@ const createUICard = (scene) => {
     rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
     movementOrientationFollowsViewerPoseCheckbox.isChecked =
       movementSettings.movementOrientationFollowsViewerPose;
+
+    // Move the player back to the starting position
+    mainCamera.position = new BABYLON.Vector3(0, 3, 0);
   });
+
+  const grid = new GUI.Grid();
+  grid.addColumnDefinition(40, true);
+  grid.addColumnDefinition(0.5);
+  grid.addColumnDefinition(0.5);
+  grid.addColumnDefinition(40, true);
+
+  grid.addRowDefinition(72, true); // empty row
+
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  grid.addRowDefinition(72, true); // empty row
+
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  grid.addRowDefinition(72, true); // empty row
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+  grid.addRowDefinition(72, true);
+
+  sv.addControl(grid);
 
   // Layout the grid content
   grid.addControl(movementSpeedLabel, 1, 1);
@@ -385,7 +428,17 @@ const createUICard = (scene) => {
   grid.addControl(movementOrientationFollowsViewerPoseLabel, 9, 1);
   grid.addControl(movementOrientationFollowsViewerPoseCheckbox, 9, 2);
 
-  grid.addControl(resetButton, 10, 1);
+  grid.addControl(gravityLabel, 10, 1);
+  grid.addControl(gravityCheckbox, 10, 2);
+
+  grid.addControl(resetButton, 12, 2);
+
+  watch(menuIsVisible, (newValue) => {
+    card.isVisible = newValue;
+    plane.isVisible = newValue;
+  });
+
+  return { toggleMenu };
 };
 
 const setupCameraForCollisions = (camera) => {
@@ -395,7 +448,7 @@ const setupCameraForCollisions = (camera) => {
   camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
 };
 
-const addLabPlayerLocal = async (scene) => {
+const addLabPlayerLocal = async (scene, toggleMenu) => {
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     disableTeleportation: true,
@@ -481,6 +534,10 @@ const addLabPlayerLocal = async (scene) => {
         squeezeComponent?.onButtonStateChangedObservable.add(() => {
           if (squeezeComponent.pressed) {
             console.log("Left Grip Pressed");
+            mainCamera.applyGravity = false;
+          } else {
+            console.log("Left Grip Released");
+            mainCamera.applyGravity = true;
           }
         });
 
@@ -494,7 +551,7 @@ const addLabPlayerLocal = async (scene) => {
         yButtonComponent?.onButtonStateChangedObservable.add(() => {
           if (yButtonComponent.pressed) {
             console.log("Y Button Pressed");
-            // toggleMenu(controller);
+            toggleMenu();
           }
         });
       }
@@ -521,11 +578,6 @@ const addLabPlayerLocal = async (scene) => {
           // Move the player back to the start position if the A button is pressed
           if (aButtonComponent.pressed) {
             console.log("A Button Pressed");
-            mainCamera.position = new BABYLON.Vector3(
-              0,
-              mainCamera.position.y,
-              -2
-            );
           }
         });
         let bButtonComponent = motionController.getComponent(xr_ids[4]); //b-button
