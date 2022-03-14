@@ -52,7 +52,7 @@
       </p>
       <p>Each lab contains a Babylon JS scene, a title, and some notes.</p>
       <p>
-        Check the code for each lap for more details. The repo is
+        Check the code for each lab for more details. The repo is
         <a href="https://github.com/vrhermit/Canvatorium">here</a>
       </p>
       <p>
