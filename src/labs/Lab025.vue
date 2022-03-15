@@ -141,13 +141,17 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
-  const parabolicCheckRadiusLabel = new GUI.TextBlock();
-  parabolicCheckRadiusLabel.text = "Parabolic Radius: 5";
-  parabolicCheckRadiusLabel.height = "60px";
-  parabolicCheckRadiusLabel.fontSize = "40px";
-  parabolicCheckRadiusLabel.color = "white";
-  parabolicCheckRadiusLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const createGridMenuLabel = (text) => {
+    const label = new GUI.TextBlock();
+    label.text = text;
+    label.height = "60px";
+    label.fontSize = "40px";
+    label.color = "white";
+    label.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    return label;
+  };
+
+  const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
 
   const parabolicCheckRadiusSlider = new GUI.Slider();
   parabolicCheckRadiusSlider.minimum = 1;
@@ -165,13 +169,7 @@ const createUICard = (scene) => {
     parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
   });
 
-  const parabolicRayEnabledLabel = new GUI.TextBlock();
-  parabolicRayEnabledLabel.text = "Parabolic Enabled";
-  parabolicRayEnabledLabel.height = "60px";
-  parabolicRayEnabledLabel.fontSize = "40px";
-  parabolicRayEnabledLabel.color = "white";
-  parabolicRayEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const parabolicRayEnabledLabel = createGridMenuLabel("Parabolic Enabled");
 
   const parabolicRayEnabledToggle = new GUI.Checkbox();
   parabolicRayEnabledToggle.isChecked = true;
@@ -186,13 +184,7 @@ const createUICard = (scene) => {
     teleportSettings.parabolicRayEnabled = value;
   });
 
-  const rotationAngleLabel = new GUI.TextBlock();
-  rotationAngleLabel.text = "Snap Turn Angle (Pi / 8)";
-  rotationAngleLabel.height = "60px";
-  rotationAngleLabel.fontSize = "40px";
-  rotationAngleLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationAngleLabel.color = "white";
+  const rotationAngleLabel = createGridMenuLabel("Snap Turn Angle (Pi / 8)");
 
   const rotationAngleSlider = new GUI.Slider();
   rotationAngleSlider.minimum = 2;
@@ -211,14 +203,7 @@ const createUICard = (scene) => {
   });
 
   // Important: This setting only effects the rotation feature on an active teleport target. The user can move their thumbstick to rotate round the target before completing the teleportation.
-  const rotationEnabledLabel = new GUI.TextBlock();
-  rotationEnabledLabel.text = "Rotation Enabled";
-  rotationEnabledLabel.height = "60px";
-  rotationEnabledLabel.fontSize = "40px";
-  rotationEnabledLabel.fontSize = "40px";
-  rotationEnabledLabel.color = "white";
-  rotationEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const rotationEnabledLabel = createGridMenuLabel("Rotation Enabled");
 
   const rotationEnabledCheckbox = new GUI.Checkbox();
   rotationEnabledCheckbox.isChecked = true;
@@ -233,13 +218,8 @@ const createUICard = (scene) => {
     teleportSettings.rotationEnabled = value;
   });
 
-  const backwardsMovementEnabledLabel = new GUI.TextBlock();
-  backwardsMovementEnabledLabel.text = "Backwards Movement";
-  backwardsMovementEnabledLabel.height = "60px";
-  backwardsMovementEnabledLabel.fontSize = "40px";
-  backwardsMovementEnabledLabel.color = "white";
-  backwardsMovementEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const backwardsMovementEnabledLabel =
+    createGridMenuLabel("Backwards Movement");
 
   const backwardsMovementEnabledCheckbox = new GUI.Checkbox();
   backwardsMovementEnabledCheckbox.isChecked = true;
@@ -256,13 +236,9 @@ const createUICard = (scene) => {
     teleportSettings.backwardsMovementEnabled = value;
   });
 
-  const backwardsTeleportationDistanceLabel = new GUI.TextBlock();
-  backwardsTeleportationDistanceLabel.text = "Backwards Distance: 1.0";
-  backwardsTeleportationDistanceLabel.height = "60px";
-  backwardsTeleportationDistanceLabel.fontSize = "40px";
-  backwardsTeleportationDistanceLabel.color = "white";
-  backwardsTeleportationDistanceLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const backwardsTeleportationDistanceLabel = createGridMenuLabel(
+    "Backwards Distance: 1.0"
+  );
 
   const backwardsTeleportationDistanceSlider = new GUI.Slider();
   backwardsTeleportationDistanceSlider.minimum = 0;
