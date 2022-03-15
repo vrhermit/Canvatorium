@@ -319,44 +319,41 @@ const createUICard = (scene) => {
   grid.addColumnDefinition(0.5);
   grid.addColumnDefinition(40, true);
 
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
+  // Layout the grid content
+  // Add rows to the grid and attach controls to the rows, using the current row count.
+  // This makes it easy to reorder these in code without having to reindex the grid content.
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(parabolicCheckRadiusLabel, grid.rowCount, 1)
+    .addControl(parabolicCheckRadiusSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(parabolicRayEnabledLabel, grid.rowCount, 1)
+    .addControl(parabolicRayEnabledToggle, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationAngleLabel, grid.rowCount, 1)
+    .addControl(rotationAngleSlider, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationEnabledLabel, grid.rowCount, 1)
+    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(backwardsTeleportationDistanceLabel, grid.rowCount, 1)
+    .addControl(backwardsTeleportationDistanceSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(backwardsMovementEnabledLabel, grid.rowCount, 1)
+    .addControl(backwardsMovementEnabledCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
 
   sv.addControl(grid);
-
-  // Layout the grid content
-  grid.addControl(parabolicCheckRadiusLabel, 1, 1);
-  grid.addControl(parabolicCheckRadiusSlider, 1, 2);
-  grid.addControl(parabolicRayEnabledLabel, 2, 1);
-  grid.addControl(parabolicRayEnabledToggle, 2, 2);
-
-  grid.addControl(rotationAngleLabel, 4, 1);
-  grid.addControl(rotationAngleSlider, 4, 2);
-  grid.addControl(rotationEnabledLabel, 6, 1);
-  grid.addControl(rotationEnabledCheckbox, 6, 2);
-
-  grid.addControl(backwardsMovementEnabledLabel, 8, 1);
-  grid.addControl(backwardsMovementEnabledCheckbox, 8, 2);
-
-  grid.addControl(backwardsTeleportationDistanceLabel, 9, 1);
-  grid.addControl(backwardsTeleportationDistanceSlider, 9, 2);
-
-  grid.addControl(resetButton, 12, 2);
 
   watch(menuIsVisible, (newValue) => {
     card.isVisible = newValue;
