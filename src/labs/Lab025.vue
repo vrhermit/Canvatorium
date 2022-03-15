@@ -151,19 +151,29 @@ const createUICard = (scene) => {
     return label;
   };
 
+  const createGridMenuSlider = (options) => {
+    const { min, max, step, value } = options;
+    const slider = new GUI.Slider();
+    slider.minimum = min;
+    slider.maximum = max;
+    slider.step = step;
+    slider.value = value;
+    slider.height = "60px";
+    slider.width = "100%";
+    slider.color = "#8854d0";
+    slider.background = "#53637b";
+
+    return slider;
+  };
+
   const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
 
-  const parabolicCheckRadiusSlider = new GUI.Slider();
-  parabolicCheckRadiusSlider.minimum = 1;
-  parabolicCheckRadiusSlider.maximum = 20;
-  parabolicCheckRadiusSlider.step = 1;
-  parabolicCheckRadiusSlider.value = 5;
-  parabolicCheckRadiusSlider.height = "60px";
-  parabolicCheckRadiusSlider.width = "100%";
-  parabolicCheckRadiusSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  parabolicCheckRadiusSlider.color = "#8854d0";
-  parabolicCheckRadiusSlider.background = "#53637b";
+  const parabolicCheckRadiusSlider = createGridMenuSlider({
+    min: 1,
+    max: 20,
+    step: 1,
+    value: 5,
+  });
   parabolicCheckRadiusSlider.onValueChangedObservable.add(function (value) {
     teleportSettings.parabolicCheckRadius = value;
     parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
@@ -186,17 +196,12 @@ const createUICard = (scene) => {
 
   const rotationAngleLabel = createGridMenuLabel("Snap Turn Angle (Pi / 8)");
 
-  const rotationAngleSlider = new GUI.Slider();
-  rotationAngleSlider.minimum = 2;
-  rotationAngleSlider.maximum = 16;
-  rotationAngleSlider.value = 8;
-  rotationAngleSlider.step = 1;
-  rotationAngleSlider.height = "60px";
-  rotationAngleSlider.width = "100%";
-  rotationAngleSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationAngleSlider.color = "#8854d0";
-  rotationAngleSlider.background = "#53637b";
+  const rotationAngleSlider = createGridMenuSlider({
+    min: 2,
+    max: 12,
+    step: 1,
+    value: 8,
+  });
   rotationAngleSlider.onValueChangedObservable.add(function (value) {
     teleportSettings.rotationAngle = value;
     rotationAngleLabel.text = `Snap Turn Angle (Pi / ${value})`;
@@ -240,17 +245,12 @@ const createUICard = (scene) => {
     "Backwards Distance: 1.0"
   );
 
-  const backwardsTeleportationDistanceSlider = new GUI.Slider();
-  backwardsTeleportationDistanceSlider.minimum = 0;
-  backwardsTeleportationDistanceSlider.maximum = 10;
-  backwardsTeleportationDistanceSlider.value = 1;
-  backwardsTeleportationDistanceSlider.step = 0.1;
-  backwardsTeleportationDistanceSlider.height = "60px";
-  backwardsTeleportationDistanceSlider.width = "100%";
-  backwardsTeleportationDistanceSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  backwardsTeleportationDistanceSlider.color = "#8854d0";
-  backwardsTeleportationDistanceSlider.background = "#53637b";
+  const backwardsTeleportationDistanceSlider = createGridMenuSlider({
+    min: 0,
+    max: 10,
+    step: 0.1,
+    value: 1,
+  });
   backwardsTeleportationDistanceSlider.onValueChangedObservable.add(function (
     value
   ) {
