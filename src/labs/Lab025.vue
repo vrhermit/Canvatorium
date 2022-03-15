@@ -22,32 +22,31 @@ let scene;
 let mainCamera; // a refecence to the XR camera, will be set after entering VR
 let menuIsVisible = ref(true);
 
-let movementControlManager; // a reference to the movement controls
-let movementSettings = reactive({
-  movementOrientationFollowsViewerPose: true,
-
-  movementEnabled: true,
-  movementSpeed: 0.5, // 1 is too fast most of the time
-  movementThreshold: 0.25,
+let teleportControlManager; // a reference to the teleport object
+let teleportSettings = reactive({
+  parabolicRayEnabled: true,
+  parabolicCheckRadius: 5,
 
   rotationEnabled: true,
-  rotationSpeed: 0.25,
-  rotationThreshold: 0.25,
+  rotationAngle: 0.25,
+
+  backwardsMovementEnabled: true,
+  backwardsTeleportationDistance: 0.7,
 });
 
-watch(movementSettings, (newValue) => {
-  // console.log("watching movementSettings", newValue);
-  if (movementControlManager) {
-    movementControlManager.movementOrientationFollowsViewerPose =
-      newValue.movementOrientationFollowsViewerPose;
+watch(teleportSettings, (newValue) => {
+  // console.log("watching teleportSettings", newValue);
+  if (teleportControlManager) {
+    teleportControlManager.parabolicRayEnabled = newValue.parabolicRayEnabled;
+    teleportControlManager.parabolicCheckRadius = newValue.parabolicCheckRadius;
 
-    movementControlManager.movementEnabled = newValue.movementEnabled;
-    movementControlManager.movementSpeed = newValue.movementSpeed;
-    movementControlManager.movementThreshold = newValue.movementThreshold;
+    teleportControlManager.rotationEnabled = newValue.rotationEnabled;
+    teleportControlManager.rotationAngle = newValue.rotationAngle;
 
-    movementControlManager.rotationEnabled = newValue.rotationEnabled;
-    movementControlManager.rotationSpeed = newValue.rotationSpeed;
-    movementControlManager.rotationThreshold = newValue.rotationThreshold;
+    teleportControlManager.backwardsMovementEnabled =
+      newValue.backwardsMovementEnabled;
+    teleportControlManager.backwardsTeleportationDistance =
+      newValue.backwardsTeleportationDistance;
   }
 });
 
@@ -66,7 +65,7 @@ const createScene = async (canvas) => {
   const { toggleMenu } = createUICard();
 
   await addLabPlayerLocal(scene, toggleMenu, teleportMeshes);
-  toggleMenu();
+  // toggleMenu();
 
   engine.runRenderLoop(() => {
     scene.render();
@@ -142,127 +141,84 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
-  const movementSpeedLabel = new GUI.TextBlock();
-  movementSpeedLabel.text = "Movement Speed: 0.5";
-  movementSpeedLabel.height = "60px";
-  movementSpeedLabel.fontSize = "40px";
-  movementSpeedLabel.color = "white";
-  movementSpeedLabel.textHorizontalAlignment =
+  const parabolicCheckRadiusLabel = new GUI.TextBlock();
+  parabolicCheckRadiusLabel.text = "Parabolic Radius: 5";
+  parabolicCheckRadiusLabel.height = "60px";
+  parabolicCheckRadiusLabel.fontSize = "40px";
+  parabolicCheckRadiusLabel.color = "white";
+  parabolicCheckRadiusLabel.textHorizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
-  const movementSpeedSlider = new GUI.Slider();
-  movementSpeedSlider.minimum = 0.1;
-  movementSpeedSlider.maximum = 2;
-  movementSpeedSlider.value = 0.5;
-  movementSpeedSlider.height = "60px";
-  movementSpeedSlider.width = "100%";
-  movementSpeedSlider.horizontalAlignment =
+  const parabolicCheckRadiusSlider = new GUI.Slider();
+  parabolicCheckRadiusSlider.minimum = 1;
+  parabolicCheckRadiusSlider.maximum = 20;
+  parabolicCheckRadiusSlider.step = 1;
+  parabolicCheckRadiusSlider.value = 5;
+  parabolicCheckRadiusSlider.height = "60px";
+  parabolicCheckRadiusSlider.width = "100%";
+  parabolicCheckRadiusSlider.horizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementSpeedSlider.color = "#8854d0";
-  movementSpeedSlider.background = "#53637b";
-  movementSpeedSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.movementSpeed = value;
-    movementSpeedLabel.text = `Movement Speed: ${value.toFixed(2)}`;
+  parabolicCheckRadiusSlider.color = "#8854d0";
+  parabolicCheckRadiusSlider.background = "#53637b";
+  parabolicCheckRadiusSlider.onValueChangedObservable.add(function (value) {
+    teleportSettings.parabolicCheckRadius = value;
+    parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
   });
 
-  const movementThresholdLabel = new GUI.TextBlock();
-  movementThresholdLabel.text = "Axis Threshold: 0.25";
-  movementThresholdLabel.height = "60px";
-  movementThresholdLabel.fontSize = "40px";
-  movementThresholdLabel.color = "white";
-  movementThresholdLabel.textHorizontalAlignment =
+  const parabolicRayEnabledLabel = new GUI.TextBlock();
+  parabolicRayEnabledLabel.text = "Parabolic Enabled";
+  parabolicRayEnabledLabel.height = "60px";
+  parabolicRayEnabledLabel.fontSize = "40px";
+  parabolicRayEnabledLabel.color = "white";
+  parabolicRayEnabledLabel.textHorizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
-  const movementThresholdSlider = new GUI.Slider();
-  movementThresholdSlider.minimum = 0;
-  movementThresholdSlider.maximum = 1;
-  movementThresholdSlider.value = 0.25;
-  movementThresholdSlider.height = "60px";
-  movementThresholdSlider.width = "100%";
-  movementThresholdSlider.horizontalAlignment =
+  const parabolicRayEnabledToggle = new GUI.Checkbox();
+  parabolicRayEnabledToggle.isChecked = true;
+  parabolicRayEnabledToggle.height = "60px";
+  parabolicRayEnabledToggle.width = "70px";
+  parabolicRayEnabledToggle.color = "#8854d0";
+  parabolicRayEnabledToggle.background = "#53637b";
+  parabolicRayEnabledToggle.paddingLeftInPixels = "10";
+  parabolicRayEnabledToggle.horizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementThresholdSlider.color = "#8854d0";
-  movementThresholdSlider.background = "#53637b";
-  movementThresholdSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.movementThreshold = value;
-    movementThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
+  parabolicRayEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
+    teleportSettings.parabolicRayEnabled = value;
   });
 
-  const movementEnabledLabel = new GUI.TextBlock();
-  movementEnabledLabel.text = "Movement Enabled";
-  movementEnabledLabel.height = "60px";
-  movementEnabledLabel.fontSize = "40px";
-  movementEnabledLabel.color = "white";
-  movementEnabledLabel.textHorizontalAlignment =
+  const rotationAngleLabel = new GUI.TextBlock();
+  rotationAngleLabel.text = "Snap Turn Angle (Pi / 8)";
+  rotationAngleLabel.height = "60px";
+  rotationAngleLabel.fontSize = "40px";
+  rotationAngleLabel.textHorizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  rotationAngleLabel.color = "white";
 
-  const movementEnabledToggle = new GUI.Checkbox();
-  movementEnabledToggle.isChecked = true;
-  movementEnabledToggle.height = "60px";
-  movementEnabledToggle.width = "70px";
-  movementEnabledToggle.color = "#8854d0";
-  movementEnabledToggle.background = "#53637b";
-  movementEnabledToggle.paddingLeftInPixels = "10";
-  movementEnabledToggle.horizontalAlignment =
+  const rotationAngleSlider = new GUI.Slider();
+  rotationAngleSlider.minimum = 2;
+  rotationAngleSlider.maximum = 16;
+  rotationAngleSlider.value = 8;
+  rotationAngleSlider.step = 1;
+  rotationAngleSlider.height = "60px";
+  rotationAngleSlider.width = "100%";
+  rotationAngleSlider.horizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
-    movementSettings.movementEnabled = value;
+  rotationAngleSlider.color = "#8854d0";
+  rotationAngleSlider.background = "#53637b";
+  rotationAngleSlider.onValueChangedObservable.add(function (value) {
+    teleportSettings.rotationAngle = value;
+    rotationAngleLabel.text = `Snap Turn Angle (Pi / ${value})`;
   });
 
-  const rotationSpeedLabel = new GUI.TextBlock();
-  rotationSpeedLabel.text = "Rotation Speed: 0.25";
-  rotationSpeedLabel.height = "60px";
-  rotationSpeedLabel.fontSize = "40px";
-  rotationSpeedLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationSpeedLabel.color = "white";
-
-  const rotationSpeedSlider = new GUI.Slider();
-  rotationSpeedSlider.minimum = 0.1;
-  rotationSpeedSlider.maximum = 1;
-  rotationSpeedSlider.value = 0.25;
-  rotationSpeedSlider.height = "60px";
-  rotationSpeedSlider.width = "100%";
-  rotationSpeedSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationSpeedSlider.color = "#8854d0";
-  rotationSpeedSlider.background = "#53637b";
-  rotationSpeedSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.rotationSpeed = value;
-    rotationSpeedLabel.text = `Rotation Speed: ${value.toFixed(2)}`;
-  });
-
-  const rotationThresholdLabel = new GUI.TextBlock();
-  rotationThresholdLabel.text = "Axis Threshold: 0.25";
-  rotationThresholdLabel.height = "60px";
-  rotationThresholdLabel.fontSize = "40px";
-  rotationThresholdLabel.color = "white";
-  rotationThresholdLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const rotationThresholdSlider = new GUI.Slider();
-  rotationThresholdSlider.minimum = 0;
-  rotationThresholdSlider.maximum = 1;
-  rotationThresholdSlider.value = 0.25;
-  rotationThresholdSlider.height = "60px";
-  rotationThresholdSlider.width = "100%";
-  rotationThresholdSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationThresholdSlider.color = "#8854d0";
-  rotationThresholdSlider.background = "#53637b";
-  rotationThresholdSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.rotationThreshold = value;
-    rotationThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
-  });
-
+  // Important: This setting only effects the rotation feature on an active teleport target. The user can move their thumbstick to rotate round the target before completing the teleportation.
   const rotationEnabledLabel = new GUI.TextBlock();
   rotationEnabledLabel.text = "Rotation Enabled";
-  rotationEnabledLabel.height = "70px";
-  rotationEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
+  rotationEnabledLabel.height = "60px";
+  rotationEnabledLabel.fontSize = "40px";
   rotationEnabledLabel.fontSize = "40px";
   rotationEnabledLabel.color = "white";
+  rotationEnabledLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
   const rotationEnabledCheckbox = new GUI.Checkbox();
   rotationEnabledCheckbox.isChecked = true;
@@ -274,49 +230,56 @@ const createUICard = (scene) => {
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
   rotationEnabledCheckbox.paddingLeftInPixels = "10";
   rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
-    movementSettings.rotationEnabled = value;
+    teleportSettings.rotationEnabled = value;
   });
 
-  const movementOrientationFollowsViewerPoseLabel = new GUI.TextBlock();
-  movementOrientationFollowsViewerPoseLabel.text = "Orientation Follows Pose";
-  movementOrientationFollowsViewerPoseLabel.height = "70px";
-  movementOrientationFollowsViewerPoseLabel.fontSize = "40px";
-  movementOrientationFollowsViewerPoseLabel.color = "white";
-  movementOrientationFollowsViewerPoseLabel.textHorizontalAlignment =
+  const backwardsMovementEnabledLabel = new GUI.TextBlock();
+  backwardsMovementEnabledLabel.text = "Backwards Movement";
+  backwardsMovementEnabledLabel.height = "60px";
+  backwardsMovementEnabledLabel.fontSize = "40px";
+  backwardsMovementEnabledLabel.color = "white";
+  backwardsMovementEnabledLabel.textHorizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
-  const movementOrientationFollowsViewerPoseCheckbox = new GUI.Checkbox();
-  movementOrientationFollowsViewerPoseCheckbox.isChecked = true;
-  movementOrientationFollowsViewerPoseCheckbox.height = "60px";
-  movementOrientationFollowsViewerPoseCheckbox.width = "70px";
-  movementOrientationFollowsViewerPoseCheckbox.color = "#8854d0";
-  movementOrientationFollowsViewerPoseCheckbox.background = "#53637b";
-  movementOrientationFollowsViewerPoseCheckbox.horizontalAlignment =
+  const backwardsMovementEnabledCheckbox = new GUI.Checkbox();
+  backwardsMovementEnabledCheckbox.isChecked = true;
+  backwardsMovementEnabledCheckbox.height = "60px";
+  backwardsMovementEnabledCheckbox.width = "70px";
+  backwardsMovementEnabledCheckbox.color = "#8854d0";
+  backwardsMovementEnabledCheckbox.background = "#53637b";
+  backwardsMovementEnabledCheckbox.horizontalAlignment =
     GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementOrientationFollowsViewerPoseCheckbox.paddingLeftInPixels = "10";
-  movementOrientationFollowsViewerPoseCheckbox.onIsCheckedChangedObservable.add(
-    function (value) {
-      movementSettings.movementOrientationFollowsViewerPose = value;
-    }
-  );
+  backwardsMovementEnabledCheckbox.paddingLeftInPixels = "10";
+  backwardsMovementEnabledCheckbox.onIsCheckedChangedObservable.add(function (
+    value
+  ) {
+    teleportSettings.backwardsMovementEnabled = value;
+  });
 
-  const gravityLabel = new GUI.TextBlock();
-  gravityLabel.text = "Apply Gravity";
-  gravityLabel.height = "60px";
-  gravityLabel.fontSize = "40px";
-  gravityLabel.color = "white";
-  gravityLabel.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const backwardsTeleportationDistanceLabel = new GUI.TextBlock();
+  backwardsTeleportationDistanceLabel.text = "Backwards Distance: 1.0";
+  backwardsTeleportationDistanceLabel.height = "60px";
+  backwardsTeleportationDistanceLabel.fontSize = "40px";
+  backwardsTeleportationDistanceLabel.color = "white";
+  backwardsTeleportationDistanceLabel.textHorizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
 
-  const gravityCheckbox = new GUI.Checkbox();
-  gravityCheckbox.isChecked = true;
-  gravityCheckbox.height = "60px";
-  gravityCheckbox.width = "70px";
-  gravityCheckbox.color = "#8854d0";
-  gravityCheckbox.background = "#53637b";
-  gravityCheckbox.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  gravityCheckbox.paddingLeftInPixels = "10";
-  gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
-    mainCamera.applyGravity = value;
+  const backwardsTeleportationDistanceSlider = new GUI.Slider();
+  backwardsTeleportationDistanceSlider.minimum = 0;
+  backwardsTeleportationDistanceSlider.maximum = 10;
+  backwardsTeleportationDistanceSlider.value = 1;
+  backwardsTeleportationDistanceSlider.step = 0.1;
+  backwardsTeleportationDistanceSlider.height = "60px";
+  backwardsTeleportationDistanceSlider.width = "100%";
+  backwardsTeleportationDistanceSlider.horizontalAlignment =
+    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  backwardsTeleportationDistanceSlider.color = "#8854d0";
+  backwardsTeleportationDistanceSlider.background = "#53637b";
+  backwardsTeleportationDistanceSlider.onValueChangedObservable.add(function (
+    value
+  ) {
+    teleportSettings.backwardsTeleportationDistance = value;
+    backwardsTeleportationDistanceLabel.text = `Backwards Distance: ${value}`;
   });
 
   const resetButton = GUI.Button.CreateSimpleButton(
@@ -330,26 +293,24 @@ const createUICard = (scene) => {
   resetButton.background = "#53637b";
 
   resetButton.onPointerUpObservable.add(function () {
-    movementSettings.movementSpeed = 0.5;
-    movementSettings.movementThreshold = 0.25;
-    movementSettings.movementEnabled = true;
-    movementSettings.rotationSpeed = 0.25;
-    movementSettings.rotationThreshold = 0.25;
-    movementSettings.rotationEnabled = true;
-    movementSettings.movementOrientationFollowsViewerPose = true;
+    teleportSettings.parabolicCheckRadius = 5;
+    teleportSettings.parabolicRayEnabled = true;
+    teleportSettings.rotationAngle = 8;
+    teleportSettings.rotationEnabled = true;
+    teleportSettings.backwardsMovementEnabled = true;
+    teleportSettings.backwardsTeleportationDistance = 1;
 
-    movementSpeedSlider.value = movementSettings.movementSpeed;
-    movementThresholdSlider.value = movementSettings.movementThreshold;
-    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
-    rotationSpeedSlider.value = movementSettings.rotationSpeed;
-    rotationThresholdSlider.value = movementSettings.rotationThreshold;
-    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
-    rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
-    movementOrientationFollowsViewerPoseCheckbox.isChecked =
-      movementSettings.movementOrientationFollowsViewerPose;
+    parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
+    parabolicRayEnabledToggle.isChecked = teleportSettings.parabolicRayEnabled;
+    rotationAngleSlider.value = teleportSettings.rotationAngle;
+    rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
+    backwardsMovementEnabledCheckbox.isChecked =
+      teleportSettings.backwardsMovementEnabled;
+    backwardsTeleportationDistanceSlider.value =
+      teleportSettings.backwardsTeleportationDistance;
 
     // Move the player back to the starting position
-    mainCamera.position = new BABYLON.Vector3(0, 3, 0);
+    mainCamera.position = new BABYLON.Vector3(0, 1.7, 0);
   });
 
   const grid = new GUI.Grid();
@@ -379,25 +340,21 @@ const createUICard = (scene) => {
   sv.addControl(grid);
 
   // Layout the grid content
-  grid.addControl(movementSpeedLabel, 1, 1);
-  grid.addControl(movementSpeedSlider, 1, 2);
-  grid.addControl(movementThresholdLabel, 2, 1);
-  grid.addControl(movementThresholdSlider, 2, 2);
-  grid.addControl(movementEnabledLabel, 3, 1);
-  grid.addControl(movementEnabledToggle, 3, 2);
+  grid.addControl(parabolicCheckRadiusLabel, 1, 1);
+  grid.addControl(parabolicCheckRadiusSlider, 1, 2);
+  grid.addControl(parabolicRayEnabledLabel, 2, 1);
+  grid.addControl(parabolicRayEnabledToggle, 2, 2);
 
-  grid.addControl(rotationSpeedLabel, 5, 1);
-  grid.addControl(rotationSpeedSlider, 5, 2);
-  grid.addControl(rotationThresholdLabel, 6, 1);
-  grid.addControl(rotationThresholdSlider, 6, 2);
-  grid.addControl(rotationEnabledLabel, 7, 1);
-  grid.addControl(rotationEnabledCheckbox, 7, 2);
+  grid.addControl(rotationAngleLabel, 4, 1);
+  grid.addControl(rotationAngleSlider, 4, 2);
+  grid.addControl(rotationEnabledLabel, 6, 1);
+  grid.addControl(rotationEnabledCheckbox, 6, 2);
 
-  grid.addControl(movementOrientationFollowsViewerPoseLabel, 9, 1);
-  grid.addControl(movementOrientationFollowsViewerPoseCheckbox, 9, 2);
+  grid.addControl(backwardsMovementEnabledLabel, 8, 1);
+  grid.addControl(backwardsMovementEnabledCheckbox, 8, 2);
 
-  grid.addControl(gravityLabel, 10, 1);
-  grid.addControl(gravityCheckbox, 10, 2);
+  grid.addControl(backwardsTeleportationDistanceLabel, 9, 1);
+  grid.addControl(backwardsTeleportationDistanceSlider, 9, 2);
 
   grid.addControl(resetButton, 12, 2);
 
@@ -448,7 +405,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
       xrInput: xr.input,
       floorMeshes: teleportMeshes,
       renderingGroupId: 1,
-      teleportationTargetMesh: cylinder,
+      // teleportationTargetMesh: cylinder,
       defaultTargetMeshOptions: {
         teleportationFillColor: "#3e4a5d",
         teleportationBorderColor: "#8854d0",
@@ -457,7 +414,11 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
     }
   );
 
-  teleportation.parabolicCheckRadius = 10;
+  console.log(teleportation);
+  teleportControlManager = teleportation;
+
+  // teleportation.backwardsMovementEnabled = false;
+  // teleportation.backwardsTeleportationDistance = 2;
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
