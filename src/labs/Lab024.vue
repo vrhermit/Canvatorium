@@ -295,48 +295,48 @@ const createUICard = (scene) => {
   grid.addColumnDefinition(0.5);
   grid.addColumnDefinition(40, true);
 
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
+  // Layout the grid content
+  // Add rows to the grid and attach controls to the rows, using the current row count.
+  // This makes it easy to reorder these in code without having to reindex the grid content.
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementSpeedLabel, grid.rowCount, 1)
+    .addControl(movementSpeedSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementThresholdLabel, grid.rowCount, 1)
+    .addControl(movementThresholdSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementEnabledLabel, grid.rowCount, 1)
+    .addControl(movementEnabledToggle, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationSpeedLabel, grid.rowCount, 1)
+    .addControl(rotationSpeedSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationThresholdLabel, grid.rowCount, 1)
+    .addControl(rotationThresholdSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationEnabledLabel, grid.rowCount, 1)
+    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementOrientationFollowsViewerPoseLabel, grid.rowCount, 1)
+    .addControl(movementOrientationFollowsViewerPoseCheckbox, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(gravityLabel, grid.rowCount, 1)
+    .addControl(gravityCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
 
   sv.addControl(grid);
-
-  // Layout the grid content
-  grid.addControl(movementSpeedLabel, 1, 1);
-  grid.addControl(movementSpeedSlider, 1, 2);
-  grid.addControl(movementThresholdLabel, 2, 1);
-  grid.addControl(movementThresholdSlider, 2, 2);
-  grid.addControl(movementEnabledLabel, 3, 1);
-  grid.addControl(movementEnabledToggle, 3, 2);
-
-  grid.addControl(rotationSpeedLabel, 5, 1);
-  grid.addControl(rotationSpeedSlider, 5, 2);
-  grid.addControl(rotationThresholdLabel, 6, 1);
-  grid.addControl(rotationThresholdSlider, 6, 2);
-  grid.addControl(rotationEnabledLabel, 7, 1);
-  grid.addControl(rotationEnabledCheckbox, 7, 2);
-
-  grid.addControl(movementOrientationFollowsViewerPoseLabel, 9, 1);
-  grid.addControl(movementOrientationFollowsViewerPoseCheckbox, 9, 2);
-
-  grid.addControl(gravityLabel, 10, 1);
-  grid.addControl(gravityCheckbox, 10, 2);
-
-  grid.addControl(resetButton, 12, 2);
 
   watch(menuIsVisible, (newValue) => {
     card.isVisible = newValue;
