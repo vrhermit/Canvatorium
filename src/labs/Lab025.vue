@@ -11,6 +11,12 @@ import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import LabColors from "../lab-shared/LabColors";
 
+import {
+  createGridMenuLabel,
+  createGridMenuSlider,
+  createGridMenuCheckbox,
+} from "../lab-shared/LabMenuControls";
+
 labNotes.value = `
 Teleport Controls
 
@@ -140,52 +146,6 @@ const createUICard = (scene) => {
   sv.barColor = "#53637b";
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
-
-  const createGridMenuLabel = (text) => {
-    const label = new GUI.TextBlock();
-    label.text = text;
-    label.height = "60px";
-    label.fontSize = "40px";
-    label.color = "white";
-    label.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-    return label;
-  };
-
-  const createGridMenuSlider = (options) => {
-    const { min, max, step, value } = options;
-    const slider = new GUI.Slider();
-    slider.minimum = min;
-    slider.maximum = max;
-    slider.step = step;
-    slider.value = value;
-    slider.height = "60px";
-    slider.width = "100%";
-    slider.color = "#8854d0";
-    slider.background = "#53637b";
-    slider.thumbWidth = "60px";
-    slider.thumbHeight = "60px";
-    slider.thumbBackground = "#8854d0";
-    slider.thumbBorderColor = "#8854d0";
-    slider.thumbBorderWidth = "2px";
-    slider.isThumbCircle = true;
-    slider.isThumbClamped = true;
-    slider.isThumbClampedY = true;
-
-    return slider;
-  };
-
-  const createGridMenuCheckbox = () => {
-    const checkbox = new GUI.Checkbox();
-    checkbox.isChecked = true;
-    checkbox.height = "60px";
-    // checkbox does not have a margin, so add some extra width, then use it in padding
-    checkbox.width = "70px";
-    checkbox.paddingLeftInPixels = "10";
-    checkbox.color = "#8854d0";
-    checkbox.background = "#53637b";
-    checkbox.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-    return checkbox;
-  };
 
   const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
 
