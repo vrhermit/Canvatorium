@@ -5,7 +5,13 @@ import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import * as MAT from "babylonjs-materials";
 import "babylonjs-loaders";
-import { ref, reactive, onMounted, watch } from "@vue/runtime-core";
+import {
+  ref,
+  reactive,
+  onMounted,
+  onUnmounted,
+  watch,
+} from "@vue/runtime-core";
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -117,6 +123,10 @@ onMounted(() => {
   if (bjsCanvas.value) {
     createScene(bjsCanvas.value);
   }
+});
+
+onUnmounted(() => {
+  engine.dispose();
 });
 
 const createUICard = (scene) => {
