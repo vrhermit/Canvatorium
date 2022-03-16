@@ -10,6 +10,11 @@ import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import LabColors from "../lab-shared/LabColors";
+import {
+  createGridMenuLabel,
+  createGridMenuSlider,
+  createGridMenuCheckbox,
+} from "../lab-shared/LabMenuControls";
 
 labNotes.value = `
 Movement Controls
@@ -174,179 +179,79 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
-  const movementSpeedLabel = new GUI.TextBlock();
-  movementSpeedLabel.text = "Movement Speed: 0.5";
-  movementSpeedLabel.height = "60px";
-  movementSpeedLabel.fontSize = "40px";
-  movementSpeedLabel.color = "white";
-  movementSpeedLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const movementSpeedSlider = new GUI.Slider();
-  movementSpeedSlider.minimum = 0.1;
-  movementSpeedSlider.maximum = 2;
-  movementSpeedSlider.value = 0.5;
-  movementSpeedSlider.height = "60px";
-  movementSpeedSlider.width = "100%";
-  movementSpeedSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementSpeedSlider.color = "#8854d0";
-  movementSpeedSlider.background = "#53637b";
+  const movementSpeedLabel = createGridMenuLabel("Movement Speed: 0.5");
+  const movementSpeedSlider = createGridMenuSlider({
+    min: 0.1,
+    max: 2,
+    step: 0.01,
+    value: 0.5,
+  });
   movementSpeedSlider.onValueChangedObservable.add(function (value) {
     movementSettings.movementSpeed = value;
     movementSpeedLabel.text = `Movement Speed: ${value.toFixed(2)}`;
   });
 
-  const movementThresholdLabel = new GUI.TextBlock();
-  movementThresholdLabel.text = "Axis Threshold: 0.25";
-  movementThresholdLabel.height = "60px";
-  movementThresholdLabel.fontSize = "40px";
-  movementThresholdLabel.color = "white";
-  movementThresholdLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const movementThresholdSlider = new GUI.Slider();
-  movementThresholdSlider.minimum = 0;
-  movementThresholdSlider.maximum = 1;
-  movementThresholdSlider.value = 0.25;
-  movementThresholdSlider.height = "60px";
-  movementThresholdSlider.width = "100%";
-  movementThresholdSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementThresholdSlider.color = "#8854d0";
-  movementThresholdSlider.background = "#53637b";
+  const movementThresholdLabel = createGridMenuLabel("Axis Threshold: 0.25");
+  const movementThresholdSlider = createGridMenuSlider({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    value: 0.25,
+  });
   movementThresholdSlider.onValueChangedObservable.add(function (value) {
     movementSettings.movementThreshold = value;
     movementThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
   });
 
-  const movementEnabledLabel = new GUI.TextBlock();
-  movementEnabledLabel.text = "Movement Enabled";
-  movementEnabledLabel.height = "60px";
-  movementEnabledLabel.fontSize = "40px";
-  movementEnabledLabel.color = "white";
-  movementEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const movementEnabledToggle = new GUI.Checkbox();
-  movementEnabledToggle.isChecked = true;
-  movementEnabledToggle.height = "60px";
-  movementEnabledToggle.width = "70px";
-  movementEnabledToggle.color = "#8854d0";
-  movementEnabledToggle.background = "#53637b";
-  movementEnabledToggle.paddingLeftInPixels = "10";
-  movementEnabledToggle.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const movementEnabledLabel = createGridMenuLabel("Movement Enabled");
+  const movementEnabledToggle = createGridMenuCheckbox();
   movementEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.movementEnabled = value;
   });
 
-  const rotationSpeedLabel = new GUI.TextBlock();
-  rotationSpeedLabel.text = "Rotation Speed: 0.25";
-  rotationSpeedLabel.height = "60px";
-  rotationSpeedLabel.fontSize = "40px";
-  rotationSpeedLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationSpeedLabel.color = "white";
-
-  const rotationSpeedSlider = new GUI.Slider();
-  rotationSpeedSlider.minimum = 0.1;
-  rotationSpeedSlider.maximum = 1;
-  rotationSpeedSlider.value = 0.25;
-  rotationSpeedSlider.height = "60px";
-  rotationSpeedSlider.width = "100%";
-  rotationSpeedSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationSpeedSlider.color = "#8854d0";
-  rotationSpeedSlider.background = "#53637b";
+  const rotationSpeedLabel = createGridMenuLabel("Rotation Speed: 0.25");
+  const rotationSpeedSlider = createGridMenuSlider({
+    min: 0.1,
+    max: 2,
+    step: 0.01,
+    value: 0.25,
+  });
   rotationSpeedSlider.onValueChangedObservable.add(function (value) {
     movementSettings.rotationSpeed = value;
     rotationSpeedLabel.text = `Rotation Speed: ${value.toFixed(2)}`;
   });
 
-  const rotationThresholdLabel = new GUI.TextBlock();
-  rotationThresholdLabel.text = "Axis Threshold: 0.25";
-  rotationThresholdLabel.height = "60px";
-  rotationThresholdLabel.fontSize = "40px";
-  rotationThresholdLabel.color = "white";
-  rotationThresholdLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const rotationThresholdSlider = new GUI.Slider();
-  rotationThresholdSlider.minimum = 0;
-  rotationThresholdSlider.maximum = 1;
-  rotationThresholdSlider.value = 0.25;
-  rotationThresholdSlider.height = "60px";
-  rotationThresholdSlider.width = "100%";
-  rotationThresholdSlider.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationThresholdSlider.color = "#8854d0";
-  rotationThresholdSlider.background = "#53637b";
+  const rotationThresholdLabel = createGridMenuLabel("Axis Threshold: 0.25");
+  const rotationThresholdSlider = createGridMenuSlider({
+    min: 0,
+    max: 1,
+    step: 0.01,
+    value: 0.25,
+  });
   rotationThresholdSlider.onValueChangedObservable.add(function (value) {
     movementSettings.rotationThreshold = value;
     rotationThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
   });
 
-  const rotationEnabledLabel = new GUI.TextBlock();
-  rotationEnabledLabel.text = "Rotation Enabled";
-  rotationEnabledLabel.height = "70px";
-  rotationEnabledLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  rotationEnabledLabel.fontSize = "40px";
-  rotationEnabledLabel.color = "white";
-
-  const rotationEnabledCheckbox = new GUI.Checkbox();
-  rotationEnabledCheckbox.isChecked = true;
-  rotationEnabledCheckbox.height = "60px";
-  rotationEnabledCheckbox.width = "70px";
-  rotationEnabledCheckbox.color = "#8854d0";
-  rotationEnabledCheckbox.background = "#53637b";
-  rotationEnabledCheckbox.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationEnabledCheckbox.paddingLeftInPixels = "10";
+  const rotationEnabledLabel = createGridMenuLabel("Rotation Enabled");
+  const rotationEnabledCheckbox = createGridMenuCheckbox();
   rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.rotationEnabled = value;
   });
 
-  const movementOrientationFollowsViewerPoseLabel = new GUI.TextBlock();
-  movementOrientationFollowsViewerPoseLabel.text = "Orientation Follows Pose";
-  movementOrientationFollowsViewerPoseLabel.height = "70px";
-  movementOrientationFollowsViewerPoseLabel.fontSize = "40px";
-  movementOrientationFollowsViewerPoseLabel.color = "white";
-  movementOrientationFollowsViewerPoseLabel.textHorizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-
-  const movementOrientationFollowsViewerPoseCheckbox = new GUI.Checkbox();
-  movementOrientationFollowsViewerPoseCheckbox.isChecked = true;
-  movementOrientationFollowsViewerPoseCheckbox.height = "60px";
-  movementOrientationFollowsViewerPoseCheckbox.width = "70px";
-  movementOrientationFollowsViewerPoseCheckbox.color = "#8854d0";
-  movementOrientationFollowsViewerPoseCheckbox.background = "#53637b";
-  movementOrientationFollowsViewerPoseCheckbox.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  movementOrientationFollowsViewerPoseCheckbox.paddingLeftInPixels = "10";
+  const movementOrientationFollowsViewerPoseLabel = createGridMenuLabel(
+    "Orientation Follows Pose"
+  );
+  const movementOrientationFollowsViewerPoseCheckbox = createGridMenuCheckbox();
   movementOrientationFollowsViewerPoseCheckbox.onIsCheckedChangedObservable.add(
     function (value) {
       movementSettings.movementOrientationFollowsViewerPose = value;
     }
   );
 
-  const gravityLabel = new GUI.TextBlock();
-  gravityLabel.text = "Apply Gravity";
-  gravityLabel.height = "60px";
-  gravityLabel.fontSize = "40px";
-  gravityLabel.color = "white";
-  gravityLabel.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+  const gravityLabel = createGridMenuLabel("Apply Gravity");
 
-  const gravityCheckbox = new GUI.Checkbox();
-  gravityCheckbox.isChecked = true;
-  gravityCheckbox.height = "60px";
-  gravityCheckbox.width = "70px";
-  gravityCheckbox.color = "#8854d0";
-  gravityCheckbox.background = "#53637b";
-  gravityCheckbox.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  gravityCheckbox.paddingLeftInPixels = "10";
+  const gravityCheckbox = createGridMenuCheckbox();
   gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
     mainCamera.applyGravity = value;
   });
@@ -390,48 +295,48 @@ const createUICard = (scene) => {
   grid.addColumnDefinition(0.5);
   grid.addColumnDefinition(40, true);
 
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-
-  grid.addRowDefinition(72, true); // empty row
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
-  grid.addRowDefinition(72, true);
+  // Layout the grid content
+  // Add rows to the grid and attach controls to the rows, using the current row count.
+  // This makes it easy to reorder these in code without having to reindex the grid content.
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementSpeedLabel, grid.rowCount, 1)
+    .addControl(movementSpeedSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementThresholdLabel, grid.rowCount, 1)
+    .addControl(movementThresholdSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementEnabledLabel, grid.rowCount, 1)
+    .addControl(movementEnabledToggle, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationSpeedLabel, grid.rowCount, 1)
+    .addControl(rotationSpeedSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationThresholdLabel, grid.rowCount, 1)
+    .addControl(rotationThresholdSlider, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationEnabledLabel, grid.rowCount, 1)
+    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
+    .addControl(movementOrientationFollowsViewerPoseLabel, grid.rowCount, 1)
+    .addControl(movementOrientationFollowsViewerPoseCheckbox, grid.rowCount, 2);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(gravityLabel, grid.rowCount, 1)
+    .addControl(gravityCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
 
   sv.addControl(grid);
-
-  // Layout the grid content
-  grid.addControl(movementSpeedLabel, 1, 1);
-  grid.addControl(movementSpeedSlider, 1, 2);
-  grid.addControl(movementThresholdLabel, 2, 1);
-  grid.addControl(movementThresholdSlider, 2, 2);
-  grid.addControl(movementEnabledLabel, 3, 1);
-  grid.addControl(movementEnabledToggle, 3, 2);
-
-  grid.addControl(rotationSpeedLabel, 5, 1);
-  grid.addControl(rotationSpeedSlider, 5, 2);
-  grid.addControl(rotationThresholdLabel, 6, 1);
-  grid.addControl(rotationThresholdSlider, 6, 2);
-  grid.addControl(rotationEnabledLabel, 7, 1);
-  grid.addControl(rotationEnabledCheckbox, 7, 2);
-
-  grid.addControl(movementOrientationFollowsViewerPoseLabel, 9, 1);
-  grid.addControl(movementOrientationFollowsViewerPoseCheckbox, 9, 2);
-
-  grid.addControl(gravityLabel, 10, 1);
-  grid.addControl(gravityCheckbox, 10, 2);
-
-  grid.addControl(resetButton, 12, 2);
 
   watch(menuIsVisible, (newValue) => {
     card.isVisible = newValue;

@@ -25,6 +25,7 @@ import Lab021 from "../labs/Lab021.vue";
 import Lab022 from "../labs/Lab022.vue";
 import Lab023 from "../labs/Lab023.vue";
 import Lab024 from "../labs/Lab024.vue";
+import Lab025 from "../labs/Lab025.vue";
 
 const routes = [
   {
@@ -280,6 +281,16 @@ const routes = [
     meta: {
       title: "Lab 024",
       subtitle: "Movement Controls",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab025",
+    name: "Lab025",
+    component: Lab025,
+    meta: {
+      title: "Lab 025",
+      subtitle: "Teleport Controls",
       status: "running"
     }
   }
