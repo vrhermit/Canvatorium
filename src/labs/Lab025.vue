@@ -162,8 +162,29 @@ const createUICard = (scene) => {
     slider.width = "100%";
     slider.color = "#8854d0";
     slider.background = "#53637b";
+    slider.thumbWidth = "60px";
+    slider.thumbHeight = "60px";
+    slider.thumbBackground = "#8854d0";
+    slider.thumbBorderColor = "#8854d0";
+    slider.thumbBorderWidth = "2px";
+    slider.isThumbCircle = true;
+    slider.isThumbClamped = true;
+    slider.isThumbClampedY = true;
 
     return slider;
+  };
+
+  const createGridMenuCheckbox = () => {
+    const checkbox = new GUI.Checkbox();
+    checkbox.isChecked = true;
+    checkbox.height = "60px";
+    // checkbox does not have a margin, so add some extra width, then use it in padding
+    checkbox.width = "70px";
+    checkbox.paddingLeftInPixels = "10";
+    checkbox.color = "#8854d0";
+    checkbox.background = "#53637b";
+    checkbox.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    return checkbox;
   };
 
   const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
@@ -180,17 +201,10 @@ const createUICard = (scene) => {
   });
 
   const parabolicRayEnabledLabel = createGridMenuLabel("Parabolic Enabled");
-
-  const parabolicRayEnabledToggle = new GUI.Checkbox();
-  parabolicRayEnabledToggle.isChecked = true;
-  parabolicRayEnabledToggle.height = "60px";
-  parabolicRayEnabledToggle.width = "70px";
-  parabolicRayEnabledToggle.color = "#8854d0";
-  parabolicRayEnabledToggle.background = "#53637b";
-  parabolicRayEnabledToggle.paddingLeftInPixels = "10";
-  parabolicRayEnabledToggle.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  parabolicRayEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
+  const parabolicRayEnabledCheckbox = createGridMenuCheckbox();
+  parabolicRayEnabledCheckbox.onIsCheckedChangedObservable.add(function (
+    value
+  ) {
     teleportSettings.parabolicRayEnabled = value;
   });
 
@@ -208,33 +222,15 @@ const createUICard = (scene) => {
   });
 
   // Important: This setting only effects the rotation feature on an active teleport target. The user can move their thumbstick to rotate round the target before completing the teleportation.
-  const rotationEnabledLabel = createGridMenuLabel("Rotation Enabled");
-
-  const rotationEnabledCheckbox = new GUI.Checkbox();
-  rotationEnabledCheckbox.isChecked = true;
-  rotationEnabledCheckbox.height = "60px";
-  rotationEnabledCheckbox.width = "70px";
-  rotationEnabledCheckbox.color = "#8854d0";
-  rotationEnabledCheckbox.background = "#53637b";
-  rotationEnabledCheckbox.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  rotationEnabledCheckbox.paddingLeftInPixels = "10";
+  const rotationEnabledLabel = createGridMenuLabel("Rotate During Teleport");
+  const rotationEnabledCheckbox = createGridMenuCheckbox();
   rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
     teleportSettings.rotationEnabled = value;
   });
 
   const backwardsMovementEnabledLabel =
     createGridMenuLabel("Backwards Movement");
-
-  const backwardsMovementEnabledCheckbox = new GUI.Checkbox();
-  backwardsMovementEnabledCheckbox.isChecked = true;
-  backwardsMovementEnabledCheckbox.height = "60px";
-  backwardsMovementEnabledCheckbox.width = "70px";
-  backwardsMovementEnabledCheckbox.color = "#8854d0";
-  backwardsMovementEnabledCheckbox.background = "#53637b";
-  backwardsMovementEnabledCheckbox.horizontalAlignment =
-    GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
-  backwardsMovementEnabledCheckbox.paddingLeftInPixels = "10";
+  const backwardsMovementEnabledCheckbox = createGridMenuCheckbox();
   backwardsMovementEnabledCheckbox.onIsCheckedChangedObservable.add(function (
     value
   ) {
@@ -277,7 +273,8 @@ const createUICard = (scene) => {
     teleportSettings.backwardsTeleportationDistance = 1;
 
     parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
-    parabolicRayEnabledToggle.isChecked = teleportSettings.parabolicRayEnabled;
+    parabolicRayEnabledCheckbox.isChecked =
+      teleportSettings.parabolicRayEnabled;
     rotationAngleSlider.value = teleportSettings.rotationAngle;
     rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
     backwardsMovementEnabledCheckbox.isChecked =
@@ -301,22 +298,22 @@ const createUICard = (scene) => {
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
+    .addControl(rotationEnabledLabel, grid.rowCount, 1)
+    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
+  grid.addRowDefinition(36, true); // empty row
+  grid
+    .addRowDefinition(72, true)
     .addControl(parabolicCheckRadiusLabel, grid.rowCount, 1)
     .addControl(parabolicCheckRadiusSlider, grid.rowCount, 2);
   grid
     .addRowDefinition(72, true)
     .addControl(parabolicRayEnabledLabel, grid.rowCount, 1)
-    .addControl(parabolicRayEnabledToggle, grid.rowCount, 2);
+    .addControl(parabolicRayEnabledCheckbox, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(rotationAngleLabel, grid.rowCount, 1)
     .addControl(rotationAngleSlider, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(rotationEnabledLabel, grid.rowCount, 1)
-    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
