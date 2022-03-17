@@ -72,7 +72,6 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const teleportMeshes = addLabRoomLocal(scene);
-  console.log("teleportMeshes", teleportMeshes);
 
   const { toggleMenu } = createUICard();
 
@@ -116,11 +115,12 @@ const createUICard = (scene) => {
   });
   card.material = cardMaterial;
   card.position = new BABYLON.Vector3(0, 1, 0);
+  card.scaling = new BABYLON.Vector3(0.6, 0.6, 0.6);
 
   const followBehavior = new BABYLON.FollowBehavior();
-  followBehavior.defaultDistance = 1.2;
-  followBehavior.minimumDistance = 1;
-  followBehavior.maximumDistance = 2;
+  followBehavior.defaultDistance = 0.8;
+  followBehavior.minimumDistance = 0.7;
+  followBehavior.maximumDistance = 1.25;
   followBehavior.ignoreCameraPitchAndRoll = true;
   followBehavior.pitchOffset = -10;
   followBehavior.lerpTime = 250;
@@ -157,146 +157,203 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
-  const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
+  const stackPanel = new GUI.StackPanel("lab-info-stack");
+  stackPanel.width = "100%";
+  stackPanel.height = "100%";
+  stackPanel.isVertical = true;
 
-  const parabolicCheckRadiusSlider = createGridMenuSlider({
-    min: 1,
-    max: 20,
-    step: 1,
-    value: 5,
-  });
-  parabolicCheckRadiusSlider.onValueChangedObservable.add(function (value) {
-    teleportSettings.parabolicCheckRadius = value;
-    parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
-  });
+  sv.addControl(stackPanel);
 
-  const parabolicRayEnabledLabel = createGridMenuLabel("Parabolic Enabled");
-  const parabolicRayEnabledCheckbox = createGridMenuCheckbox();
-  parabolicRayEnabledCheckbox.onIsCheckedChangedObservable.add(function (
-    value
-  ) {
-    teleportSettings.parabolicRayEnabled = value;
-  });
+  const createSection1 = () => {
+    const heading = new GUI.TextBlock("lab-info-heading-1");
+    heading.text =
+      "Section 1: These options can be modified in real time on an instance of BABYLON.WebXRFeatureName.TELEPORTATION";
+    heading.height = "90px";
+    heading.color = "#b4becc";
+    heading.textWrapping = GUI.TextWrapping.WordWrap;
+    heading.fontSize = 30;
+    heading.fontStyle = "italic";
+    heading.paddingLeft = "40px";
+    heading.paddingRight = "40px";
+    heading.paddingTop = "20px";
+    heading.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    heading.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
-  const rotationAngleLabel = createGridMenuLabel("Snap Turn Angle (Pi / 8)");
+    const parabolicCheckRadiusLabel = createGridMenuLabel(
+      "Parabolic Radius: 5"
+    );
 
-  const rotationAngleSlider = createGridMenuSlider({
-    min: 2,
-    max: 12,
-    step: 1,
-    value: 8,
-  });
-  rotationAngleSlider.onValueChangedObservable.add(function (value) {
-    teleportSettings.rotationAngle = value;
-    rotationAngleLabel.text = `Snap Turn Angle (Pi / ${value})`;
-  });
+    const parabolicCheckRadiusSlider = createGridMenuSlider({
+      min: 1,
+      max: 20,
+      step: 1,
+      value: 5,
+    });
+    parabolicCheckRadiusSlider.onValueChangedObservable.add(function (value) {
+      teleportSettings.parabolicCheckRadius = value;
+      parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
+    });
 
-  // Important: This setting only effects the rotation feature on an active teleport target. The user can move their thumbstick to rotate round the target before completing the teleportation.
-  const rotationEnabledLabel = createGridMenuLabel("Rotate During Teleport");
-  const rotationEnabledCheckbox = createGridMenuCheckbox();
-  rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
-    teleportSettings.rotationEnabled = value;
-  });
+    const parabolicRayEnabledLabel = createGridMenuLabel("Parabolic Enabled");
+    const parabolicRayEnabledCheckbox = createGridMenuCheckbox();
+    parabolicRayEnabledCheckbox.onIsCheckedChangedObservable.add(function (
+      value
+    ) {
+      teleportSettings.parabolicRayEnabled = value;
+    });
 
-  const backwardsMovementEnabledLabel =
-    createGridMenuLabel("Backwards Movement");
-  const backwardsMovementEnabledCheckbox = createGridMenuCheckbox();
-  backwardsMovementEnabledCheckbox.onIsCheckedChangedObservable.add(function (
-    value
-  ) {
-    teleportSettings.backwardsMovementEnabled = value;
-  });
+    const rotationAngleLabel = createGridMenuLabel("Snap Turn Angle (Pi / 8)");
 
-  const backwardsTeleportationDistanceLabel = createGridMenuLabel(
-    "Backwards Distance: 1.0"
-  );
+    const rotationAngleSlider = createGridMenuSlider({
+      min: 2,
+      max: 12,
+      step: 1,
+      value: 8,
+    });
+    rotationAngleSlider.onValueChangedObservable.add(function (value) {
+      teleportSettings.rotationAngle = value;
+      rotationAngleLabel.text = `Snap Turn Angle (Pi / ${value})`;
+    });
 
-  const backwardsTeleportationDistanceSlider = createGridMenuSlider({
-    min: 0,
-    max: 10,
-    step: 0.1,
-    value: 1,
-  });
-  backwardsTeleportationDistanceSlider.onValueChangedObservable.add(function (
-    value
-  ) {
-    teleportSettings.backwardsTeleportationDistance = value;
-    backwardsTeleportationDistanceLabel.text = `Backwards Distance: ${value}`;
-  });
+    // Important: This setting only effects the rotation feature on an active teleport target. The user can move their thumbstick to rotate round the target before completing the teleportation.
+    const rotationEnabledLabel = createGridMenuLabel("Rotate During Teleport");
+    const rotationEnabledCheckbox = createGridMenuCheckbox();
+    rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
+      teleportSettings.rotationEnabled = value;
+    });
 
-  const resetButton = GUI.Button.CreateSimpleButton(
-    "reset-button",
-    "Reset All"
-  );
-  resetButton.width = 1;
-  resetButton.height = "60px";
-  resetButton.fontSize = "40px";
-  resetButton.color = "white";
-  resetButton.background = "#53637b";
+    const backwardsMovementEnabledLabel =
+      createGridMenuLabel("Backwards Movement");
+    const backwardsMovementEnabledCheckbox = createGridMenuCheckbox();
+    backwardsMovementEnabledCheckbox.onIsCheckedChangedObservable.add(function (
+      value
+    ) {
+      teleportSettings.backwardsMovementEnabled = value;
+    });
 
-  resetButton.onPointerUpObservable.add(function () {
-    teleportSettings.parabolicCheckRadius = 5;
-    teleportSettings.parabolicRayEnabled = true;
-    teleportSettings.rotationAngle = 8;
-    teleportSettings.rotationEnabled = true;
-    teleportSettings.backwardsMovementEnabled = true;
-    teleportSettings.backwardsTeleportationDistance = 1;
+    const backwardsTeleportationDistanceLabel = createGridMenuLabel(
+      "Backwards Distance: 1.0"
+    );
 
-    parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
-    parabolicRayEnabledCheckbox.isChecked =
-      teleportSettings.parabolicRayEnabled;
-    rotationAngleSlider.value = teleportSettings.rotationAngle;
-    rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
-    backwardsMovementEnabledCheckbox.isChecked =
-      teleportSettings.backwardsMovementEnabled;
-    backwardsTeleportationDistanceSlider.value =
-      teleportSettings.backwardsTeleportationDistance;
+    const backwardsTeleportationDistanceSlider = createGridMenuSlider({
+      min: 0,
+      max: 10,
+      step: 0.1,
+      value: 1,
+    });
+    backwardsTeleportationDistanceSlider.onValueChangedObservable.add(function (
+      value
+    ) {
+      teleportSettings.backwardsTeleportationDistance = value;
+      backwardsTeleportationDistanceLabel.text = `Backwards Distance: ${value}`;
+    });
 
-    // Move the player back to the starting position
-    mainCamera.position = new BABYLON.Vector3(0, 1.7, 0);
-  });
+    const grid = new GUI.Grid();
+    grid.addColumnDefinition(40, true);
+    grid.addColumnDefinition(0.5);
+    grid.addColumnDefinition(0.5);
+    grid.addColumnDefinition(40, true);
 
-  const grid = new GUI.Grid();
-  grid.addColumnDefinition(40, true);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(0.5);
-  grid.addColumnDefinition(40, true);
+    // Layout the grid content
+    // Add rows to the grid and attach controls to the rows, using the current row count.
+    // This makes it easy to reorder these in code without having to reindex the grid content.
+    grid.addRowDefinition(36, true); // empty row
+    grid
+      .addRowDefinition(72, true)
+      .addControl(rotationEnabledLabel, grid.rowCount, 1)
+      .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
+    grid.addRowDefinition(36, true); // empty row
+    grid
+      .addRowDefinition(72, true)
+      .addControl(parabolicCheckRadiusLabel, grid.rowCount, 1)
+      .addControl(parabolicCheckRadiusSlider, grid.rowCount, 2);
+    grid
+      .addRowDefinition(72, true)
+      .addControl(parabolicRayEnabledLabel, grid.rowCount, 1)
+      .addControl(parabolicRayEnabledCheckbox, grid.rowCount, 2);
+    grid.addRowDefinition(36, true); // empty row
+    grid
+      .addRowDefinition(72, true)
+      .addControl(rotationAngleLabel, grid.rowCount, 1)
+      .addControl(rotationAngleSlider, grid.rowCount, 2);
+    grid.addRowDefinition(36, true); // empty row
+    grid
+      .addRowDefinition(72, true)
+      .addControl(backwardsTeleportationDistanceLabel, grid.rowCount, 1)
+      .addControl(backwardsTeleportationDistanceSlider, grid.rowCount, 2);
+    grid
+      .addRowDefinition(72, true)
+      .addControl(backwardsMovementEnabledLabel, grid.rowCount, 1)
+      .addControl(backwardsMovementEnabledCheckbox, grid.rowCount, 2);
+    grid.height = "600px";
 
-  // Layout the grid content
-  // Add rows to the grid and attach controls to the rows, using the current row count.
-  // This makes it easy to reorder these in code without having to reindex the grid content.
-  grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(rotationEnabledLabel, grid.rowCount, 1)
-    .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(parabolicCheckRadiusLabel, grid.rowCount, 1)
-    .addControl(parabolicCheckRadiusSlider, grid.rowCount, 2);
-  grid
-    .addRowDefinition(72, true)
-    .addControl(parabolicRayEnabledLabel, grid.rowCount, 1)
-    .addControl(parabolicRayEnabledCheckbox, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(rotationAngleLabel, grid.rowCount, 1)
-    .addControl(rotationAngleSlider, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(backwardsTeleportationDistanceLabel, grid.rowCount, 1)
-    .addControl(backwardsTeleportationDistanceSlider, grid.rowCount, 2);
-  grid
-    .addRowDefinition(72, true)
-    .addControl(backwardsMovementEnabledLabel, grid.rowCount, 1)
-    .addControl(backwardsMovementEnabledCheckbox, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
-  grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
+    const resetButton = GUI.Button.CreateSimpleButton(
+      "reset-button",
+      "Reset Section 1"
+    );
+    resetButton.width = "400px";
+    resetButton.height = "96px";
+    resetButton.fontSize = "40px";
+    resetButton.color = "white";
+    resetButton.background = "#53637b";
+    resetButton.paddingTop = "36px";
+    resetButton.paddingRight = "40px";
+    resetButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
 
-  sv.addControl(grid);
+    resetButton.onPointerUpObservable.add(function () {
+      teleportSettings.parabolicCheckRadius = 5;
+      teleportSettings.parabolicRayEnabled = true;
+      teleportSettings.rotationAngle = 8;
+      teleportSettings.rotationEnabled = true;
+      teleportSettings.backwardsMovementEnabled = true;
+      teleportSettings.backwardsTeleportationDistance = 1;
+
+      parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
+      parabolicRayEnabledCheckbox.isChecked =
+        teleportSettings.parabolicRayEnabled;
+      rotationAngleSlider.value = teleportSettings.rotationAngle;
+      rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
+      backwardsMovementEnabledCheckbox.isChecked =
+        teleportSettings.backwardsMovementEnabled;
+      backwardsTeleportationDistanceSlider.value =
+        teleportSettings.backwardsTeleportationDistance;
+
+      // Move the player back to the starting position
+      mainCamera.position = new BABYLON.Vector3(0, 1.7, 0);
+    });
+
+    return { heading, grid, resetButton };
+  };
+
+  const createSection2 = () => {
+    const heading = new GUI.TextBlock("lab-info-heading-2");
+    heading.text =
+      "These options are only available in the constructor. Reenable the teleportation feature to see them applied. This will replace the existing teleport feature with a new one.";
+    heading.height = "90px";
+    heading.color = "#b4becc";
+    heading.textWrapping = GUI.TextWrapping.WordWrap;
+    heading.fontSize = 30;
+    heading.fontStyle = "italic";
+    heading.paddingLeft = "40px";
+    heading.paddingRight = "40px";
+    heading.paddingTop = "20px";
+    heading.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
+    heading.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
+
+    return { heading };
+  };
+
+  const {
+    heading: heading1,
+    grid: grid1,
+    resetButton: resetButton1,
+  } = createSection1();
+  const { heading: heading2 } = createSection2();
+
+  stackPanel.addControl(heading1);
+  stackPanel.addControl(resetButton1);
+  stackPanel.addControl(grid1);
+  stackPanel.addControl(heading2);
 
   watch(menuIsVisible, (newValue) => {
     card.isVisible = newValue;
@@ -325,17 +382,17 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
   teleportRingMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
   //   var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-  const cylinder = BABYLON.MeshBuilder.CreateCylinder(
-    "cylinder",
-    { height: 0.05, diameter: 1 },
-    scene
-  );
-  cylinder.position.y = 0.25;
-  const cylinderMaterial = new BABYLON.StandardMaterial("cylinder-mat", scene);
-  cylinderMaterial.diffuseColor = LabColors["purple"];
-  cylinderMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  cylinder.material = cylinderMaterial;
-  cylinder.renderingGroupId = 1;
+  // const cylinder = BABYLON.MeshBuilder.CreateCylinder(
+  //   "cylinder",
+  //   { height: 0.05, diameter: 1 },
+  //   scene
+  // );
+  // cylinder.position.y = 0.25;
+  // const cylinderMaterial = new BABYLON.StandardMaterial("cylinder-mat", scene);
+  // cylinderMaterial.diffuseColor = LabColors["purple"];
+  // cylinderMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  // cylinder.material = cylinderMaterial;
+  // cylinder.renderingGroupId = 1;
 
   const featuresManager = xr.baseExperience.featuresManager;
   const teleportation = featuresManager.enableFeature(
@@ -354,7 +411,6 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
     }
   );
 
-  console.log(teleportation);
   teleportControlManager = teleportation;
 
   // teleportation.backwardsMovementEnabled = false;
@@ -464,8 +520,6 @@ const addLabRoomLocal = (scene) => {
   const wall2 = wall1.clone("wall2");
   wall2.rotation.z = -Math.PI / 2;
   wall2.position = new BABYLON.Vector3(50, 5, 0);
-
-  console.log("wall rotation", wall1.rotation, wall2.rotation);
 
   const wall3 = BABYLON.MeshBuilder.CreateGround(
     "wall1",

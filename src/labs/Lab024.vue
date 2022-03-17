@@ -553,8 +553,6 @@ const addLabRoomLocal = (scene) => {
   wall2.rotation.z = -Math.PI / 2;
   wall2.position = new BABYLON.Vector3(50, 5, 0);
 
-  console.log("wall rotation", wall1.rotation, wall2.rotation);
-
   const wall3 = BABYLON.MeshBuilder.CreateGround(
     "wall1",
     { height: 10, width: 100, subdivisions: 4 },
