@@ -34,6 +34,7 @@ let scene;
 let mainCamera; // a refecence to the XR camera, will be set after entering VR
 let menuIsVisible = ref(true);
 
+let featuresManager;
 let teleportControlManager; // a reference to the teleport object
 let teleportSettings = reactive({
   parabolicRayEnabled: true,
@@ -44,6 +45,12 @@ let teleportSettings = reactive({
 
   backwardsMovementEnabled: true,
   backwardsTeleportationDistance: 0.7,
+});
+
+let teleportSetupData = reactive({
+  useMainComponent: false,
+  useRenderingGroupId: false,
+  useCustomMesh: false,
 });
 
 watch(teleportSettings, (newValue) => {
@@ -75,8 +82,40 @@ const createScene = async (canvas) => {
 
   const { toggleMenu } = createUICard();
 
-  await addLabPlayerLocal(scene, toggleMenu, teleportMeshes);
+  const { createTeleportationSetup } = await addLabPlayerLocal(
+    scene,
+    toggleMenu,
+    teleportMeshes
+  );
   // toggleMenu();
+  watch(teleportSetupData, (newValue) => {
+    console.log("watching teleportSetupData", newValue);
+    if (featuresManager) {
+      const teleportation = featuresManager.enableFeature(
+        BABYLON.WebXRFeatureName.TELEPORTATION,
+        "stable",
+        createTeleportationSetup({
+          useMainComponent: newValue.useMainComponent,
+          useRenderingGroupId: newValue.useRenderingGroupId,
+          useCustomMesh: newValue.useCustomMesh,
+        })
+      );
+
+      teleportControlManager = teleportation;
+      teleportControlManager.parabolicRayEnabled =
+        teleportSettings.parabolicRayEnabled;
+      teleportControlManager.parabolicCheckRadius =
+        teleportSettings.parabolicCheckRadius;
+
+      teleportControlManager.rotationEnabled = teleportSettings.rotationEnabled;
+      teleportControlManager.rotationAngle = teleportSettings.rotationAngle;
+
+      teleportControlManager.backwardsMovementEnabled =
+        teleportSettings.backwardsMovementEnabled;
+      teleportControlManager.backwardsTeleportationDistance =
+        teleportSettings.backwardsTeleportationDistance;
+    }
+  });
 
   engine.runRenderLoop(() => {
     scene.render();
@@ -94,6 +133,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   engine.dispose();
+  // window.removeEventListener("resize");
 });
 
 const createUICard = (scene) => {
@@ -110,7 +150,7 @@ const createUICard = (scene) => {
 
   const card = BABYLON.MeshBuilder.CreateBox("menu-card", {
     width: 1,
-    height: 1,
+    height: 1.35,
     depth: 0.1,
   });
   card.material = cardMaterial;
@@ -131,7 +171,7 @@ const createUICard = (scene) => {
     "menu-plane",
     {
       width: 1,
-      height: 1,
+      height: 1.35,
     },
     scene
   );
@@ -141,7 +181,7 @@ const createUICard = (scene) => {
   const advancedTexture = GUI.AdvancedDynamicTexture.CreateForMesh(
     plane,
     1 * 1024,
-    1 * 1024
+    1.35 * 1024
   );
   advancedTexture.name = "menu-texture";
 
@@ -150,7 +190,7 @@ const createUICard = (scene) => {
   sv.color = "#3e4a5d";
   sv.background = "#3e4a5d";
   sv.opacity = 1;
-  sv.height = `${1024}px`;
+  sv.height = `${2048}px`;
   sv.width = `${1024}px`;
   sv.barSize = 30;
   sv.barColor = "#53637b";
@@ -161,8 +201,6 @@ const createUICard = (scene) => {
   stackPanel.width = "100%";
   stackPanel.height = "100%";
   stackPanel.isVertical = true;
-
-  sv.addControl(stackPanel);
 
   const createSection1 = () => {
     const heading = new GUI.TextBlock("lab-info-heading-1");
@@ -248,6 +286,40 @@ const createUICard = (scene) => {
       backwardsTeleportationDistanceLabel.text = `Backwards Distance: ${value}`;
     });
 
+    const resetButton = GUI.Button.CreateSimpleButton(
+      "reset-button",
+      "Reset Section 1"
+    );
+    resetButton.width = "100%";
+    resetButton.height = "60px";
+    resetButton.fontSize = "32px";
+    resetButton.color = "white";
+    resetButton.background = "#53637b";
+    resetButton.paddingRight = "40px";
+    resetButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+
+    resetButton.onPointerUpObservable.add(function () {
+      teleportSettings.parabolicCheckRadius = 5;
+      teleportSettings.parabolicRayEnabled = true;
+      teleportSettings.rotationAngle = 8;
+      teleportSettings.rotationEnabled = true;
+      teleportSettings.backwardsMovementEnabled = true;
+      teleportSettings.backwardsTeleportationDistance = 1;
+
+      parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
+      parabolicRayEnabledCheckbox.isChecked =
+        teleportSettings.parabolicRayEnabled;
+      rotationAngleSlider.value = teleportSettings.rotationAngle;
+      rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
+      backwardsMovementEnabledCheckbox.isChecked =
+        teleportSettings.backwardsMovementEnabled;
+      backwardsTeleportationDistanceSlider.value =
+        teleportSettings.backwardsTeleportationDistance;
+
+      // Move the player back to the starting position
+      mainCamera.position = new BABYLON.Vector3(0, 1.7, 0);
+    });
+
     const grid = new GUI.Grid();
     grid.addColumnDefinition(40, true);
     grid.addColumnDefinition(0.5);
@@ -285,75 +357,118 @@ const createUICard = (scene) => {
       .addRowDefinition(72, true)
       .addControl(backwardsMovementEnabledLabel, grid.rowCount, 1)
       .addControl(backwardsMovementEnabledCheckbox, grid.rowCount, 2);
-    grid.height = "600px";
+    grid.addRowDefinition(36, true); // empty row
+    grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
+    grid.height = "730px";
 
-    const resetButton = GUI.Button.CreateSimpleButton(
-      "reset-button",
-      "Reset Section 1"
-    );
-    resetButton.width = "400px";
-    resetButton.height = "96px";
-    resetButton.fontSize = "40px";
-    resetButton.color = "white";
-    resetButton.background = "#53637b";
-    resetButton.paddingTop = "36px";
-    resetButton.paddingRight = "40px";
-    resetButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
-
-    resetButton.onPointerUpObservable.add(function () {
-      teleportSettings.parabolicCheckRadius = 5;
-      teleportSettings.parabolicRayEnabled = true;
-      teleportSettings.rotationAngle = 8;
-      teleportSettings.rotationEnabled = true;
-      teleportSettings.backwardsMovementEnabled = true;
-      teleportSettings.backwardsTeleportationDistance = 1;
-
-      parabolicCheckRadiusSlider.value = teleportSettings.parabolicCheckRadius;
-      parabolicRayEnabledCheckbox.isChecked =
-        teleportSettings.parabolicRayEnabled;
-      rotationAngleSlider.value = teleportSettings.rotationAngle;
-      rotationEnabledCheckbox.isChecked = teleportSettings.rotationEnabled;
-      backwardsMovementEnabledCheckbox.isChecked =
-        teleportSettings.backwardsMovementEnabled;
-      backwardsTeleportationDistanceSlider.value =
-        teleportSettings.backwardsTeleportationDistance;
-
-      // Move the player back to the starting position
-      mainCamera.position = new BABYLON.Vector3(0, 1.7, 0);
-    });
-
-    return { heading, grid, resetButton };
+    return { heading, grid };
   };
 
   const createSection2 = () => {
     const heading = new GUI.TextBlock("lab-info-heading-2");
     heading.text =
       "These options are only available in the constructor. Reenable the teleportation feature to see them applied. This will replace the existing teleport feature with a new one.";
-    heading.height = "90px";
+    heading.height = "120px";
     heading.color = "#b4becc";
     heading.textWrapping = GUI.TextWrapping.WordWrap;
     heading.fontSize = 30;
     heading.fontStyle = "italic";
     heading.paddingLeft = "40px";
     heading.paddingRight = "40px";
-    heading.paddingTop = "20px";
+    // heading.paddingTop = "20px";
     heading.textHorizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_LEFT;
     heading.textVerticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
 
-    return { heading };
+    const useMainComponentLabel = createGridMenuLabel(
+      "Trigger / Timer Teleport"
+    );
+    const useMainComponentCheckbox = createGridMenuCheckbox();
+    useMainComponentCheckbox.isChecked = false;
+    useMainComponentCheckbox.onIsCheckedChangedObservable.add(function (value) {
+      teleportSetupData.useMainComponent = value;
+    });
+
+    const useCustomMeshLabel = createGridMenuLabel("Use Custom Mesh");
+    const useCustomMeshCheckbox = createGridMenuCheckbox();
+    useCustomMeshCheckbox.isChecked = false;
+    useCustomMeshCheckbox.onIsCheckedChangedObservable.add(function (value) {
+      teleportSetupData.useCustomMesh = value;
+    });
+
+    const useRenderingGroupIdLabel = createGridMenuLabel(
+      "Use Rendering Group Id"
+    );
+    const useRenderingGroupIdCheckbox = createGridMenuCheckbox();
+    useRenderingGroupIdCheckbox.isChecked = false;
+    useRenderingGroupIdCheckbox.onIsCheckedChangedObservable.add(function (
+      value
+    ) {
+      teleportSetupData.useRenderingGroupId = value;
+    });
+
+    const resetButton = GUI.Button.CreateSimpleButton(
+      "reset-button",
+      "Reset Section 2"
+    );
+    resetButton.width = "100%";
+    resetButton.height = "60px";
+    resetButton.fontSize = "32px";
+    resetButton.color = "white";
+    resetButton.background = "#53637b";
+    resetButton.paddingRight = "40px";
+    resetButton.horizontalAlignment = GUI.Control.HORIZONTAL_ALIGNMENT_RIGHT;
+
+    resetButton.onPointerUpObservable.add(function () {
+      teleportSetupData.useMainComponent = false;
+      teleportSetupData.useCustomMesh = false;
+      teleportSetupData.useRenderingGroupId = false;
+
+      useMainComponentCheckbox.isChecked = teleportSetupData.useMainComponent;
+      useCustomMeshCheckbox.isChecked = teleportSetupData.useCustomMesh;
+      useRenderingGroupIdCheckbox.isChecked =
+        teleportSetupData.useRenderingGroupId;
+    });
+
+    const grid = new GUI.Grid();
+    grid.addColumnDefinition(40, true);
+    grid.addColumnDefinition(0.5);
+    grid.addColumnDefinition(0.5);
+    grid.addColumnDefinition(40, true);
+
+    // Layout the grid content
+    // Add rows to the grid and attach controls to the rows, using the current row count.
+    // This makes it easy to reorder these in code without having to reindex the grid content.
+    grid.addRowDefinition(36, true); // empty row
+    grid
+      .addRowDefinition(72, true)
+      .addControl(useRenderingGroupIdLabel, grid.rowCount, 1)
+      .addControl(useRenderingGroupIdCheckbox, grid.rowCount, 2);
+    grid
+      .addRowDefinition(72, true)
+      .addControl(useCustomMeshLabel, grid.rowCount, 1)
+      .addControl(useCustomMeshCheckbox, grid.rowCount, 2);
+    grid
+      .addRowDefinition(72, true)
+      .addControl(useMainComponentLabel, grid.rowCount, 1)
+      .addControl(useMainComponentCheckbox, grid.rowCount, 2);
+
+    grid.addRowDefinition(36, true); // empty row
+    grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
+
+    grid.height = "400px";
+
+    return { heading, grid };
   };
 
-  const {
-    heading: heading1,
-    grid: grid1,
-    resetButton: resetButton1,
-  } = createSection1();
-  const { heading: heading2 } = createSection2();
+  const { heading: heading1, grid: grid1 } = createSection1();
+  const { heading: heading2, grid: grid2 } = createSection2();
 
   stackPanel.addControl(heading1);
-  stackPanel.addControl(resetButton1);
   stackPanel.addControl(grid1);
   stackPanel.addControl(heading2);
+  stackPanel.addControl(grid2);
+
+  sv.addControl(stackPanel);
 
   watch(menuIsVisible, (newValue) => {
     card.isVisible = newValue;
@@ -366,7 +481,7 @@ const createUICard = (scene) => {
 const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
-    // floorMeshes: teleportMeshes,
+    floorMeshes: teleportMeshes,
     pointerSelectionOptions: {
       enablePointerSelectionOnAllControllers: true,
     },
@@ -381,34 +496,59 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
   teleportRingMat.diffuseColor = LabColors["light1"];
   teleportRingMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
-  //   var utilLayer = new BABYLON.UtilityLayerRenderer(scene);
-  // const cylinder = BABYLON.MeshBuilder.CreateCylinder(
-  //   "cylinder",
-  //   { height: 0.05, diameter: 1 },
-  //   scene
-  // );
-  // cylinder.position.y = 0.25;
-  // const cylinderMaterial = new BABYLON.StandardMaterial("cylinder-mat", scene);
-  // cylinderMaterial.diffuseColor = LabColors["purple"];
-  // cylinderMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  // cylinder.material = cylinderMaterial;
-  // cylinder.renderingGroupId = 1;
+  featuresManager = xr.baseExperience.featuresManager;
 
-  const featuresManager = xr.baseExperience.featuresManager;
-  const teleportation = featuresManager.enableFeature(
-    BABYLON.WebXRFeatureName.TELEPORTATION,
-    "stable",
-    {
+  const createTeleportationSetup = (options) => {
+    const cylinder = BABYLON.MeshBuilder.CreateCylinder(
+      "cylinder",
+      { height: 0.05, diameter: 1 },
+      scene
+    );
+    cylinder.position.y = 0.25;
+    const cylinderMaterial = new BABYLON.StandardMaterial(
+      "cylinder-mat",
+      scene
+    );
+    cylinderMaterial.diffuseColor = LabColors["purple"];
+    cylinderMaterial.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+    cylinder.material = cylinderMaterial;
+    cylinder.isVisible = false;
+    const { useMainComponent, useRenderingGroupId, useCustomMesh } = options;
+    let setup = {
       xrInput: xr.input,
       floorMeshes: teleportMeshes,
-      renderingGroupId: 1,
-      // teleportationTargetMesh: cylinder,
-      defaultTargetMeshOptions: {
+    };
+    if (useCustomMesh) {
+      cylinder.isVisible = true;
+      setup["teleportationTargetMesh"] = cylinder;
+    } else {
+      cylinder.isVisible = false;
+      setup["defaultTargetMeshOptions"] = {
         teleportationFillColor: "#3e4a5d",
         teleportationBorderColor: "#8854d0",
         torusArrowMaterial: teleportRingMat,
-      },
+      };
     }
+    if (useRenderingGroupId) {
+      cylinder.renderingGroupId = 1;
+      setup["renderingGroupId"] = 1;
+    } else {
+      cylinder.renderingGroupId = 0;
+    }
+    if (useMainComponent) {
+      setup["useMainComponentOnly"] = true;
+      // setup["timeToTeleport"] = 1.5;
+    }
+    return setup;
+  };
+  const teleportation = featuresManager.enableFeature(
+    BABYLON.WebXRFeatureName.TELEPORTATION,
+    "stable",
+    createTeleportationSetup({
+      useMainComponent: false,
+      useRenderingGroupId: false,
+      useCustomMesh: false,
+    })
   );
 
   teleportControlManager = teleportation;
@@ -482,6 +622,8 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
       }
     });
   });
+
+  return { createTeleportationSetup };
 };
 
 const addLabRoomLocal = (scene) => {
