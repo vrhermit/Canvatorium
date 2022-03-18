@@ -12,6 +12,7 @@ import {
   onUnmounted,
   watch,
 } from "@vue/runtime-core";
+import { useStorage } from "@vueuse/core";
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
@@ -24,7 +25,8 @@ import {
 
 labNotes.value = `
 Movement Controls
-Checking out the new Movement Controls in Babylon JS 5.0
+Checking out the new Movement Controls in Babylon JS 5.0.
+Data from the settings menu is saved in local storage.
 - Swapped the left and right thumbsticks based on the example in the docs
 - Right stick: movement
 - Left stick: rotation
@@ -45,8 +47,8 @@ let scene;
 let mainCamera; // a refecence to the XR camera, will be set after entering VR
 let menuIsVisible = ref(true);
 
-let movementControlManager; // a reference to the movement controls
-let movementSettings = reactive({
+// Default settings for the movement controls
+const defaultMovementSettings = {
   movementOrientationFollowsViewerPose: true,
 
   movementEnabled: true,
@@ -56,7 +58,33 @@ let movementSettings = reactive({
   rotationEnabled: true,
   rotationSpeed: 0.25,
   rotationThreshold: 0.25,
+
+  applyGravity: true,
+};
+
+// Spread the default settings into the stored settings
+// This will only be set if the local storage value is not found, else it will use the local storage value
+let storedMovementSettings = useStorage("lab-movement-controls", {
+  ...defaultMovementSettings,
 });
+
+// Map the stored settings to the reactive settings object
+// I could not find a way to get Watch working with useStorage
+let movementSettings = reactive({
+  movementEnabled: storedMovementSettings.value.movementEnabled,
+  movementSpeed: storedMovementSettings.value.movementSpeed,
+  movementThreshold: storedMovementSettings.value.movementThreshold,
+
+  rotationEnabled: storedMovementSettings.value.rotationEnabled,
+  rotationSpeed: storedMovementSettings.value.rotationSpeed,
+  rotationThreshold: storedMovementSettings.value.rotationThreshold,
+
+  movementOrientationFollowsViewerPose:
+    storedMovementSettings.value.movementOrientationFollowsViewerPose,
+  applyGravity: storedMovementSettings.value.applyGravity,
+});
+
+let movementControlManager; // a reference to the movement controls
 
 watch(movementSettings, (newValue) => {
   // console.log("watching movementSettings", newValue);
@@ -71,6 +99,7 @@ watch(movementSettings, (newValue) => {
     movementControlManager.rotationEnabled = newValue.rotationEnabled;
     movementControlManager.rotationSpeed = newValue.rotationSpeed;
     movementControlManager.rotationThreshold = newValue.rotationThreshold;
+    storedMovementSettings.value = newValue;
   }
 });
 
@@ -189,25 +218,31 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
-  const movementSpeedLabel = createGridMenuLabel("Movement Speed: 0.5");
+  const movementSpeedLabel = createGridMenuLabel(
+    `Movement Speed: ${movementSettings.movementSpeed.toFixed(2)}`
+  );
   const movementSpeedSlider = createGridMenuSlider({
     min: 0.1,
     max: 2,
     step: 0.01,
     value: 0.5,
   });
+  movementSpeedSlider.value = movementSettings.movementSpeed;
   movementSpeedSlider.onValueChangedObservable.add(function (value) {
     movementSettings.movementSpeed = value;
     movementSpeedLabel.text = `Movement Speed: ${value.toFixed(2)}`;
   });
 
-  const movementThresholdLabel = createGridMenuLabel("Axis Threshold: 0.25");
+  const movementThresholdLabel = createGridMenuLabel(
+    `Axis Threshold: ${movementSettings.movementThreshold.toFixed(2)}`
+  );
   const movementThresholdSlider = createGridMenuSlider({
     min: 0,
     max: 1,
     step: 0.01,
     value: 0.25,
   });
+  movementThresholdSlider.value = movementSettings.movementThreshold;
   movementThresholdSlider.onValueChangedObservable.add(function (value) {
     movementSettings.movementThreshold = value;
     movementThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
@@ -215,29 +250,36 @@ const createUICard = (scene) => {
 
   const movementEnabledLabel = createGridMenuLabel("Movement Enabled");
   const movementEnabledToggle = createGridMenuCheckbox();
+  movementEnabledToggle.isChecked = movementSettings.movementEnabled;
   movementEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.movementEnabled = value;
   });
 
-  const rotationSpeedLabel = createGridMenuLabel("Rotation Speed: 0.25");
+  const rotationSpeedLabel = createGridMenuLabel(
+    `Rotation Speed: ${movementSettings.rotationSpeed.toFixed(2)}`
+  );
   const rotationSpeedSlider = createGridMenuSlider({
     min: 0.1,
     max: 2,
     step: 0.01,
     value: 0.25,
   });
+  rotationSpeedSlider.value = movementSettings.rotationSpeed;
   rotationSpeedSlider.onValueChangedObservable.add(function (value) {
     movementSettings.rotationSpeed = value;
     rotationSpeedLabel.text = `Rotation Speed: ${value.toFixed(2)}`;
   });
 
-  const rotationThresholdLabel = createGridMenuLabel("Axis Threshold: 0.25");
+  const rotationThresholdLabel = createGridMenuLabel(
+    `Axis Threshold: ${movementSettings.rotationThreshold.toFixed(2)}`
+  );
   const rotationThresholdSlider = createGridMenuSlider({
     min: 0,
     max: 1,
     step: 0.01,
     value: 0.25,
   });
+  rotationThresholdSlider.value = movementSettings.rotationThreshold;
   rotationThresholdSlider.onValueChangedObservable.add(function (value) {
     movementSettings.rotationThreshold = value;
     rotationThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
@@ -245,6 +287,7 @@ const createUICard = (scene) => {
 
   const rotationEnabledLabel = createGridMenuLabel("Rotation Enabled");
   const rotationEnabledCheckbox = createGridMenuCheckbox();
+  rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
   rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.rotationEnabled = value;
   });
@@ -253,6 +296,8 @@ const createUICard = (scene) => {
     "Orientation Follows Pose"
   );
   const movementOrientationFollowsViewerPoseCheckbox = createGridMenuCheckbox();
+  movementOrientationFollowsViewerPoseCheckbox.isChecked =
+    movementSettings.movementOrientationFollowsViewerPose;
   movementOrientationFollowsViewerPoseCheckbox.onIsCheckedChangedObservable.add(
     function (value) {
       movementSettings.movementOrientationFollowsViewerPose = value;
@@ -262,7 +307,9 @@ const createUICard = (scene) => {
   const gravityLabel = createGridMenuLabel("Apply Gravity");
 
   const gravityCheckbox = createGridMenuCheckbox();
+  gravityCheckbox.isChecked = movementSettings.applyGravity;
   gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
+    movementSettings.applyGravity = value;
     mainCamera.applyGravity = value;
   });
 
@@ -358,7 +405,7 @@ const createUICard = (scene) => {
 
 const setupCameraForCollisions = (camera) => {
   camera.checkCollisions = true;
-  camera.applyGravity = true;
+  camera.applyGravity = movementSettings.applyGravity;
   camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
   camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
 };
