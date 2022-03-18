@@ -24,81 +24,60 @@ import {
 } from "../lab-shared/LabMenuControls";
 
 labNotes.value = `
-Movement Controls
-Checking out the new Movement Controls in Babylon JS 5.0.
-Data from the settings menu is saved in local storage.
-- Swapped the left and right thumbsticks based on the example in the docs
-- Right stick: movement
-- Left stick: rotation
-- Menu to customize the movement control options, with a Follow Behavior attached.
-- Reset button - reset all values and restore default position
-- Bonus: Hold the trigger on the left controller for a 3X speed boost
-- Bonus: Toggle camera gravity
-- Y button to toggle the menu
+User Locomotion Settings
+- Based on the work in Labs 024 and 025
+- Select the locomotion type: teleport or movement modules
 
-Resources
-- Documentation for [Movement Controls](https://doc.babylonjs.com/divingDeeper/webXR/WebXRSelectedFeatures#movement-module)
-- Movement Controls [Playground](https://playground.babylonjs.com/#AZML8U) - I adapted this to the controls used in this lab.
 `;
 const bjsCanvas = ref(null);
 
 let engine;
 let scene;
+// TODO: Set this with the default camera, then replace it with the VR camera. Set it back when exiting VR
 let mainCamera; // a refecence to the XR camera, will be set after entering VR
 let menuIsVisible = ref(true);
 
 // Default settings for the movement controls
 const defaultMovementSettings = {
-  movementOrientationFollowsViewerPose: true,
-
+  locomotionType: "teleport", // "teleport" or "movement"
   movementEnabled: true,
   movementSpeed: 0.5, // 1 is too fast most of the time
-  movementThreshold: 0.25,
-
   rotationEnabled: true,
   rotationSpeed: 0.25,
-  rotationThreshold: 0.25,
-
   applyGravity: true,
 };
 
 // Spread the default settings into the stored settings
 // This will only be set if the local storage value is not found, else it will use the local storage value
-let storedMovementSettings = useStorage("lab-movement-controls", {
+let storedMovementSettings = useStorage("lab-locomotion-config", {
   ...defaultMovementSettings,
 });
 
 // Map the stored settings to the reactive settings object
 // I could not find a way to get Watch working with useStorage
 let movementSettings = reactive({
+  locomotionType: storedMovementSettings.value.locomotionType,
   movementEnabled: storedMovementSettings.value.movementEnabled,
   movementSpeed: storedMovementSettings.value.movementSpeed,
-  movementThreshold: storedMovementSettings.value.movementThreshold,
 
   rotationEnabled: storedMovementSettings.value.rotationEnabled,
   rotationSpeed: storedMovementSettings.value.rotationSpeed,
-  rotationThreshold: storedMovementSettings.value.rotationThreshold,
 
-  movementOrientationFollowsViewerPose:
-    storedMovementSettings.value.movementOrientationFollowsViewerPose,
   applyGravity: storedMovementSettings.value.applyGravity,
 });
+
+console.log("movementSettings", movementSettings);
 
 let movementControlManager; // a reference to the movement controls
 
 watch(movementSettings, (newValue) => {
-  // console.log("watching movementSettings", newValue);
+  // TODO: Check the locomoation type enable the corrent feature set
   if (movementControlManager) {
-    movementControlManager.movementOrientationFollowsViewerPose =
-      newValue.movementOrientationFollowsViewerPose;
-
     movementControlManager.movementEnabled = newValue.movementEnabled;
     movementControlManager.movementSpeed = newValue.movementSpeed;
-    movementControlManager.movementThreshold = newValue.movementThreshold;
-
     movementControlManager.rotationEnabled = newValue.rotationEnabled;
     movementControlManager.rotationSpeed = newValue.rotationSpeed;
-    movementControlManager.rotationThreshold = newValue.rotationThreshold;
+    // TODO: move the gravity change here?
     storedMovementSettings.value = newValue;
   }
 });
@@ -244,25 +223,10 @@ const createUICard = (scene) => {
     movementSpeedLabel.text = `Movement Speed: ${value.toFixed(2)}`;
   });
 
-  const movementThresholdLabel = createGridMenuLabel(
-    `Axis Threshold: ${movementSettings.movementThreshold.toFixed(2)}`
-  );
-  const movementThresholdSlider = createGridMenuSlider({
-    min: 0,
-    max: 1,
-    step: 0.01,
-    value: 0.25,
-  });
-  movementThresholdSlider.value = movementSettings.movementThreshold;
-  movementThresholdSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.movementThreshold = value;
-    movementThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
-  });
-
   const movementEnabledLabel = createGridMenuLabel("Movement Enabled");
-  const movementEnabledToggle = createGridMenuCheckbox();
-  movementEnabledToggle.isChecked = movementSettings.movementEnabled;
-  movementEnabledToggle.onIsCheckedChangedObservable.add(function (value) {
+  const movementEnabledCheckbox = createGridMenuCheckbox();
+  movementEnabledCheckbox.isChecked = movementSettings.movementEnabled;
+  movementEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.movementEnabled = value;
   });
 
@@ -281,39 +245,12 @@ const createUICard = (scene) => {
     rotationSpeedLabel.text = `Rotation Speed: ${value.toFixed(2)}`;
   });
 
-  const rotationThresholdLabel = createGridMenuLabel(
-    `Axis Threshold: ${movementSettings.rotationThreshold.toFixed(2)}`
-  );
-  const rotationThresholdSlider = createGridMenuSlider({
-    min: 0,
-    max: 1,
-    step: 0.01,
-    value: 0.25,
-  });
-  rotationThresholdSlider.value = movementSettings.rotationThreshold;
-  rotationThresholdSlider.onValueChangedObservable.add(function (value) {
-    movementSettings.rotationThreshold = value;
-    rotationThresholdLabel.text = `Axis Threshold: ${value.toFixed(2)}`;
-  });
-
   const rotationEnabledLabel = createGridMenuLabel("Rotation Enabled");
   const rotationEnabledCheckbox = createGridMenuCheckbox();
   rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
   rotationEnabledCheckbox.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.rotationEnabled = value;
   });
-
-  const movementOrientationFollowsViewerPoseLabel = createGridMenuLabel(
-    "Orientation Follows Pose"
-  );
-  const movementOrientationFollowsViewerPoseCheckbox = createGridMenuCheckbox();
-  movementOrientationFollowsViewerPoseCheckbox.isChecked =
-    movementSettings.movementOrientationFollowsViewerPose;
-  movementOrientationFollowsViewerPoseCheckbox.onIsCheckedChangedObservable.add(
-    function (value) {
-      movementSettings.movementOrientationFollowsViewerPose = value;
-    }
-  );
 
   const gravityLabel = createGridMenuLabel("Apply Gravity");
 
@@ -336,25 +273,53 @@ const createUICard = (scene) => {
 
   resetButton.onPointerUpObservable.add(function () {
     movementSettings.movementSpeed = 0.5;
-    movementSettings.movementThreshold = 0.25;
     movementSettings.movementEnabled = true;
     movementSettings.rotationSpeed = 0.25;
-    movementSettings.rotationThreshold = 0.25;
     movementSettings.rotationEnabled = true;
-    movementSettings.movementOrientationFollowsViewerPose = true;
 
     movementSpeedSlider.value = movementSettings.movementSpeed;
-    movementThresholdSlider.value = movementSettings.movementThreshold;
-    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
+    movementEnabledCheckbox.isChecked = movementSettings.movementEnabled;
     rotationSpeedSlider.value = movementSettings.rotationSpeed;
-    rotationThresholdSlider.value = movementSettings.rotationThreshold;
-    movementEnabledToggle.isChecked = movementSettings.movementEnabled;
     rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
-    movementOrientationFollowsViewerPoseCheckbox.isChecked =
-      movementSettings.movementOrientationFollowsViewerPose;
 
     // Move the player back to the starting position
     mainCamera.position = new BABYLON.Vector3(0, 3, 0);
+  });
+
+  const teleportButton = GUI.Button.CreateSimpleButton(
+    "teleport-button",
+    "Teleport"
+  );
+  teleportButton.width = 1;
+  teleportButton.height = "60px";
+  teleportButton.fontSize = "40px";
+  teleportButton.color = "white";
+  teleportButton.background =
+    movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+  teleportButton.onPointerUpObservable.add(function () {
+    movementSettings.locomotionType = "teleport";
+    teleportButton.background =
+      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    movementButton.background =
+      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+  });
+
+  const movementButton = GUI.Button.CreateSimpleButton(
+    "movement-button",
+    "Movement"
+  );
+  movementButton.width = 1;
+  movementButton.height = "60px";
+  movementButton.fontSize = "40px";
+  movementButton.color = "white";
+  movementButton.background =
+    movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+  movementButton.onPointerUpObservable.add(function () {
+    movementSettings.locomotionType = "movement";
+    teleportButton.background =
+      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    movementButton.background =
+      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
   });
 
   const grid = new GUI.Grid();
@@ -366,6 +331,10 @@ const createUICard = (scene) => {
   // Layout the grid content
   // Add rows to the grid and attach controls to the rows, using the current row count.
   // This makes it easy to reorder these in code without having to reindex the grid content.
+  grid
+    .addRowDefinition(72, true)
+    .addControl(teleportButton, grid.rowCount, 1)
+    .addControl(movementButton, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
@@ -373,12 +342,8 @@ const createUICard = (scene) => {
     .addControl(movementSpeedSlider, grid.rowCount, 2);
   grid
     .addRowDefinition(72, true)
-    .addControl(movementThresholdLabel, grid.rowCount, 1)
-    .addControl(movementThresholdSlider, grid.rowCount, 2);
-  grid
-    .addRowDefinition(72, true)
     .addControl(movementEnabledLabel, grid.rowCount, 1)
-    .addControl(movementEnabledToggle, grid.rowCount, 2);
+    .addControl(movementEnabledCheckbox, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
@@ -386,17 +351,9 @@ const createUICard = (scene) => {
     .addControl(rotationSpeedSlider, grid.rowCount, 2);
   grid
     .addRowDefinition(72, true)
-    .addControl(rotationThresholdLabel, grid.rowCount, 1)
-    .addControl(rotationThresholdSlider, grid.rowCount, 2);
-  grid
-    .addRowDefinition(72, true)
     .addControl(rotationEnabledLabel, grid.rowCount, 1)
     .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
-  grid
-    .addRowDefinition(72, true)
-    .addControl(movementOrientationFollowsViewerPoseLabel, grid.rowCount, 1)
-    .addControl(movementOrientationFollowsViewerPoseCheckbox, grid.rowCount, 2);
   grid
     .addRowDefinition(72, true)
     .addControl(gravityLabel, grid.rowCount, 1)
