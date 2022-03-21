@@ -1,6 +1,5 @@
 <script setup>
 import { labNotes } from "../composables/LabData";
-
 import * as BABYLON from "babylonjs";
 import * as GUI from "babylonjs-gui";
 import * as MAT from "babylonjs-materials";
