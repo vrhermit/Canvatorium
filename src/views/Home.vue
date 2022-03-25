@@ -1,8 +1,16 @@
 <template>
   <div class="home">
     <article>
-      <h3>How to</h3>
+      <h3>Get Started</h3>
       <ul>
+        <li>
+          <b>
+            Visit <router-link to="/lab026">Lab 026</router-link> to customize
+            your Locomotion Preferences.
+          </b>
+          These preferences will be saved to Local Storage in your browser and
+          will be used in most other Labs.
+        </li>
         <li>
           Use the sidebar to select a Lab. "Active" labs are the ones I'm
           working on.
@@ -14,6 +22,10 @@
         <li>
           Toggle the Lab Menu (Oculus Y button) to view Lab Notes and other menu
           options.
+        </li>
+        <li>
+          The Lab Menu contains notes about the lab and a simple version of
+          console logging.
         </li>
       </ul>
       <h3>A few notes</h3>
