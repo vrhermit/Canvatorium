@@ -24,9 +24,12 @@ import {
 
 labNotes.value = `
 User Locomotion Settings
-- Based on the work in Labs 024 and 025
-- Select the locomotion type: teleport or movement modules
-
+You can use this lab to customize your locomotion settings. These settings will be used in most other labs where the LabPlayer is used.
+- Based on the work in Labs 024 and 025.
+- Select the locomotion type: teleport or movement modules.
+- User can customize a subset of features for each locomotion type.
+- Save data to local storage for use in other labs.
+- Press the Y button to toggle the menu while in the Lab.
 `;
 const bjsCanvas = ref(null);
 
@@ -94,19 +97,22 @@ const createScene = async (canvas) => {
   );
 
   watch(movementSettings, (newValue) => {
-    // TODO: Check the locomoation type enable the corrent feature set
+    // Check the locomoation type enable the corrent feature set
     if (newValue.locomotionType === "teleport") {
       useTeleportControls(mainFeatureManager);
     } else {
       useMovementControls(mainFeatureManager);
     }
 
+    // Update the movement settings
     if (movementControlManager) {
       movementControlManager.movementEnabled = newValue.movementEnabled;
       movementControlManager.movementSpeed = newValue.movementSpeed;
       movementControlManager.rotationEnabled = newValue.rotationEnabled;
       movementControlManager.rotationSpeed = newValue.rotationSpeed;
     }
+
+    // Update the teleport settings
     if (teleportControlManager) {
       teleportControlManager.parabolicCheckRadius =
         newValue.parabolicCheckRadius;
@@ -114,6 +120,8 @@ const createScene = async (canvas) => {
       teleportControlManager.backwardsTeleportationDistance =
         newValue.backwardsTeleportationDistance;
     }
+
+    // Update all settings in the local storage
     storedMovementSettings.value = newValue;
   });
 
@@ -139,10 +147,6 @@ onMounted(() => {
 onUnmounted(() => {
   engine.dispose();
   window.removeEventListener("resize", resizeListener);
-});
-
-onUnmounted(() => {
-  engine.dispose();
 });
 
 const createUICard = (scene) => {
