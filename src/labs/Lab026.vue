@@ -527,10 +527,22 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
     featureManager.disableFeature(BABYLON.WebXRFeatureName.MOVEMENT);
     // Configure and enable the teleportation feature
     const createTeleportationSetup = () => {
+      const teleportRingMat = new BABYLON.StandardMaterial("grab-mat1", scene);
+      teleportRingMat.diffuseColor = LabColors["light1"];
+      teleportRingMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
       let setup = {
         xrInput: xr.input,
         floorMeshes: teleportMeshes,
       };
+
+      setup["defaultTargetMeshOptions"] = {
+        teleportationFillColor: "#3e4a5d",
+        teleportationBorderColor: "#8854d0",
+        torusArrowMaterial: teleportRingMat,
+      };
+
+      setup["renderingGroupId"] = 1;
 
       return setup;
     };
@@ -545,6 +557,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
     teleportControlManager.rotationAngle = movementSettings.rotationAngle;
     teleportControlManager.backwardsTeleportationDistance =
       movementSettings.backwardsTeleportationDistance;
+    teleportControlManager.rotationEnabled = false; // rotation while teleport is disabled
   };
 
   mainFeatureManager = xr.baseExperience.featuresManager;
