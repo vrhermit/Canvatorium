@@ -32,9 +32,11 @@ const bjsCanvas = ref(null);
 
 let engine;
 let scene;
-// TODO: Set this with the default camera, then replace it with the VR camera. Set it back when exiting VR
-let mainCamera; // a refecence to the XR camera, will be set after entering VR
 let menuIsVisible = ref(true);
+let mainCamera; // a refecence to the XR camera, will be set after entering VR
+let mainFeatureManager; // a reference to the feature manager, will be set after entering VR
+let movementControlManager; // a reference to the movement controls
+let teleportControlManager; // a reference to the teleport object
 
 // Default settings for the movement controls
 const defaultMovementSettings = {
@@ -72,12 +74,6 @@ let movementSettings = reactive({
     storedMovementSettings.value.backwardsTeleportationDistance,
 });
 
-console.log("movementSettings", movementSettings);
-
-let mainFeatureManager; // a reference to the feature manager, will be set after entering VR
-let movementControlManager; // a reference to the movement controls
-let teleportControlManager; // a reference to the teleport object
-
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
@@ -88,28 +84,6 @@ const createScene = async (canvas) => {
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
   const teleportMeshes = addLabRoomLocal(scene);
-
-  const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
-  subjectMat1.diffuseColor = LabColors["purple"];
-  subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject1 = BABYLON.MeshBuilder.CreateSphere("subject1", {
-    radius: 1,
-  });
-  subject1.material = subjectMat1;
-  subject1.position = new BABYLON.Vector3(-5, 1.5, 0);
-
-  const sixDofDragBehavior = new BABYLON.SixDofDragBehavior();
-  sixDofDragBehavior.allowMultiPointers = true;
-  subject1.addBehavior(sixDofDragBehavior);
-
-  const platform = BABYLON.MeshBuilder.CreateBox("subject1", {
-    width: 20,
-    height: 0.2,
-    depth: 200,
-  });
-  platform.material = subjectMat1;
-  platform.position = new BABYLON.Vector3(60, 10, 0);
-  platform.checkCollisions = true;
 
   const { toggleMenu } = createUICard();
 
@@ -610,7 +584,10 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
         });
         let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
         yButtonComponent?.onButtonStateChangedObservable.add(() => {
-          console.log("Y Button Pressed");
+          if (yButtonComponent.pressed) {
+            console.log("Y Button Pressed");
+            toggleMenu();
+          }
         });
       }
 
@@ -657,6 +634,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
       }
     });
   });
+
   return { useMovementControls, useTeleportControls };
 };
 
@@ -664,7 +642,7 @@ const addLabRoomLocal = (scene) => {
   // Add a ground plane to the scene. Used for WebXR teleportation
   const ground = BABYLON.MeshBuilder.CreateGround(
     "ground",
-    { height: 200, width: 100, subdivisions: 4 },
+    { height: 100, width: 100, subdivisions: 4 },
     scene
   );
   // ground.position.y = 10;
@@ -684,7 +662,7 @@ const addLabRoomLocal = (scene) => {
 
   const wall1 = BABYLON.MeshBuilder.CreateGround(
     "wall1",
-    { height: 10, width: 200, subdivisions: 4 },
+    { height: 10, width: 100, subdivisions: 4 },
     scene
   );
   wall1.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI / 2);
@@ -705,37 +683,49 @@ const addLabRoomLocal = (scene) => {
   wall3.material = groundMaterial;
   wall3.sideOrientation = "DOUBLESIDE";
   wall3.checkCollisions = true;
-  // const wall3 = wall1.clone("wall3");
   wall3.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2);
-  wall3.position = new BABYLON.Vector3(0, 5, -100);
+  wall3.position = new BABYLON.Vector3(0, 5, -50);
 
   const wall4 = wall3.clone("wall4");
   wall4.rotation.z = -Math.PI / 2;
-  wall4.position = new BABYLON.Vector3(0, 5, 100);
+  wall4.position = new BABYLON.Vector3(0, 5, 50);
+
+  const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
+  subjectMat1.diffuseColor = LabColors["purple"];
+  subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const subject1 = BABYLON.MeshBuilder.CreateBox("subject1", {
+    width: 20,
+    height: 0.2,
+    depth: 20,
+  });
+  subject1.material = subjectMat1;
+  subject1.position = new BABYLON.Vector3(20, 3, 10);
 
   const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
   subjectMat2.diffuseColor = LabColors["blue"];
   subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
-    height: 8,
-    width: 16,
-    depth: 0.2,
+    width: 20,
+    height: 0.2,
+    depth: 20,
   });
   subject2.material = subjectMat2;
-  subject2.position = new BABYLON.Vector3(0, 4, 100);
+  subject2.position = new BABYLON.Vector3(-12, 9, 15);
 
   const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
   subjectMat3.diffuseColor = LabColors["green"];
   subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
-    height: 8,
-    width: 16,
-    depth: 0.2,
+    width: 20,
+    height: 0.2,
+    depth: 20,
   });
   subject3.material = subjectMat3;
-  subject3.position = new BABYLON.Vector3(0, 4, -100);
+  subject3.position = new BABYLON.Vector3(0, 6, -20);
 
-  return [ground];
+  // return meshes for teleportation
+  return [ground, subject1, subject2, subject3];
 };
 </script>
 
