@@ -450,14 +450,14 @@ const createUICard = (scene) => {
   return { toggleMenu };
 };
 
-const setupCameraForCollisions = (camera) => {
-  camera.checkCollisions = true;
-  camera.applyGravity = true;
-  camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
-  camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
-};
-
 const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
+  const setupCameraForCollisions = (camera) => {
+    camera.checkCollisions = true;
+    camera.applyGravity = true;
+    camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
+    camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
+  };
+
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     disableTeleportation: true,
@@ -561,15 +561,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
         const xr_ids = motionController.getComponentIds();
         let triggerComponent = motionController.getComponent(xr_ids[0]); //xr-standard-trigger
         triggerComponent?.onButtonStateChangedObservable.add(() => {
-          if (triggerComponent.pressed) {
-            console.log("Left Trigger Pressed");
-            movementControlManager.movementSpeed =
-              movementSettings.movementSpeed * 3;
-          } else {
-            console.log("Left Trigger Released");
-            movementControlManager.movementSpeed =
-              movementSettings.movementSpeed;
-          }
+          console.log("Left Trigger Pressed");
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
         squeezeComponent?.onButtonStateChangedObservable.add(() => {
@@ -617,19 +609,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
         });
         let bButtonComponent = motionController.getComponent(xr_ids[4]); //b-button
         bButtonComponent?.onButtonStateChangedObservable.add(() => {
-          if (bButtonComponent.pressed) {
-            console.log("B Button Pressed");
-            if (movementSettings.movementSpeed == 1) {
-              movementSettings.movementSpeed = 0.1;
-            } else {
-              movementSettings.movementSpeed = 1;
-            }
-            console.log(
-              "Subject 1: ExecuteCodeAction -> OnPickTrigger",
-              movementControlManager.movementSpeed,
-              movementSettings.movementSpeed
-            );
-          }
+          console.log("B Button Pressed");
         });
       }
     });
@@ -701,6 +681,7 @@ const addLabRoomLocal = (scene) => {
   });
   subject1.material = subjectMat1;
   subject1.position = new BABYLON.Vector3(20, 3, 10);
+  subject1.checkCollisions = true;
 
   const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
   subjectMat2.diffuseColor = LabColors["blue"];
@@ -712,6 +693,7 @@ const addLabRoomLocal = (scene) => {
   });
   subject2.material = subjectMat2;
   subject2.position = new BABYLON.Vector3(-12, 9, 15);
+  subject2.checkCollisions = true;
 
   const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
   subjectMat3.diffuseColor = LabColors["green"];
@@ -723,6 +705,7 @@ const addLabRoomLocal = (scene) => {
   });
   subject3.material = subjectMat3;
   subject3.position = new BABYLON.Vector3(0, 6, -20);
+  subject3.checkCollisions = true;
 
   // return meshes for teleportation
   return [ground, subject1, subject2, subject3];
