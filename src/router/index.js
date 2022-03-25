@@ -252,7 +252,7 @@ const routes = [
     meta: {
       title: "Lab 021",
       subtitle: "Dynamic Texture Cards",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -262,7 +262,7 @@ const routes = [
     meta: {
       title: "Lab 022",
       subtitle: "3D Cards pop out from 2D GUI",
-      status: "running"
+      status: "complete"
     }
   },
   {
@@ -272,7 +272,7 @@ const routes = [
     meta: {
       title: "Lab 023",
       subtitle: "Save Object Transform",
-      status: "running"
+      status: "complete"
     }
   },
   {

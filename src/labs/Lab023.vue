@@ -154,9 +154,14 @@ const createScene = async (canvas) => {
   engine.runRenderLoop(() => {
     scene.render();
   });
-  window.addEventListener("resize", function () {
+
+  window.addEventListener("resize", resizeListener);
+};
+
+const resizeListener = () => {
+  if (engine) {
     engine.resize();
-  });
+  }
 };
 
 onMounted(() => {
@@ -167,6 +172,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   engine.dispose();
+  window.removeEventListener("resize", resizeListener);
 });
 </script>
 

@@ -164,10 +164,6 @@ onUnmounted(() => {
   window.removeEventListener("resize", resizeListener);
 });
 
-onUnmounted(() => {
-  engine.dispose();
-});
-
 const createUICard = (scene) => {
   const toggleMenu = () => {
     menuIsVisible.value = !menuIsVisible.value;
