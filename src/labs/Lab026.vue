@@ -39,11 +39,16 @@ let menuIsVisible = ref(true);
 // Default settings for the movement controls
 const defaultMovementSettings = {
   locomotionType: "teleport", // "teleport" or "movement"
+  // Movement settings
   movementEnabled: true,
   movementSpeed: 0.5, // 1 is too fast most of the time
   rotationEnabled: true,
   rotationSpeed: 0.25,
   applyGravity: true,
+  // Teleport settings
+  parabolicCheckRadius: 5,
+  rotationAngle: 0.25, // teleport rotation angle, not movement controls
+  backwardsTeleportationDistance: 0.7,
 };
 
 // Spread the default settings into the stored settings
@@ -63,6 +68,11 @@ let movementSettings = reactive({
   rotationSpeed: storedMovementSettings.value.rotationSpeed,
 
   applyGravity: storedMovementSettings.value.applyGravity,
+
+  parabolicCheckRadius: storedMovementSettings.value.parabolicCheckRadius,
+  rotationAngle: storedMovementSettings.value.rotationAngle,
+  backwardsTeleportationDistance:
+    storedMovementSettings.value.backwardsTeleportationDistance,
 });
 
 console.log("movementSettings", movementSettings);
@@ -78,6 +88,11 @@ watch(movementSettings, (newValue) => {
     movementControlManager.rotationSpeed = newValue.rotationSpeed;
     // TODO: move the gravity change here?
     storedMovementSettings.value = newValue;
+
+    movementControlManager.parabolicCheckRadius = newValue.parabolicCheckRadius;
+    movementControlManager.rotationAngle = newValue.rotationAngle;
+    movementControlManager.backwardsTeleportationDistance =
+      newValue.backwardsTeleportationDistance;
   }
 });
 
@@ -207,6 +222,11 @@ const createUICard = (scene) => {
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
 
+  const movementSettingslabel = createGridMenuLabel("MOVEMENT SETTINGS");
+  movementSettingslabel.fontSize = "30px";
+  movementSettingslabel.fontStyle = "bold";
+  movementSettingslabel.color = "#a5b1c2";
+
   const movementSpeedLabel = createGridMenuLabel(
     `Movement Speed: ${movementSettings.movementSpeed.toFixed(2)}`
   );
@@ -258,6 +278,54 @@ const createUICard = (scene) => {
   gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
     movementSettings.applyGravity = value;
     mainCamera.applyGravity = value;
+  });
+
+  const teleportSettingslabel = createGridMenuLabel("TELEPORT SETTINGS");
+  teleportSettingslabel.fontSize = "30px";
+  teleportSettingslabel.fontStyle = "bold";
+  teleportSettingslabel.color = "#a5b1c2";
+
+  const parabolicCheckRadiusLabel = createGridMenuLabel("Parabolic Radius: 5");
+
+  const parabolicCheckRadiusSlider = createGridMenuSlider({
+    min: 1,
+    max: 20,
+    step: 1,
+    value: 5,
+  });
+  parabolicCheckRadiusSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.parabolicCheckRadius = value;
+    parabolicCheckRadiusLabel.text = `Parabolic Radius: ${value}`;
+  });
+
+  const rotationAngleLabel = createGridMenuLabel("Snap Turn Angle (Pi / 8)");
+
+  const rotationAngleSlider = createGridMenuSlider({
+    min: 2,
+    max: 12,
+    step: 1,
+    value: 8,
+  });
+  rotationAngleSlider.onValueChangedObservable.add(function (value) {
+    movementSettings.rotationAngle = value;
+    rotationAngleLabel.text = `Snap Turn Angle (Pi / ${value})`;
+  });
+
+  const backwardsTeleportationDistanceLabel = createGridMenuLabel(
+    "Backwards Distance: 1.0"
+  );
+
+  const backwardsTeleportationDistanceSlider = createGridMenuSlider({
+    min: 0,
+    max: 10,
+    step: 0.1,
+    value: 1,
+  });
+  backwardsTeleportationDistanceSlider.onValueChangedObservable.add(function (
+    value
+  ) {
+    movementSettings.backwardsTeleportationDistance = value;
+    backwardsTeleportationDistanceLabel.text = `Backwards Distance: ${value}`;
   });
 
   const resetButton = GUI.Button.CreateSimpleButton(
@@ -331,11 +399,6 @@ const createUICard = (scene) => {
       movementSettings.locomotionType === "movement" ? "bold" : "normal";
   });
 
-  const movementSettingslabel = createGridMenuLabel("MOVEMENT SETTINGS");
-  movementSettingslabel.fontSize = "30px";
-  movementSettingslabel.fontStyle = "bold";
-  movementSettingslabel.color = "#a5b1c2";
-
   const grid = new GUI.Grid();
   grid.addColumnDefinition(40, true);
   grid.addColumnDefinition(0.5);
@@ -345,11 +408,34 @@ const createUICard = (scene) => {
   // Layout the grid content
   // Add rows to the grid and attach controls to the rows, using the current row count.
   // This makes it easy to reorder these in code without having to reindex the grid content.
+  grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(teleportButton, grid.rowCount, 1)
     .addControl(movementButton, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
+  grid.addRowDefinition(18, true); // empty row
+
+  // Layout the Teleport Controls
+  grid
+    .addRowDefinition(72, true)
+    .addControl(teleportSettingslabel, grid.rowCount, 1);
+  grid
+    .addRowDefinition(72, true)
+    .addControl(parabolicCheckRadiusLabel, grid.rowCount, 1)
+    .addControl(parabolicCheckRadiusSlider, grid.rowCount, 2);
+
+  grid
+    .addRowDefinition(72, true)
+    .addControl(rotationAngleLabel, grid.rowCount, 1)
+    .addControl(rotationAngleSlider, grid.rowCount, 2);
+
+  grid
+    .addRowDefinition(72, true)
+    .addControl(backwardsTeleportationDistanceLabel, grid.rowCount, 1)
+    .addControl(backwardsTeleportationDistanceSlider, grid.rowCount, 2);
+  grid.addRowDefinition(18, true); // empty row
+
+  // Layout the Movmement Controls
   grid
     .addRowDefinition(72, true)
     .addControl(movementSettingslabel, grid.rowCount, 1);
@@ -361,7 +447,6 @@ const createUICard = (scene) => {
     .addRowDefinition(72, true)
     .addControl(movementEnabledLabel, grid.rowCount, 1)
     .addControl(movementEnabledCheckbox, grid.rowCount, 2);
-  // grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(rotationSpeedLabel, grid.rowCount, 1)
@@ -370,7 +455,6 @@ const createUICard = (scene) => {
     .addRowDefinition(72, true)
     .addControl(rotationEnabledLabel, grid.rowCount, 1)
     .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
-  // grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(gravityLabel, grid.rowCount, 1)
