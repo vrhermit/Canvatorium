@@ -287,11 +287,13 @@ const createUICard = (scene) => {
 
   const teleportButton = GUI.Button.CreateSimpleButton(
     "teleport-button",
-    "Teleport"
+    "TELEPORT MODE"
   );
   teleportButton.width = 1;
   teleportButton.height = "60px";
-  teleportButton.fontSize = "40px";
+  teleportButton.fontSize = "32px";
+  teleportButton.fontStyle =
+    movementSettings.locomotionType === "teleport" ? "bold" : "normal";
   teleportButton.color = "white";
   teleportButton.background =
     movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
@@ -299,17 +301,21 @@ const createUICard = (scene) => {
     movementSettings.locomotionType = "teleport";
     teleportButton.background =
       movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    teleportButton.fontStyle =
+      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
     movementButton.background =
       movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
   });
 
   const movementButton = GUI.Button.CreateSimpleButton(
     "movement-button",
-    "Movement"
+    "MOVEMENT MODE"
   );
   movementButton.width = 1;
   movementButton.height = "60px";
-  movementButton.fontSize = "40px";
+  movementButton.fontSize = "32px";
+  movementButton.fontStyle =
+    movementSettings.locomotionType === "movement" ? "bold" : "normal";
   movementButton.color = "white";
   movementButton.background =
     movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
@@ -317,9 +323,18 @@ const createUICard = (scene) => {
     movementSettings.locomotionType = "movement";
     teleportButton.background =
       movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    teleportButton.fontStyle =
+      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
     movementButton.background =
       movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+    movementButton.fontStyle =
+      movementSettings.locomotionType === "movement" ? "bold" : "normal";
   });
+
+  const movementSettingslabel = createGridMenuLabel("MOVEMENT SETTINGS");
+  movementSettingslabel.fontSize = "30px";
+  movementSettingslabel.fontStyle = "bold";
+  movementSettingslabel.color = "#a5b1c2";
 
   const grid = new GUI.Grid();
   grid.addColumnDefinition(40, true);
@@ -337,13 +352,16 @@ const createUICard = (scene) => {
   grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
+    .addControl(movementSettingslabel, grid.rowCount, 1);
+  grid
+    .addRowDefinition(72, true)
     .addControl(movementSpeedLabel, grid.rowCount, 1)
     .addControl(movementSpeedSlider, grid.rowCount, 2);
   grid
     .addRowDefinition(72, true)
     .addControl(movementEnabledLabel, grid.rowCount, 1)
     .addControl(movementEnabledCheckbox, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
+  // grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(rotationSpeedLabel, grid.rowCount, 1)
@@ -352,7 +370,7 @@ const createUICard = (scene) => {
     .addRowDefinition(72, true)
     .addControl(rotationEnabledLabel, grid.rowCount, 1)
     .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
-  grid.addRowDefinition(36, true); // empty row
+  // grid.addRowDefinition(36, true); // empty row
   grid
     .addRowDefinition(72, true)
     .addControl(gravityLabel, grid.rowCount, 1)
