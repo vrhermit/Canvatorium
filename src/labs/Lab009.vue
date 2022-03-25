@@ -4,7 +4,7 @@ import { labNotes } from "../composables/LabData";
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import * as GUI from "babylonjs-gui";
-import { ref, onMounted } from "@vue/runtime-core";
+import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
@@ -100,6 +100,10 @@ onMounted(() => {
   if (bjsCanvas.value) {
     createScene(bjsCanvas.value);
   }
+});
+
+onUnmounted(() => {
+  engine.dispose();
 });
 </script>
 

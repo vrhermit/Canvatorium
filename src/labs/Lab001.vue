@@ -86,6 +86,10 @@ onMounted(() => {
     createScene(bjsCanvas.value);
   }
 });
+
+// onUnmounted(() => {
+//   engine.dispose();
+// });
 </script>
 
 <template>
