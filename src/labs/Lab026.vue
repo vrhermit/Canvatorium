@@ -44,7 +44,6 @@ const defaultMovementSettings = {
   movementSpeed: 0.5, // 1 is too fast most of the time
   rotationEnabled: true,
   rotationSpeed: 0.25,
-  applyGravity: true,
   // Teleport settings
   parabolicCheckRadius: 5,
   rotationAngle: 0.25, // teleport rotation angle, not movement controls
@@ -67,8 +66,6 @@ let movementSettings = reactive({
   rotationEnabled: storedMovementSettings.value.rotationEnabled,
   rotationSpeed: storedMovementSettings.value.rotationSpeed,
 
-  applyGravity: storedMovementSettings.value.applyGravity,
-
   parabolicCheckRadius: storedMovementSettings.value.parabolicCheckRadius,
   rotationAngle: storedMovementSettings.value.rotationAngle,
   backwardsTeleportationDistance:
@@ -80,32 +77,6 @@ console.log("movementSettings", movementSettings);
 let mainFeatureManager; // a reference to the feature manager, will be set after entering VR
 let movementControlManager; // a reference to the movement controls
 let teleportControlManager; // a reference to the teleport object
-
-// watch(movementSettings, (newValue) => {
-//   // TODO: Check the locomoation type enable the corrent feature set
-//   if (newValue.locomotionType === "teleport") {
-//     // mainFeatureManager.enableFeature("teleport");
-//     // mainFeatureManager.disableFeature("movement");
-//   } else {
-//     // mainFeatureManager.disableFeature("teleport");
-//     // mainFeatureManager.enableFeature("movement");
-//   }
-
-//   if (movementControlManager) {
-//     movementControlManager.movementEnabled = newValue.movementEnabled;
-//     movementControlManager.movementSpeed = newValue.movementSpeed;
-//     movementControlManager.rotationEnabled = newValue.rotationEnabled;
-//     movementControlManager.rotationSpeed = newValue.rotationSpeed;
-//     // TODO: move the gravity change here?
-//   }
-//   if (teleportControlManager) {
-//     teleportControlManager.parabolicCheckRadius = newValue.parabolicCheckRadius;
-//     teleportControlManager.rotationAngle = newValue.rotationAngle;
-//     teleportControlManager.backwardsTeleportationDistance =
-//       newValue.backwardsTeleportationDistance;
-//   }
-//   storedMovementSettings.value = newValue;
-// });
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -152,12 +123,8 @@ const createScene = async (canvas) => {
     // TODO: Check the locomoation type enable the corrent feature set
     if (newValue.locomotionType === "teleport") {
       useTeleportControls(mainFeatureManager);
-      // mainFeatureManager.enableFeature("teleport");
-      // mainFeatureManager.disableFeature("movement");
     } else {
       useMovementControls(mainFeatureManager);
-      // mainFeatureManager.disableFeature("teleport");
-      // mainFeatureManager.enableFeature("movement");
     }
 
     if (movementControlManager) {
@@ -165,7 +132,6 @@ const createScene = async (canvas) => {
       movementControlManager.movementSpeed = newValue.movementSpeed;
       movementControlManager.rotationEnabled = newValue.rotationEnabled;
       movementControlManager.rotationSpeed = newValue.rotationSpeed;
-      // TODO: move the gravity change here?
     }
     if (teleportControlManager) {
       teleportControlManager.parabolicCheckRadius =
@@ -361,15 +327,6 @@ const createUICard = (scene) => {
     movementSettings.rotationEnabled = value;
   });
 
-  const gravityLabel = createGridMenuLabel("Apply Gravity");
-
-  const gravityCheckbox = createGridMenuCheckbox();
-  gravityCheckbox.isChecked = movementSettings.applyGravity;
-  gravityCheckbox.onIsCheckedChangedObservable.add(function (value) {
-    movementSettings.applyGravity = value;
-    mainCamera.applyGravity = value;
-  });
-
   const teleportSettingslabel = createGridMenuLabel("TELEPORT SETTINGS");
   teleportSettingslabel.fontSize = "30px";
   teleportSettingslabel.fontStyle = "bold";
@@ -433,8 +390,6 @@ const createUICard = (scene) => {
     movementSettings.movementEnabled = true;
     movementSettings.rotationSpeed = 0.25;
     movementSettings.rotationEnabled = true;
-
-    movementSettings.applyGravity = true;
     movementSettings.parabolicCheckRadius = 5;
     movementSettings.rotationAngle = 8;
     movementSettings.backwardsTeleportationDistance = 1;
@@ -443,7 +398,6 @@ const createUICard = (scene) => {
     movementEnabledCheckbox.isChecked = movementSettings.movementEnabled;
     rotationSpeedSlider.value = movementSettings.rotationSpeed;
     rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
-    gravityCheckbox.isChecked = movementSettings.applyGravity;
     parabolicCheckRadiusSlider.value = movementSettings.parabolicCheckRadius;
     rotationAngleSlider.value = movementSettings.rotationAngle;
     backwardsTeleportationDistanceSlider.value =
@@ -509,10 +463,6 @@ const createUICard = (scene) => {
     .addRowDefinition(72, true)
     .addControl(rotationEnabledLabel, grid.rowCount, 1)
     .addControl(rotationEnabledCheckbox, grid.rowCount, 2);
-  grid
-    .addRowDefinition(72, true)
-    .addControl(gravityLabel, grid.rowCount, 1)
-    .addControl(gravityCheckbox, grid.rowCount, 2);
   grid.addRowDefinition(36, true); // empty row
   grid.addRowDefinition(72, true).addControl(resetButton, grid.rowCount, 2);
 
@@ -528,7 +478,7 @@ const createUICard = (scene) => {
 
 const setupCameraForCollisions = (camera) => {
   camera.checkCollisions = true;
-  camera.applyGravity = movementSettings.applyGravity;
+  camera.applyGravity = true;
   camera.ellipsoid = new BABYLON.Vector3(0.7, 1, 0.7);
   camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
 };
@@ -649,13 +599,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
         });
         let squeezeComponent = motionController.getComponent(xr_ids[1]); //xr-standard-squeeze
         squeezeComponent?.onButtonStateChangedObservable.add(() => {
-          if (squeezeComponent.pressed) {
-            console.log("Left Grip Pressed");
-            mainCamera.applyGravity = false;
-          } else {
-            console.log("Left Grip Released");
-            mainCamera.applyGravity = true;
-          }
+          console.log("Left Grip Pressed");
         });
 
         let xButtonComponent = motionController.getComponent(xr_ids[3]); //x-button
@@ -666,10 +610,7 @@ const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
         });
         let yButtonComponent = motionController.getComponent(xr_ids[4]); //y-button
         yButtonComponent?.onButtonStateChangedObservable.add(() => {
-          if (yButtonComponent.pressed) {
-            console.log("Y Button Pressed");
-            toggleMenu();
-          }
+          console.log("Y Button Pressed");
         });
       }
 
