@@ -148,11 +148,26 @@ const createScene = async (canvas) => {
   engine.runRenderLoop(() => {
     scene.render();
   });
-  window.addEventListener("resize", function () {
-    engine.resize();
-  });
+
+  window.addEventListener("resize", resizeListener);
 };
 
+const resizeListener = () => {
+  if (engine) {
+    engine.resize();
+  }
+};
+
+onMounted(() => {
+  if (bjsCanvas.value) {
+    createScene(bjsCanvas.value);
+  }
+});
+
+onUnmounted(() => {
+  engine.dispose();
+  window.removeEventListener("resize", resizeListener);
+});
 // Watch the labLog data and update the text in the GUI
 // TODO: Refactor this to append only the new eleements to the text block
 watch(conLogData, (newValue) => {

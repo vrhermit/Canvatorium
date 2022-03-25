@@ -110,10 +110,26 @@ const createScene = async (canvas) => {
   engine.runRenderLoop(() => {
     scene.render();
   });
-  window.addEventListener("resize", function () {
-    engine.resize();
-  });
+
+  window.addEventListener("resize", resizeListener);
 };
+
+const resizeListener = () => {
+  if (engine) {
+    engine.resize();
+  }
+};
+
+onMounted(() => {
+  if (bjsCanvas.value) {
+    createScene(bjsCanvas.value);
+  }
+});
+
+onUnmounted(() => {
+  engine.dispose();
+  window.removeEventListener("resize", resizeListener);
+});
 
 const addGridRow = (grid, projectIndex) => {
   grid.addRowDefinition(100, true);
