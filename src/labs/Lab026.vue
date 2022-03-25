@@ -77,24 +77,35 @@ let movementSettings = reactive({
 
 console.log("movementSettings", movementSettings);
 
+let mainFeatureManager; // a reference to the feature manager, will be set after entering VR
 let movementControlManager; // a reference to the movement controls
+let teleportControlManager; // a reference to the teleport object
 
-watch(movementSettings, (newValue) => {
-  // TODO: Check the locomoation type enable the corrent feature set
-  if (movementControlManager) {
-    movementControlManager.movementEnabled = newValue.movementEnabled;
-    movementControlManager.movementSpeed = newValue.movementSpeed;
-    movementControlManager.rotationEnabled = newValue.rotationEnabled;
-    movementControlManager.rotationSpeed = newValue.rotationSpeed;
-    // TODO: move the gravity change here?
-    storedMovementSettings.value = newValue;
+// watch(movementSettings, (newValue) => {
+//   // TODO: Check the locomoation type enable the corrent feature set
+//   if (newValue.locomotionType === "teleport") {
+//     // mainFeatureManager.enableFeature("teleport");
+//     // mainFeatureManager.disableFeature("movement");
+//   } else {
+//     // mainFeatureManager.disableFeature("teleport");
+//     // mainFeatureManager.enableFeature("movement");
+//   }
 
-    movementControlManager.parabolicCheckRadius = newValue.parabolicCheckRadius;
-    movementControlManager.rotationAngle = newValue.rotationAngle;
-    movementControlManager.backwardsTeleportationDistance =
-      newValue.backwardsTeleportationDistance;
-  }
-});
+//   if (movementControlManager) {
+//     movementControlManager.movementEnabled = newValue.movementEnabled;
+//     movementControlManager.movementSpeed = newValue.movementSpeed;
+//     movementControlManager.rotationEnabled = newValue.rotationEnabled;
+//     movementControlManager.rotationSpeed = newValue.rotationSpeed;
+//     // TODO: move the gravity change here?
+//   }
+//   if (teleportControlManager) {
+//     teleportControlManager.parabolicCheckRadius = newValue.parabolicCheckRadius;
+//     teleportControlManager.rotationAngle = newValue.rotationAngle;
+//     teleportControlManager.backwardsTeleportationDistance =
+//       newValue.backwardsTeleportationDistance;
+//   }
+//   storedMovementSettings.value = newValue;
+// });
 
 const createScene = async (canvas) => {
   // Create and customize the scene
@@ -105,7 +116,7 @@ const createScene = async (canvas) => {
   addLabCamera(canvas, scene);
   scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -2);
   addLabLights(scene);
-  addLabRoomLocal(scene);
+  const teleportMeshes = addLabRoomLocal(scene);
 
   const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
   subjectMat1.diffuseColor = LabColors["purple"];
@@ -131,7 +142,40 @@ const createScene = async (canvas) => {
 
   const { toggleMenu } = createUICard();
 
-  await addLabPlayerLocal(scene, toggleMenu);
+  const { useMovementControls, useTeleportControls } = await addLabPlayerLocal(
+    scene,
+    toggleMenu,
+    teleportMeshes
+  );
+
+  watch(movementSettings, (newValue) => {
+    // TODO: Check the locomoation type enable the corrent feature set
+    if (newValue.locomotionType === "teleport") {
+      useTeleportControls(mainFeatureManager);
+      // mainFeatureManager.enableFeature("teleport");
+      // mainFeatureManager.disableFeature("movement");
+    } else {
+      useMovementControls(mainFeatureManager);
+      // mainFeatureManager.disableFeature("teleport");
+      // mainFeatureManager.enableFeature("movement");
+    }
+
+    if (movementControlManager) {
+      movementControlManager.movementEnabled = newValue.movementEnabled;
+      movementControlManager.movementSpeed = newValue.movementSpeed;
+      movementControlManager.rotationEnabled = newValue.rotationEnabled;
+      movementControlManager.rotationSpeed = newValue.rotationSpeed;
+      // TODO: move the gravity change here?
+    }
+    if (teleportControlManager) {
+      teleportControlManager.parabolicCheckRadius =
+        newValue.parabolicCheckRadius;
+      teleportControlManager.rotationAngle = newValue.rotationAngle;
+      teleportControlManager.backwardsTeleportationDistance =
+        newValue.backwardsTeleportationDistance;
+    }
+    storedMovementSettings.value = newValue;
+  });
 
   engine.runRenderLoop(() => {
     scene.render();
@@ -221,6 +265,52 @@ const createUICard = (scene) => {
   sv.barColor = "#53637b";
   sv.verticalAlignment = GUI.Control.VERTICAL_ALIGNMENT_TOP;
   advancedTexture.addControl(sv);
+
+  const teleportButton = GUI.Button.CreateSimpleButton(
+    "teleport-button",
+    "TELEPORT MODE"
+  );
+  teleportButton.width = 1;
+  teleportButton.height = "60px";
+  teleportButton.fontSize = "32px";
+  teleportButton.fontStyle =
+    movementSettings.locomotionType === "teleport" ? "bold" : "normal";
+  teleportButton.color = "white";
+  teleportButton.background =
+    movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+  teleportButton.onPointerUpObservable.add(function () {
+    movementSettings.locomotionType = "teleport";
+    teleportButton.background =
+      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    teleportButton.fontStyle =
+      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
+    movementButton.background =
+      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+  });
+
+  const movementButton = GUI.Button.CreateSimpleButton(
+    "movement-button",
+    "MOVEMENT MODE"
+  );
+  movementButton.width = 1;
+  movementButton.height = "60px";
+  movementButton.fontSize = "32px";
+  movementButton.fontStyle =
+    movementSettings.locomotionType === "movement" ? "bold" : "normal";
+  movementButton.color = "white";
+  movementButton.background =
+    movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+  movementButton.onPointerUpObservable.add(function () {
+    movementSettings.locomotionType = "movement";
+    teleportButton.background =
+      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
+    teleportButton.fontStyle =
+      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
+    movementButton.background =
+      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
+    movementButton.fontStyle =
+      movementSettings.locomotionType === "movement" ? "bold" : "normal";
+  });
 
   const movementSettingslabel = createGridMenuLabel("MOVEMENT SETTINGS");
   movementSettingslabel.fontSize = "30px";
@@ -344,59 +434,23 @@ const createUICard = (scene) => {
     movementSettings.rotationSpeed = 0.25;
     movementSettings.rotationEnabled = true;
 
+    movementSettings.applyGravity = true;
+    movementSettings.parabolicCheckRadius = 5;
+    movementSettings.rotationAngle = 8;
+    movementSettings.backwardsTeleportationDistance = 1;
+
     movementSpeedSlider.value = movementSettings.movementSpeed;
     movementEnabledCheckbox.isChecked = movementSettings.movementEnabled;
     rotationSpeedSlider.value = movementSettings.rotationSpeed;
     rotationEnabledCheckbox.isChecked = movementSettings.rotationEnabled;
+    gravityCheckbox.isChecked = movementSettings.applyGravity;
+    parabolicCheckRadiusSlider.value = movementSettings.parabolicCheckRadius;
+    rotationAngleSlider.value = movementSettings.rotationAngle;
+    backwardsTeleportationDistanceSlider.value =
+      movementSettings.backwardsTeleportationDistance;
 
     // Move the player back to the starting position
     mainCamera.position = new BABYLON.Vector3(0, 3, 0);
-  });
-
-  const teleportButton = GUI.Button.CreateSimpleButton(
-    "teleport-button",
-    "TELEPORT MODE"
-  );
-  teleportButton.width = 1;
-  teleportButton.height = "60px";
-  teleportButton.fontSize = "32px";
-  teleportButton.fontStyle =
-    movementSettings.locomotionType === "teleport" ? "bold" : "normal";
-  teleportButton.color = "white";
-  teleportButton.background =
-    movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
-  teleportButton.onPointerUpObservable.add(function () {
-    movementSettings.locomotionType = "teleport";
-    teleportButton.background =
-      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
-    teleportButton.fontStyle =
-      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
-    movementButton.background =
-      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
-  });
-
-  const movementButton = GUI.Button.CreateSimpleButton(
-    "movement-button",
-    "MOVEMENT MODE"
-  );
-  movementButton.width = 1;
-  movementButton.height = "60px";
-  movementButton.fontSize = "32px";
-  movementButton.fontStyle =
-    movementSettings.locomotionType === "movement" ? "bold" : "normal";
-  movementButton.color = "white";
-  movementButton.background =
-    movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
-  movementButton.onPointerUpObservable.add(function () {
-    movementSettings.locomotionType = "movement";
-    teleportButton.background =
-      movementSettings.locomotionType === "teleport" ? "#8854d0" : "#53637b";
-    teleportButton.fontStyle =
-      movementSettings.locomotionType === "teleport" ? "bold" : "normal";
-    movementButton.background =
-      movementSettings.locomotionType === "movement" ? "#8854d0" : "#53637b";
-    movementButton.fontStyle =
-      movementSettings.locomotionType === "movement" ? "bold" : "normal";
   });
 
   const grid = new GUI.Grid();
@@ -479,7 +533,7 @@ const setupCameraForCollisions = (camera) => {
   camera.ellipsoidOffset = new BABYLON.Vector3(0, 0.5, 0);
 };
 
-const addLabPlayerLocal = async (scene, toggleMenu) => {
+const addLabPlayerLocal = async (scene, toggleMenu, teleportMeshes) => {
   // Create the default experience
   let xr = await scene.createDefaultXRExperienceAsync({
     disableTeleportation: true,
@@ -493,56 +547,88 @@ const addLabPlayerLocal = async (scene, toggleMenu) => {
     xrCamera.position.z = -2;
   });
 
-  const swappedHandednessConfiguration = [
-    {
-      allowedComponentTypes: [
-        BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE,
-        BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE,
-      ],
-      forceHandedness: "right",
-      axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
-        console.log(xrInput);
-        movementState.rotateX =
-          Math.abs(axes.x) > featureContext.rotationThreshold ? axes.x : 0;
-        movementState.rotateY =
-          Math.abs(axes.y) > featureContext.rotationThreshold ? axes.y : 0;
+  const useMovementControls = (featureManager) => {
+    // Turn off the other feature
+    featureManager.disableFeature(BABYLON.WebXRFeatureName.TELEPORTATION);
+    // Configure and enable the movement controls
+    const swappedHandednessConfiguration = [
+      {
+        allowedComponentTypes: [
+          BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE,
+          BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE,
+        ],
+        forceHandedness: "right",
+        axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
+          console.log(xrInput);
+          movementState.rotateX =
+            Math.abs(axes.x) > featureContext.rotationThreshold ? axes.x : 0;
+          movementState.rotateY =
+            Math.abs(axes.y) > featureContext.rotationThreshold ? axes.y : 0;
+        },
       },
-    },
-    {
-      allowedComponentTypes: [
-        BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE,
-        BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE,
-      ],
-      forceHandedness: "left",
-      axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
-        console.log(xrInput);
-        movementState.moveX =
-          Math.abs(axes.x) > featureContext.movementThreshold ? axes.x : 0;
-        movementState.moveY =
-          Math.abs(axes.y) > featureContext.movementThreshold ? axes.y : 0;
+      {
+        allowedComponentTypes: [
+          BABYLON.WebXRControllerComponent.THUMBSTICK_TYPE,
+          BABYLON.WebXRControllerComponent.TOUCHPAD_TYPE,
+        ],
+        forceHandedness: "left",
+        axisChangedHandler: (axes, movementState, featureContext, xrInput) => {
+          console.log(xrInput);
+          movementState.moveX =
+            Math.abs(axes.x) > featureContext.movementThreshold ? axes.x : 0;
+          movementState.moveY =
+            Math.abs(axes.y) > featureContext.movementThreshold ? axes.y : 0;
+        },
       },
-    },
-  ];
+    ];
 
-  setupCameraForCollisions(xr.input.xrCamera);
+    setupCameraForCollisions(xr.input.xrCamera);
 
-  const featureManager = xr.baseExperience.featuresManager;
+    movementControlManager = featureManager.enableFeature(
+      BABYLON.WebXRFeatureName.MOVEMENT,
+      "latest",
+      {
+        xrInput: xr.input,
+        customRegistrationConfigurations: swappedHandednessConfiguration,
+        movementEnabled: movementSettings.movementEnabled,
+        movementSpeed: movementSettings.movementSpeed,
+        rotationEnabled: movementSettings.rotationEnabled,
+        rotationSpeed: movementSettings.rotationSpeed,
+      }
+    );
+  };
 
-  movementControlManager = featureManager.enableFeature(
-    BABYLON.WebXRFeatureName.MOVEMENT,
-    "latest",
-    {
-      xrInput: xr.input,
-      customRegistrationConfigurations: swappedHandednessConfiguration,
-      movementOrientationFollowsViewerPose: true,
-      movementEnabled: movementSettings.movementEnabled,
-      movementSpeed: movementSettings.movementSpeed,
-      movementThreshold: movementSettings.movementThreshold,
-      rotationEnabled: movementSettings.rotationEnabled,
-      rotationSpeed: movementSettings.rotationSpeed,
-      rotationThreshold: movementSettings.rotationThreshold,
-    }
-  );
+  const useTeleportControls = (featureManager) => {
+    // Turn off the other feature
+    featureManager.disableFeature(BABYLON.WebXRFeatureName.MOVEMENT);
+    // Configure and enable the teleportation feature
+    const createTeleportationSetup = () => {
+      let setup = {
+        xrInput: xr.input,
+        floorMeshes: teleportMeshes,
+      };
+
+      return setup;
+    };
+
+    teleportControlManager = featureManager.enableFeature(
+      BABYLON.WebXRFeatureName.TELEPORTATION,
+      "stable",
+      createTeleportationSetup({})
+    );
+    teleportControlManager.parabolicCheckRadius =
+      movementSettings.parabolicCheckRadius;
+    teleportControlManager.rotationAngle = movementSettings.rotationAngle;
+    teleportControlManager.backwardsTeleportationDistance =
+      movementSettings.backwardsTeleportationDistance;
+  };
+
+  mainFeatureManager = xr.baseExperience.featuresManager;
+  if (movementSettings.locomotionType === "movement") {
+    useMovementControls(mainFeatureManager);
+  } else {
+    useTeleportControls(mainFeatureManager);
+  }
 
   //controller input
   xr.input.onControllerAddedObservable.add((controller) => {
@@ -630,6 +716,7 @@ const addLabPlayerLocal = async (scene, toggleMenu) => {
       }
     });
   });
+  return { useMovementControls, useTeleportControls };
 };
 
 const addLabRoomLocal = (scene) => {
@@ -706,6 +793,8 @@ const addLabRoomLocal = (scene) => {
   });
   subject3.material = subjectMat3;
   subject3.position = new BABYLON.Vector3(0, 4, -100);
+
+  return [ground];
 };
 </script>
 
