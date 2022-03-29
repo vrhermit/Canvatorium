@@ -169,9 +169,9 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
         thumbstickComponent?.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Left Thumbstick Pressed");
-          }
+          // if (thumbstickComponent.pressed) {
+          //   console.log("Left Thumbstick Pressed");
+          // }
         });
         // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
         //   console.log("Left Axises: " + axes.x + " " + axes.y);
@@ -210,9 +210,9 @@ export const createLabPlayer = async (scene, teleportMeshes) => {
         });
         let thumbstickComponent = motionController.getComponent(xr_ids[2]); //xr-standard-thumbstick
         thumbstickComponent?.onButtonStateChangedObservable.add(() => {
-          if (thumbstickComponent.pressed) {
-            console.log("Right Thumbstick Pressed");
-          }
+          // if (thumbstickComponent.pressed) {
+          //   console.log("Right Thumbstick Pressed");
+          // }
         });
         // thumbstickComponent.onAxisValueChangedObservable.add((axes) => {
         //   console.log("Right Axises: " + axes.x + " " + axes.y);
