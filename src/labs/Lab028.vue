@@ -7,8 +7,8 @@ import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
-import addLabLights from "../lab-shared/LabLights";
-import addLabRoom from "../lab-shared/LabRoom";
+// import addLabLights from "../lab-shared/LabLights";
+// import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
 // Import the LabPlayer
 import { createLabPlayer } from "../lab-shared/LabPlayer";
@@ -27,13 +27,66 @@ const createScene = async (canvas) => {
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
 
+  const ambientLight1 = new BABYLON.HemisphericLight(
+    "light-01",
+    new BABYLON.Vector3(5, 5, 5),
+    scene
+  );
+  ambientLight1.intensity = 0.8;
+  const ambientLight2 = new BABYLON.HemisphericLight(
+    "light-02",
+    new BABYLON.Vector3(-5, 5, -5),
+    scene
+  );
+  ambientLight2.intensity = 0.8;
+  //   var light = new BABYLON.DirectionalLight(
+  //     "light",
+  //     new BABYLON.Vector3(-1, -1, -1),
+  //     scene
+  //   );
+
+  scene.clearColor = LabColors["light3"];
+
   // Use the shared lab tools
   addLabCamera(canvas, scene);
-  addLabLights(scene);
-  const ground = addLabRoom(scene);
+  //   addLabLights(scene);
+  //   const ground = addLabRoom(scene);
+  const ground = BABYLON.MeshBuilder.CreateGround(
+    "ground",
+    { height: 100, width: 100, subdivisions: 5 },
+    scene
+  );
+  ground.isVisible = false;
+  ground.receiveShadows = true;
   console.log(ground);
 
-  createColumn1();
+  //   var shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
+  //   shadowGenerator.usePoissonSampling = true;
+  //   shadowGenerator.useExponentialShadowMap = true;
+
+  const column = createColumn1();
+  column.position = new BABYLON.Vector3(-45, 0, 0);
+  //   shadowGenerator.addShadowCaster(column);
+
+  const numberOfColumns = 18;
+  var x = column.position.x;
+  var i = 0;
+  do {
+    i++;
+    x += 5;
+    console.log(x);
+    const newCol = column.clone("column");
+    newCol.position = new BABYLON.Vector3(
+      x,
+      column.position.y,
+      column.position.z
+    );
+
+    newCol.enableEdgesRendering();
+    newCol.getChildMeshes()[0].enableEdgesRendering();
+    newCol.getChildMeshes()[1].enableEdgesRendering();
+    // shadowGenerator.addShadowCaster(newCol);
+  } while (i < numberOfColumns);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
@@ -125,6 +178,7 @@ const createColumn1 = () => {
   column.enableEdgesRendering();
   column.edgesWidth = 0.2;
   column.edgesColor = new BABYLON.Color4(0.8, 0.8, 0.8, 1);
+  //   column.edgesShareWithInstances = true;
 
   base.material = colMat;
   base.enableEdgesRendering();
