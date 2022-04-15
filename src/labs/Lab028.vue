@@ -78,14 +78,24 @@ const createColumn1 = () => {
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
 
   const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  colTex.vScale = 4;
+  colTex.uScale = 4;
   colMat.diffuseTexture = colTex;
+
+  const maseMat = new BABYLON.StandardMaterial("menu-card-material", scene);
+  maseMat.diffuseColor = LabColors["light3"];
+  maseMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+
+  const baseTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+
+  maseMat.diffuseTexture = baseTex;
 
   const base = BABYLON.MeshBuilder.CreateBox("menu-card", {
     width: 1.04,
     height: 0.2,
     depth: 1.04,
   });
-  base.material = colMat;
+  base.material = maseMat;
   base.position = new BABYLON.Vector3(0, 0.1, 0);
 
   const cap = BABYLON.MeshBuilder.CreateBox("menu-card", {
@@ -93,7 +103,7 @@ const createColumn1 = () => {
     height: 0.2,
     depth: 1.04,
   });
-  cap.material = colMat;
+  cap.material = maseMat;
   cap.position = new BABYLON.Vector3(0, 5.34, 0);
 
   const profile = [
@@ -113,7 +123,7 @@ const createColumn1 = () => {
   column.material = colMat;
   column.convertToFlatShadedMesh();
   column.enableEdgesRendering();
-  column.edgesWidth = 0.4;
+  column.edgesWidth = 0.2;
   column.edgesColor = new BABYLON.Color4(0.8, 0.8, 0.8, 1);
 
   base.material = colMat;

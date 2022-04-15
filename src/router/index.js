@@ -28,6 +28,7 @@ import Lab024 from "../labs/Lab024.vue";
 import Lab025 from "../labs/Lab025.vue";
 import Lab026 from "../labs/Lab026.vue";
 import Lab027 from "../labs/Lab027.vue";
+import Lab028 from "../labs/Lab028.vue";
 
 const routes = [
   {
@@ -313,6 +314,16 @@ const routes = [
     meta: {
       title: "Lab 027",
       subtitle: "Performance Testing",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab028",
+    name: "Lab028",
+    component: Lab028,
+    meta: {
+      title: "Lab 028",
+      subtitle: "Columns",
       status: "running"
     }
   }
