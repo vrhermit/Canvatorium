@@ -15,7 +15,8 @@ import LabColors from "../lab-shared/LabColors";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 labNotes.value = `
-Columns
+This is a work in progress version of a Stoa for a side project I'm considering.
+The geometry is messy, but uses only Babylon JS. No imported models from other tools.
 
 `;
 const bjsCanvas = ref(null);
