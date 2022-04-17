@@ -9,7 +9,6 @@ import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
-// import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
 // Import the LabPlayer
 import { createLabPlayer } from "../lab-shared/LabPlayer";
@@ -28,6 +27,9 @@ const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
+  const framesPerSecond = 60;
+  const gravity = -9.81;
+  scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
