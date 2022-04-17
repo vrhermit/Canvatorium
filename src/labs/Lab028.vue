@@ -55,15 +55,10 @@ const createScene = async (canvas) => {
   ground.material = groundMaterial;
   ground.checkCollisions = true;
 
-  const rail = BABYLON.MeshBuilder.CreateBox(
-    "rail",
-    { height: 0.6, width: 36.5, depth: 0.8 },
-    scene
-  );
-  // rail.material = blockMat;
-  rail.position = new BABYLON.Vector3(0, 5.76, 0);
-
   const { floor, step1, step2 } = createBase();
+
+  createRails();
+  createCorners();
 
   const column = createColumnDoric();
   column.position = new BABYLON.Vector3(-16.15, 0, 0);
@@ -111,8 +106,8 @@ onUnmounted(() => {
 });
 
 const createBase = () => {
-  const blockMat = new BABYLON.StandardMaterial("menu-card-material", scene);
-  blockMat.diffuseColor = LabColors["light1"];
+  const blockMat = new BABYLON.StandardMaterial("base-mat", scene);
+  blockMat.diffuseColor = LabColors["dark1"];
   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -147,8 +142,81 @@ const createBase = () => {
   return [floor, step1, step2];
 };
 
+const createRails = () => {
+  const railMat = new BABYLON.StandardMaterial("rail-mat", scene);
+  railMat.diffuseColor = LabColors["cyan"];
+  railMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  // railMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  blockText.uScale = 1;
+  blockText.vScale = 36.5;
+  railMat.diffuseTexture = blockText;
+  const rail1 = BABYLON.MeshBuilder.CreateBox(
+    "rail",
+    { height: 0.6, width: 36.3, depth: 0.8 },
+    scene
+  );
+  rail1.material = railMat;
+  rail1.position = new BABYLON.Vector3(0, 5.76, 0);
+
+  const rail2 = rail1.clone();
+  rail2.position = new BABYLON.Vector3(0, 5.76, -14);
+
+  const rail3 = BABYLON.MeshBuilder.CreateBox(
+    "rail",
+    { height: 0.56, width: 0.75, depth: 14 },
+    scene
+  );
+  rail3.material = railMat;
+  rail3.position = new BABYLON.Vector3(17.75, 5.76, -7);
+
+  const rail4 = rail3.clone();
+  rail4.position = new BABYLON.Vector3(-17.75, 5.76, -7);
+};
+
+const createCorners = () => {
+  const railMat = new BABYLON.StandardMaterial("rail-mat", scene);
+  railMat.diffuseColor = LabColors["purple"];
+  railMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  // railMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  blockText.uScale = 5.46;
+  blockText.vScale = 1;
+  railMat.diffuseTexture = blockText;
+  const corner1 = BABYLON.MeshBuilder.CreateBox(
+    "corner1",
+    { height: 7, width: 0.82, depth: 0.82 },
+    scene
+  );
+  corner1.material = railMat;
+  corner1.position = new BABYLON.Vector3(17.75, 3.5, 0);
+
+  const corner2 = corner1.clone();
+  corner2.position = new BABYLON.Vector3(-17.75, 3.5, 0);
+
+  const corner3 = corner1.clone();
+  corner3.position = new BABYLON.Vector3(17.75, 3.5, -14);
+
+  const corner4 = corner1.clone();
+  corner4.position = new BABYLON.Vector3(-17.75, 3.5, -14);
+
+  // const rail2 = rail1.clone();
+  // rail2.position = new BABYLON.Vector3(0, 5.76, -14);
+
+  // const rail3 = BABYLON.MeshBuilder.CreateBox(
+  //   "rail",
+  //   { height: 0.56, width: 0.76, depth: 14 },
+  //   scene
+  // );
+  // rail3.material = railMat;
+  // rail3.position = new BABYLON.Vector3(17.85, 5.76, -7);
+
+  // const rail4 = rail3.clone();
+  // rail4.position = new BABYLON.Vector3(-17.85, 5.76, -7);
+};
+
 const createColumnDoric = () => {
-  const colMat = new BABYLON.StandardMaterial("menu-card-material", scene);
+  const colMat = new BABYLON.StandardMaterial("column-doric-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
@@ -206,7 +274,7 @@ const columnFactory = (column) => {
 };
 
 const createColumn2 = () => {
-  const colMat = new BABYLON.StandardMaterial("menu-card-material", scene);
+  const colMat = new BABYLON.StandardMaterial("column-ionic-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
