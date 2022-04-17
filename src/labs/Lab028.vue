@@ -53,114 +53,17 @@ const createScene = async (canvas) => {
   ground.material = groundMaterial;
   ground.checkCollisions = true;
 
-  const blockMat = new BABYLON.StandardMaterial("menu-card-material", scene);
-  blockMat.diffuseColor = LabColors["light1"];
-  blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  blockText.uScale = 10;
-  blockText.vScale = 5;
-  blockMat.diffuseTexture = blockText;
-
-  const railTop = BABYLON.MeshBuilder.CreateBox(
-    "railTop",
-    { height: 0.7, width: 35, depth: 0.8 },
-    scene
-  );
-  railTop.material = blockMat;
-  railTop.position = new BABYLON.Vector3(0, 7.7, -7);
-
-  const roof1 = BABYLON.MeshBuilder.CreateBox(
-    "roof1",
-    { height: 0.4, width: 36, depth: 7 },
-    scene
-  );
-  roof1.material = blockMat;
-  roof1.position = new BABYLON.Vector3(0, 6.8, -3.5);
-  roof1.rotation = new BABYLON.Vector3(0.3, 0, 0);
-
-  const roof2 = BABYLON.MeshBuilder.CreateBox(
-    "roof2",
-    { height: 0.4, width: 36, depth: 7 },
-    scene
-  );
-  roof2.material = blockMat;
-  roof2.position = new BABYLON.Vector3(0, 6.8, -10.5);
-  roof2.rotation = new BABYLON.Vector3(-0.3, 0, 0);
-
   const rail = BABYLON.MeshBuilder.CreateBox(
     "rail",
-    { height: 0.6, width: 36.5, depth: 1 },
+    { height: 0.6, width: 36.5, depth: 0.8 },
     scene
   );
-  rail.material = blockMat;
+  // rail.material = blockMat;
   rail.position = new BABYLON.Vector3(0, 5.76, 0);
 
-  const wall1 = BABYLON.MeshBuilder.CreateBox(
-    "wall1",
-    { height: 6, width: 0.8, depth: 15 },
-    scene
-  );
-  wall1.material = blockMat;
-  wall1.position = new BABYLON.Vector3(-17.85, 3, -7);
+  const { floor, step1, step2 } = createBase();
 
-  const wallCap1 = BABYLON.MeshBuilder.CreateCylinder("wallCap1", {
-    tessellation: 3,
-  });
-  wallCap1.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
-  wallCap1.scaling = new BABYLON.Vector3(3, 0.4, 17);
-  wallCap1.position = new BABYLON.Vector3(-17.85, 6.7, -7);
-  wallCap1.material = blockMat;
-
-  const wall2 = BABYLON.MeshBuilder.CreateBox(
-    "wall2",
-    { height: 6, width: 0.8, depth: 15 },
-    scene
-  );
-  wall2.material = blockMat;
-  wall2.position = new BABYLON.Vector3(17.85, 3, -7);
-
-  const wallCap2 = BABYLON.MeshBuilder.CreateCylinder("wallCap2", {
-    tessellation: 3,
-  });
-  wallCap2.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
-  wallCap2.scaling = new BABYLON.Vector3(3, 0.4, 17);
-  wallCap2.position = new BABYLON.Vector3(17.85, 6.7, -7);
-  wallCap2.material = blockMat;
-
-  const wall3 = BABYLON.MeshBuilder.CreateBox(
-    "wall3",
-    { height: 6, width: 36.5, depth: 0.85 },
-    scene
-  );
-  wall3.material = blockMat;
-  wall3.position = new BABYLON.Vector3(0, 3, -14.1);
-
-  const floor = BABYLON.MeshBuilder.CreateBox(
-    "floor",
-    { height: 0.2, width: 36.5, depth: 15 },
-    scene
-  );
-  floor.material = blockMat;
-  floor.position = new BABYLON.Vector3(0, 0, -7);
-
-  const step1 = BABYLON.MeshBuilder.CreateBox(
-    "step1",
-    { height: 0.2, width: 37.3, depth: 15.8 },
-    scene
-  );
-  step1.material = blockMat;
-  step1.position = new BABYLON.Vector3(0, -0.2, -7);
-
-  const step2 = BABYLON.MeshBuilder.CreateBox(
-    "step2",
-    { height: 0.2, width: 38.1, depth: 16.6 },
-    scene
-  );
-  step2.material = blockMat;
-  step2.position = new BABYLON.Vector3(0, -0.4, -7);
-
-  const column = createColumn1();
+  const column = createColumnDoric();
   column.position = new BABYLON.Vector3(-16.15, 0, 0);
   columnFactory(column);
 
@@ -169,7 +72,7 @@ const createScene = async (canvas) => {
   columnFactory2(column2);
 
   // Use the LabPlayer
-  const { xr } = await createLabPlayer(scene, [ground, floor]);
+  const { xr } = await createLabPlayer(scene, [ground, floor, step1, step2]);
   console.log(xr);
 
   engine.runRenderLoop(() => {
@@ -205,15 +108,52 @@ onUnmounted(() => {
   engine.dispose();
 });
 
-const createColumn1 = () => {
+const createBase = () => {
+  const blockMat = new BABYLON.StandardMaterial("menu-card-material", scene);
+  blockMat.diffuseColor = LabColors["light1"];
+  blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  blockText.uScale = 15;
+  blockText.vScale = 36.5;
+  blockMat.diffuseTexture = blockText;
+
+  const floor = BABYLON.MeshBuilder.CreateBox(
+    "floor",
+    { height: 0.2, width: 36.5, depth: 15 },
+    scene
+  );
+  floor.material = blockMat;
+  floor.position = new BABYLON.Vector3(0, 0, -7);
+
+  const step1 = BABYLON.MeshBuilder.CreateBox(
+    "step1",
+    { height: 0.2, width: 37.3, depth: 15.8 },
+    scene
+  );
+  step1.material = blockMat;
+  step1.position = new BABYLON.Vector3(0, -0.2, -7);
+
+  const step2 = BABYLON.MeshBuilder.CreateBox(
+    "step2",
+    { height: 0.2, width: 38.1, depth: 16.6 },
+    scene
+  );
+  step2.material = blockMat;
+  step2.position = new BABYLON.Vector3(0, -0.4, -7);
+
+  return [floor, step1, step2];
+};
+
+const createColumnDoric = () => {
   const colMat = new BABYLON.StandardMaterial("menu-card-material", scene);
   colMat.diffuseColor = LabColors["light3"];
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
   const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  colTex.vScale = 4;
-  colTex.uScale = 4;
+  colTex.vScale = 1;
+  colTex.uScale = 5.6;
   colMat.diffuseTexture = colTex;
 
   const profile = [
@@ -242,7 +182,6 @@ const createColumn1 = () => {
   cap.position = new BABYLON.Vector3(0, 5.38, 0);
 
   const result = BABYLON.Mesh.MergeMeshes([column, cap], true, true);
-  // column.scaling = new BABYLON.Vector3(0.85, 1, 0.85);
   return result;
 };
 
@@ -253,7 +192,6 @@ const columnFactory = (column) => {
   do {
     i++;
     x += 1.7;
-    console.log(x);
     const newCol = column.createInstance("column");
     newCol.position = new BABYLON.Vector3(
       x,
@@ -309,8 +247,7 @@ const columnFactory2 = (column) => {
   do {
     i++;
     x += 3.7;
-    console.log(x);
-    const newCol = column.clone("column");
+    const newCol = column.createInstance("column");
     newCol.position = new BABYLON.Vector3(
       x,
       column.position.y,
