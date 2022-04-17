@@ -34,6 +34,18 @@ const createScene = async (canvas) => {
   // Use the shared lab tools
   addLabCamera(canvas, scene);
   addLabLights(scene);
+
+  const light1 = new BABYLON.PointLight(
+    "pointLight",
+    new BABYLON.Vector3(-9, 4, -7),
+    scene
+  );
+  light1.diffuse = new BABYLON.Color3(1, 1, 1);
+  light1.intensity = 0.3;
+
+  const light2 = light1.clone("pointLight2");
+  light2.position = new BABYLON.Vector3(9, 4, -7);
+
   const teleportMeshes = addLabRoomLocal(scene);
   // const ground = BABYLON.MeshBuilder.CreateGround(
   //   "ground",
@@ -118,7 +130,7 @@ const createBase = () => {
   const blockMat = new BABYLON.StandardMaterial("base-mat", scene);
   blockMat.diffuseColor = LabColors["dark1"];
   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  // blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
   blockText.uScale = 15;
   blockText.vScale = 36.5;
@@ -153,7 +165,7 @@ const createBase = () => {
 
 const createRoof = () => {
   const blockMat = new BABYLON.StandardMaterial("base-mat", scene);
-  blockMat.diffuseColor = LabColors["purple"];
+  blockMat.diffuseColor = LabColors["light2"];
   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -173,7 +185,7 @@ const createRoof = () => {
   roofCap2.position = new BABYLON.Vector3(17.6, 7.85, -7);
 
   const roofCenterMat = new BABYLON.StandardMaterial("base-mat", scene);
-  roofCenterMat.diffuseColor = LabColors["light1"];
+  roofCenterMat.diffuseColor = LabColors["light3"];
   roofCenterMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const roofCenterTex = new BABYLON.Texture(
@@ -196,7 +208,7 @@ const createRoof = () => {
 
 const createCeilingBlock = () => {
   const blockMat = new BABYLON.StandardMaterial("ceiling-mat", scene);
-  blockMat.diffuseColor = LabColors["red"];
+  blockMat.diffuseColor = LabColors["light2"];
   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -215,7 +227,7 @@ const createCeilingBlock = () => {
 
 const createCeiling = () => {
   const blockMat = new BABYLON.StandardMaterial("ceiling-mat", scene);
-  blockMat.diffuseColor = LabColors["blue"];
+  blockMat.diffuseColor = LabColors["light1"];
   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // blockMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -235,7 +247,7 @@ const createCeiling = () => {
 
 const createRails = () => {
   const railMat = new BABYLON.StandardMaterial("rail-mat", scene);
-  railMat.diffuseColor = LabColors["cyan"];
+  railMat.diffuseColor = LabColors["light2"];
   railMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // railMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -267,7 +279,7 @@ const createRails = () => {
 
 const createCorners = () => {
   const cornerMat = new BABYLON.StandardMaterial("corner-mat", scene);
-  cornerMat.diffuseColor = LabColors["purple"];
+  cornerMat.diffuseColor = LabColors["light2"];
   cornerMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // cornerMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -294,7 +306,7 @@ const createCorners = () => {
 
 const createWallsInside = () => {
   const wallMat = new BABYLON.StandardMaterial("wall-mat", scene);
-  wallMat.diffuseColor = LabColors["teal"];
+  wallMat.diffuseColor = LabColors["light3"];
   wallMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // wallMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -327,7 +339,7 @@ const createWallsInside = () => {
 
 const createWallsOutside = () => {
   const wallMat = new BABYLON.StandardMaterial("wall-mat", scene);
-  wallMat.diffuseColor = LabColors["orange"];
+  wallMat.diffuseColor = LabColors["light3"];
   wallMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   // wallMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
   const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
@@ -362,7 +374,7 @@ const createColumnDoric = () => {
   const colMat = new BABYLON.StandardMaterial("column-doric-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  // colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
   const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
   colTex.vScale = 1;
@@ -420,7 +432,7 @@ const createColumn2 = () => {
   const colMat = new BABYLON.StandardMaterial("column-ionic-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  // colMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
   const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
   colTex.vScale = 4;
