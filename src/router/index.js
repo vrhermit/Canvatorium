@@ -323,7 +323,7 @@ const routes = [
     component: Lab028,
     meta: {
       title: "Lab 028",
-      subtitle: "Columns",
+      subtitle: "Stoa (Geometry)",
       status: "running"
     }
   }
