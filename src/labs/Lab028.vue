@@ -34,26 +34,26 @@ const createScene = async (canvas) => {
   // Use the shared lab tools
   addLabCamera(canvas, scene);
   addLabLights(scene);
-  //   const ground = addLabRoom(scene);
-  const ground = BABYLON.MeshBuilder.CreateGround(
-    "ground",
-    { height: 50, width: 100, subdivisions: 10 },
-    scene
-  );
-  ground.position = new BABYLON.Vector3(0, -0.4, -6);
-  //   ground.isVisible = false;
-  ground.receiveShadows = true;
-  ground.sideOrientation = "DOUBLESIDE";
-  const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
-  groundMaterial.majorUnitFrequency = 5;
-  groundMaterial.minorUnitFrequency = 0.1;
-  groundMaterial.gridRatio = 1;
-  groundMaterial.backFaceCulling = false;
-  groundMaterial.mainColor = LabColors.light1;
-  groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-  groundMaterial.opacity = 0.98;
-  ground.material = groundMaterial;
-  ground.checkCollisions = true;
+  const teleportMeshes = addLabRoomLocal(scene);
+  // const ground = BABYLON.MeshBuilder.CreateGround(
+  //   "ground",
+  //   { height: 50, width: 100, subdivisions: 10 },
+  //   scene
+  // );
+  // ground.position = new BABYLON.Vector3(0, -0.4, -6);
+  // //   ground.isVisible = false;
+  // ground.receiveShadows = true;
+  // ground.sideOrientation = "DOUBLESIDE";
+  // const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
+  // groundMaterial.majorUnitFrequency = 5;
+  // groundMaterial.minorUnitFrequency = 0.1;
+  // groundMaterial.gridRatio = 1;
+  // groundMaterial.backFaceCulling = false;
+  // groundMaterial.mainColor = LabColors.light1;
+  // groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+  // groundMaterial.opacity = 0.98;
+  // ground.material = groundMaterial;
+  // ground.checkCollisions = true;
 
   const { floor, step1, step2 } = createBase();
   createRoof();
@@ -73,7 +73,12 @@ const createScene = async (canvas) => {
   columnFactory2(column2);
 
   // Use the LabPlayer
-  const { xr } = await createLabPlayer(scene, [ground, floor, step1, step2]);
+  const { xr } = await createLabPlayer(scene, [
+    ...teleportMeshes,
+    floor,
+    step1,
+    step2,
+  ]);
   console.log(xr);
 
   engine.runRenderLoop(() => {
@@ -161,11 +166,11 @@ const createRoof = () => {
   roofCap1.convertToFlatShadedMesh();
   roofCap1.rotation = new BABYLON.Vector3(0, 0, Math.PI / 2);
   roofCap1.scaling = new BABYLON.Vector3(3, 0.5, 17);
-  roofCap1.position = new BABYLON.Vector3(-17.6, 7.9, -7);
+  roofCap1.position = new BABYLON.Vector3(-17.6, 7.85, -7);
   roofCap1.material = blockMat;
 
   const roofCap2 = roofCap1.clone("roofCap2");
-  roofCap2.position = new BABYLON.Vector3(17.6, 7.9, -7);
+  roofCap2.position = new BABYLON.Vector3(17.6, 7.85, -7);
 
   const roofCenterMat = new BABYLON.StandardMaterial("base-mat", scene);
   roofCenterMat.diffuseColor = LabColors["light1"];
@@ -462,6 +467,108 @@ const columnFactory2 = (column) => {
 
     // newCol.enableEdgesRendering();
   } while (i < numberOfColumns);
+};
+
+const addLabRoomLocal = (scene) => {
+  // Add a ground plane to the scene. Used for WebXR teleportation
+  const ground = BABYLON.MeshBuilder.CreateGround(
+    "ground",
+    { height: 100, width: 100, subdivisions: 4 },
+    scene
+  );
+  // ground.position.y = 10;
+  ground.sideOrientation = "DOUBLESIDE";
+  const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
+  groundMaterial.majorUnitFrequency = 5;
+  groundMaterial.minorUnitFrequency = 0.1;
+  groundMaterial.gridRatio = 1;
+  groundMaterial.backFaceCulling = false;
+  groundMaterial.mainColor = LabColors.light1;
+  groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
+  groundMaterial.opacity = 0.98;
+  ground.material = groundMaterial;
+  ground.checkCollisions = true;
+
+  // Note: the rotation of these elements is set to put the face of the plane/ground facing the inside of the room so that collisions will work.
+
+  const wall1 = BABYLON.MeshBuilder.CreateGround(
+    "wall1",
+    { height: 10, width: 100, subdivisions: 4 },
+    scene
+  );
+  wall1.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI / 2);
+  wall1.position = new BABYLON.Vector3(-50, 5, 0);
+  wall1.material = groundMaterial;
+  wall1.sideOrientation = "DOUBLESIDE";
+  wall1.checkCollisions = true;
+
+  const wall2 = wall1.clone("wall2");
+  wall2.rotation.z = -Math.PI / 2;
+  wall2.position = new BABYLON.Vector3(50, 5, 0);
+
+  const wall3 = BABYLON.MeshBuilder.CreateGround(
+    "wall1",
+    { height: 10, width: 100, subdivisions: 4 },
+    scene
+  );
+  wall3.material = groundMaterial;
+  wall3.sideOrientation = "DOUBLESIDE";
+  wall3.checkCollisions = true;
+  wall3.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2);
+  wall3.position = new BABYLON.Vector3(0, 5, -50);
+
+  const wall4 = wall3.clone("wall4");
+  wall4.rotation.z = -Math.PI / 2;
+  wall4.position = new BABYLON.Vector3(0, 5, 50);
+
+  const subjectMat1 = new BABYLON.StandardMaterial("grab-mat1", scene);
+  subjectMat1.diffuseColor = LabColors["dark1"];
+  subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+
+  const subject1 = BABYLON.MeshBuilder.CreateBox("subject1", {
+    width: 6,
+    height: 3,
+    depth: 6,
+  });
+  subject1.material = subjectMat1;
+  subject1.position = new BABYLON.Vector3(-6, 1.5, 12);
+  subject1.checkCollisions = true;
+
+  const subjectMat2 = new BABYLON.StandardMaterial("grab-mat2", scene);
+  subjectMat2.diffuseColor = LabColors["dark1"];
+  subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
+    width: 6,
+    height: 6,
+    depth: 6,
+  });
+  subject2.material = subjectMat2;
+  subject2.position = new BABYLON.Vector3(-12, 3, 12);
+  subject2.checkCollisions = true;
+
+  const subjectMat3 = new BABYLON.StandardMaterial("grab-mat3", scene);
+  subjectMat3.diffuseColor = LabColors["dark1"];
+  subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
+    width: 6,
+    height: 9,
+    depth: 6,
+  });
+  subject3.material = subjectMat3;
+  subject3.position = new BABYLON.Vector3(-18, 4.5, 12);
+  subject3.checkCollisions = true;
+
+  subject1.isVisible = false;
+  subject2.isVisible = false;
+  subject3.isVisible = false;
+  ground.isVisible = false;
+  wall1.isVisible = false;
+  wall2.isVisible = false;
+  wall3.isVisible = false;
+  wall4.isVisible = false;
+
+  // return meshes for teleportation
+  return [ground, subject1, subject2, subject3];
 };
 </script>
 
