@@ -90,11 +90,11 @@ const createScene = async (canvas) => {
 
   const rail = BABYLON.MeshBuilder.CreateBox(
     "rail",
-    { height: 0.6, width: 36.5, depth: 1.2 },
+    { height: 0.6, width: 36.5, depth: 1 },
     scene
   );
   rail.material = blockMat;
-  rail.position = new BABYLON.Vector3(0, 5.7, 0);
+  rail.position = new BABYLON.Vector3(0, 5.76, 0);
 
   const wall1 = BABYLON.MeshBuilder.CreateBox(
     "wall1",
@@ -215,19 +215,12 @@ const createColumn1 = () => {
   colTex.vScale = 4;
   colTex.uScale = 4;
   colMat.diffuseTexture = colTex;
-  //   colMat.emissiveTexture = colTex;
-  //   colMat.
 
   const profile = [
-    new BABYLON.Vector3(0.5, 0, 0),
-    new BABYLON.Vector3(0.4, 5, 0),
-    new BABYLON.Vector3(0.42, 5.05, 0),
-    new BABYLON.Vector3(0.44, 5.1, 0),
-    new BABYLON.Vector3(0.44, 5.2, 0),
+    new BABYLON.Vector3(0.48, 0, 0),
+    new BABYLON.Vector3(0.38, 5.1, 0),
+    new BABYLON.Vector3(0.46, 5.175, 0),
     new BABYLON.Vector3(0.5, 5.3, 0),
-    new BABYLON.Vector3(0.5, 5.4, 0),
-    // new BABYLON.Vector3(0.44, 5.2, 0),
-    new BABYLON.Vector3(0, 5.4, 0),
   ];
 
   const column = BABYLON.MeshBuilder.CreateLathe("stand", {
@@ -238,8 +231,19 @@ const createColumn1 = () => {
 
   column.material = colMat;
   column.convertToFlatShadedMesh();
-  column.scaling = new BABYLON.Vector3(0.85, 1, 0.85);
-  return column;
+
+  const cap = BABYLON.MeshBuilder.CreateBox("menu-card", {
+    width: 1.02,
+    height: 0.16,
+    depth: 1.02,
+  });
+  cap.material = colMat;
+  cap.parent = column;
+  cap.position = new BABYLON.Vector3(0, 5.38, 0);
+
+  const result = BABYLON.Mesh.MergeMeshes([column, cap], true, true);
+  // column.scaling = new BABYLON.Vector3(0.85, 1, 0.85);
+  return result;
 };
 
 const columnFactory = (column) => {
@@ -250,7 +254,7 @@ const columnFactory = (column) => {
     i++;
     x += 1.7;
     console.log(x);
-    const newCol = column.clone("column");
+    const newCol = column.createInstance("column");
     newCol.position = new BABYLON.Vector3(
       x,
       column.position.y,
