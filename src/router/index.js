@@ -29,6 +29,7 @@ import Lab025 from "../labs/Lab025.vue";
 import Lab026 from "../labs/Lab026.vue";
 import Lab027 from "../labs/Lab027.vue";
 import Lab028 from "../labs/Lab028.vue";
+import Lab029 from "../labs/Lab029.vue";
 
 const routes = [
   {
@@ -324,6 +325,16 @@ const routes = [
     meta: {
       title: "Lab 028",
       subtitle: "Stoa (Geometry)",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab029",
+    name: "Lab029",
+    component: Lab029,
+    meta: {
+      title: "Lab 029",
+      subtitle: "Stoa (Lighting & Textures)",
       status: "running"
     }
   }
