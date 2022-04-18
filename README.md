@@ -65,6 +65,7 @@ Install the latest Babylon JS 5.0 Preview
 ```
 npm install --save babylonjs@preview babylonjs-gui@preview babylonjs-loaders@preview
 npm install --save babylonjs-materials@preview
+npm install --save babylonjs-procedural-textures@preview
 npm install --save-dev babylonjs-inspector@preview
 
 ```
