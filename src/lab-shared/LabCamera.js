@@ -7,7 +7,7 @@ const addLabCamera = (canvas, scene) => {
   camera.wheelDeltaPercentage = 0.01;
   camera.upperBetaLimit = Math.PI / 1.5;
   camera.lowerRadiusLimit = 2;
-  camera.upperRadiusLimit = 50;
+  camera.upperRadiusLimit = 128;
   camera.setPosition(new BABYLON.Vector3(0, 3.5, -6));
   camera.setTarget(new BABYLON.Vector3(0, 1, 0));
   camera.attachControl(canvas, true);
