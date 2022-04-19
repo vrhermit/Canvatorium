@@ -43,7 +43,7 @@ const createScene = async (canvas) => {
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
 
-  setupCamera(scene, canvas, false);
+  setupCamera(scene, canvas, true);
   setupSceneLighting();
 
   const teleportMeshes = addLabRoomLocal(scene);
@@ -221,7 +221,7 @@ const createBase = () => {
   const blockMat = new MAT.CellMaterial("base-mat", scene);
   blockMat.diffuseColor = LabColors["light3"];
   //   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   blockText.uScale = 15;
   blockText.vScale = 36.5;
   blockMat.diffuseTexture = blockText;
@@ -234,12 +234,16 @@ const createBase = () => {
   floor.material = blockMat;
   floor.position = new BABYLON.Vector3(0, 0, -7);
 
+  const blockMat2 = new MAT.CellMaterial("base-mat", scene);
+  blockMat2.diffuseColor = LabColors["teal"];
+  blockMat.diffuseTexture = blockText;
+
   const step1 = BABYLON.MeshBuilder.CreateBox(
     "step1",
     { height: 0.2, width: 37.3, depth: 15.8 },
     scene
   );
-  step1.material = blockMat;
+  step1.material = blockMat2;
   step1.position = new BABYLON.Vector3(0, -0.2, -7);
 
   const step2 = BABYLON.MeshBuilder.CreateBox(
@@ -247,7 +251,7 @@ const createBase = () => {
     { height: 0.2, width: 38.1, depth: 16.6 },
     scene
   );
-  step2.material = blockMat;
+  step2.material = blockMat2;
   step2.position = new BABYLON.Vector3(0, -0.4, -7);
 
   return [floor, step1, step2];
@@ -257,7 +261,7 @@ const createRoof = () => {
   const blockMat = new MAT.CellMaterial("base-mat", scene);
   blockMat.diffuseColor = LabColors["light3"];
   //   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   blockText.uScale = 15;
   blockText.vScale = 36.5;
   blockMat.diffuseTexture = blockText;
@@ -274,10 +278,10 @@ const createRoof = () => {
   roofCap2.position = new BABYLON.Vector3(17.6, 7.85, -7);
 
   const roofCenterMat = new MAT.CellMaterial("base-mat", scene);
-  roofCenterMat.diffuseColor = LabColors["light3"];
+  roofCenterMat.diffuseColor = LabColors["red"];
   //   roofCenterMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   const roofCenterTex = new BABYLON.Texture(
-    "../assets/stoa-noise-01.jpg",
+    "../assets/stoa-noise-02.png",
     scene
   );
   roofCenterTex.uScale = 15;
@@ -296,9 +300,9 @@ const createRoof = () => {
 
 const createCeilingBlock = () => {
   const blockMat = new MAT.CellMaterial("ceiling-mat", scene);
-  blockMat.diffuseColor = LabColors["light3"];
+  blockMat.diffuseColor = LabColors["blue"];
   //   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   blockText.uScale = 15;
   blockText.vScale = 36.5;
   blockMat.diffuseTexture = blockText;
@@ -316,7 +320,7 @@ const createCeiling = () => {
   const blockMat = new MAT.CellMaterial("ceiling-mat", scene);
   blockMat.diffuseColor = LabColors["light3"];
   //   blockMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   blockText.uScale = 14;
   blockText.vScale = 36.2;
   blockMat.diffuseTexture = blockText;
@@ -335,9 +339,9 @@ const createRails = () => {
   const railMat = new MAT.CellMaterial("rail-mat", scene);
   railMat.diffuseColor = LabColors["light3"];
   //   railMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   blockText.uScale = 1;
-  blockText.vScale = 36.5;
+  blockText.vScale = 9;
   railMat.diffuseTexture = blockText;
   const rail1 = BABYLON.MeshBuilder.CreateBox(
     "rail",
@@ -363,13 +367,14 @@ const createRails = () => {
 };
 
 const createCorners = () => {
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText.uScale = 1;
+  blockText.vScale = 7;
+
   const cornerMat = new MAT.CellMaterial("corner-mat", scene);
   cornerMat.diffuseColor = LabColors["light3"];
-  //   cornerMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  blockText.uScale = 5.46;
-  blockText.vScale = 1;
   cornerMat.diffuseTexture = blockText;
+
   const corner1 = BABYLON.MeshBuilder.CreateBox(
     "corner1",
     { height: 7, width: 0.82, depth: 0.82 },
@@ -389,13 +394,13 @@ const createCorners = () => {
 };
 
 const createWallsInside = () => {
-  const wallMat = new MAT.CellMaterial("wall-mat", scene);
-  wallMat.diffuseColor = LabColors["light3"];
-  //   wallMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  blockText.uScale = 4;
-  blockText.vScale = 1;
-  wallMat.diffuseTexture = blockText;
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText.uScale = 17.5;
+  blockText.vScale = 3;
+
+  const wallMat1 = new MAT.CellMaterial("wall-mat-1", scene);
+  wallMat1.diffuseColor = LabColors["light3"];
+  wallMat1.diffuseTexture = blockText;
 
   const wall1 = BABYLON.MeshBuilder.CreatePlane(
     "wall1",
@@ -404,7 +409,15 @@ const createWallsInside = () => {
   );
   wall1.position = new BABYLON.Vector3(0, 3, -13.4);
   wall1.rotation = new BABYLON.Vector3(0, Math.PI, 0);
-  wall1.material = wallMat;
+  wall1.material = wallMat1;
+
+  const blockText2 = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText2.uScale = 7;
+  blockText2.vScale = 3;
+
+  const wallMat2 = new MAT.CellMaterial("wall-mat-2", scene);
+  wallMat2.diffuseColor = LabColors["light3"];
+  wallMat2.diffuseTexture = blockText2;
 
   const wall2 = BABYLON.MeshBuilder.CreatePlane(
     "wall2",
@@ -413,20 +426,19 @@ const createWallsInside = () => {
   );
   wall2.position = new BABYLON.Vector3(17.37, 3, -7);
   wall2.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-  wall2.material = wallMat;
+  wall2.material = wallMat2;
 
-  const wall3 = wall2.clone();
+  const wall3 = wall2.clone("wall3");
   wall3.position = new BABYLON.Vector3(-17.37, 3, -7);
   wall3.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
 };
 
 const createWallsOutside = () => {
   const wallMat = new MAT.CellMaterial("wall-mat", scene);
-  wallMat.diffuseColor = LabColors["light3"];
-  //   wallMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  blockText.uScale = 1;
-  blockText.vScale = 1;
+  wallMat.diffuseColor = LabColors["red"];
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText.uScale = 35;
+  blockText.vScale = 6;
   wallMat.diffuseTexture = blockText;
 
   const wall1 = BABYLON.MeshBuilder.CreatePlane(
@@ -438,6 +450,14 @@ const createWallsOutside = () => {
   wall1.rotation = new BABYLON.Vector3(0, 0, 0);
   wall1.material = wallMat;
 
+  const blockText2 = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText2.uScale = 7;
+  blockText2.vScale = 3;
+
+  const wallMat2 = new MAT.CellMaterial("wall-mat-2", scene);
+  wallMat2.diffuseColor = LabColors["red"];
+  wallMat2.diffuseTexture = blockText2;
+
   const wall2 = BABYLON.MeshBuilder.CreatePlane(
     "wall2",
     { height: 6, width: 14 },
@@ -445,7 +465,7 @@ const createWallsOutside = () => {
   );
   wall2.position = new BABYLON.Vector3(18, 3, -7);
   wall2.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
-  wall2.material = wallMat;
+  wall2.material = wallMat2;
 
   const wall3 = wall2.clone();
   wall3.position = new BABYLON.Vector3(-18, 3, -7);
@@ -512,7 +532,7 @@ const createColumnIonic = () => {
   const colMat = new MAT.CellMaterial("column-ionic-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
   //   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const colTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   colTex.vScale = 4;
   colTex.uScale = 4;
   colMat.diffuseTexture = colTex;
@@ -591,7 +611,7 @@ const addLabRoomLocal = (scene) => {
   // Create Base
   const baseMat = new MAT.CellMaterial("column-ionic-mat", scene);
   baseMat.diffuseColor = LabColors["light3"];
-  const baseTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const baseTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   baseTex.vScale = 100;
   baseTex.uScale = 100;
   baseMat.diffuseTexture = baseTex;
