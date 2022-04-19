@@ -7,7 +7,7 @@ import * as MAT from "babylonjs-materials";
 import "babylonjs-inspector";
 import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
 import LabLayout from "../components/LabLayout.vue";
-import addLabCamera from "../lab-shared/LabCamera";
+// import addLabCamera from "../lab-shared/LabCamera";
 // import addLabLights from "../lab-shared/LabLights";
 // import LabColors from "../lab-shared/LabColors";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
@@ -54,6 +54,26 @@ const makeBox = (colorName, parent, scene) => {
   return mesh;
 };
 
+BABYLON.ArcRotateCamera.prototype.spinTo = function (
+  whichprop,
+  targetval,
+  speed
+) {
+  var ease = new BABYLON.CubicEase();
+  ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+  BABYLON.Animation.CreateAndStartAnimation(
+    "at4",
+    this,
+    whichprop,
+    speed,
+    120,
+    this[whichprop],
+    targetval,
+    0,
+    ease
+  );
+};
+
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
@@ -63,7 +83,23 @@ const createScene = async (canvas) => {
   const framesPerSecond = 60;
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
-  addLabCamera(canvas, scene);
+  // addLabCamera(canvas, scene);
+
+  const camera = new BABYLON.ArcRotateCamera(
+    "camera",
+    -Math.PI / 2,
+    Math.PI / 2.5,
+    3,
+    new BABYLON.Vector3(0, 0, 0),
+    scene
+  );
+  camera.wheelDeltaPercentage = 0.01;
+  camera.upperBetaLimit = Math.PI / 1.5;
+  camera.lowerRadiusLimit = 2;
+  camera.upperRadiusLimit = 128;
+  camera.setPosition(new BABYLON.Vector3(0, 3.5, -6));
+  camera.setTarget(new BABYLON.Vector3(0, 1, 24));
+  camera.attachControl(canvas, true);
 
   const hemiLight = new BABYLON.HemisphericLight(
     "hemiLight",
@@ -168,6 +204,19 @@ const createScene = async (canvas) => {
   const columnIonic = createColumnIonic();
   columnIonic.position = new BABYLON.Vector3(-14, 0, -7);
   columnFactory2(columnIonic);
+
+  setTimeout(() => camera.spinTo("beta", 1.2, 20), 2000);
+  setTimeout(() => camera.spinTo("radius", 12, 20), 1000);
+  setTimeout(() => camera.spinTo("alpha", Math.PI / 2, 40), 4000);
+  setTimeout(() => camera.spinTo("radius", 24, 20), 5000);
+  setTimeout(() => camera.spinTo("alpha", -2, 20), 8000);
+  setTimeout(() => camera.spinTo("beta", 1.5, 20), 8000);
+  setTimeout(() => camera.spinTo("beta", 0, 20), 10000);
+  setTimeout(() => camera.spinTo("beta", 1.2, 20), 11000);
+  setTimeout(() => camera.spinTo("radius", 128, 20), 12000);
+  setTimeout(() => camera.spinTo("beta", 1.5, 20), 14000);
+  // setTimeout(() => camera.spinTo("altha", Math.PI / 2, 20), 16000);
+  // setTimeout(() => camera.spinTo("beta", 3, 30), 12000);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [
@@ -557,7 +606,6 @@ const addLabRoomLocal = (scene) => {
   // Add a ground plane to the scene. Used for WebXR teleportation
   const groundGridMaterial = new MAT.GridMaterial("ground-mat", scene);
   groundGridMaterial.majorUnitFrequency = 1;
-  // groundGridMaterial.minorUnitFrequency = 0.1;
   groundGridMaterial.gridRatio = 1;
   groundGridMaterial.backFaceCulling = false;
   groundGridMaterial.mainColor = LabColors["light2"];
@@ -577,8 +625,6 @@ const addLabRoomLocal = (scene) => {
     "ground",
     {
       radius: 64,
-      // tessellation: 100,
-      //   ark: 0,
     },
     scene
   );
@@ -594,13 +640,13 @@ const addLabRoomLocal = (scene) => {
   groundGrid.position = new BABYLON.Vector3(0, -0.45, 24);
 
   // Create Base
-  const colMat = new MAT.CellMaterial("column-ionic-mat", scene);
-  colMat.diffuseColor = LabColors["light3"];
+  const baseMat = new MAT.CellMaterial("column-ionic-mat", scene);
+  baseMat.diffuseColor = LabColors["light3"];
   //   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
-  colTex.vScale = 100;
-  colTex.uScale = 100;
-  colMat.diffuseTexture = colTex;
+  const baseTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  baseTex.vScale = 100;
+  baseTex.uScale = 100;
+  baseMat.diffuseTexture = baseTex;
 
   const profile = [
     new BABYLON.Vector3(0, 0, 0),
@@ -613,17 +659,16 @@ const addLabRoomLocal = (scene) => {
     new BABYLON.Vector3(62, 0, 0),
   ];
 
-  const column = BABYLON.MeshBuilder.CreateLathe("base", {
+  const base = BABYLON.MeshBuilder.CreateLathe("base", {
     tessellation: 64,
     shape: profile,
     sideOrientation: BABYLON.Mesh.DOUBLESIDE,
   });
 
-  column.material = colMat;
-  column.convertToFlatShadedMesh();
-  column.checkCollisions = true;
-  column.position = new BABYLON.Vector3(0, -0.55, 24);
-  // column.scaling = new BABYLON.Vector3(0.6, 1, 0.6);
+  base.material = baseMat;
+  base.convertToFlatShadedMesh();
+  base.checkCollisions = true;
+  base.position = new BABYLON.Vector3(0, -0.55, 24);
 
   // return meshes for teleportation
   return [ground];
