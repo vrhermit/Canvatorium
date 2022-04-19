@@ -6,9 +6,6 @@ import "babylonjs-loaders";
 import * as MAT from "babylonjs-materials";
 import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
 import LabLayout from "../components/LabLayout.vue";
-// import addLabCamera from "../lab-shared/LabCamera";
-// import addLabLights from "../lab-shared/LabLights";
-// import LabColors from "../lab-shared/LabColors";
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 labNotes.value = `
@@ -21,6 +18,7 @@ const bjsCanvas = ref(null);
 let engine;
 let scene;
 
+// Define a custom set of colors for this lab
 const LabColors = {
   purple: new BABYLON.Color3.FromHexString("#a7afff"),
   blue: new BABYLON.Color3.FromHexString("#a7dbff"),
@@ -37,153 +35,16 @@ const LabColors = {
   light3: new BABYLON.Color3.FromHexString("#FFFFFF"),
 };
 
-// const makeBox = (colorName, parent, scene) => {
-//   // Create a colored box from using a string to get the color from the Brand object
-//   const mat = new MAT.CellMaterial(`${colorName}-material`, scene);
-//   mat.diffuseColor = LabColors[colorName];
-//   mat.computeHighLevel = true;
-//   const mesh = BABYLON.MeshBuilder.CreateBox(
-//     `${colorName}-box`,
-//     { size: 1 },
-//     scene
-//   );
-//   mesh.material = mat;
-//   mesh.parent = parent;
-
-//   return mesh;
-// };
-
-BABYLON.ArcRotateCamera.prototype.spinTo = function (
-  whichprop,
-  targetval,
-  speed
-) {
-  var ease = new BABYLON.CubicEase();
-  ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
-  BABYLON.Animation.CreateAndStartAnimation(
-    "at4",
-    this,
-    whichprop,
-    speed,
-    120,
-    this[whichprop],
-    targetval,
-    0,
-    ease
-  );
-};
-
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
-  // scene.clearColor = BABYLON.Color3.FromHexString("#a7dbff");
-  //   scene.debugLayer.show();
   const framesPerSecond = 60;
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
-  // addLabCamera(canvas, scene);
 
-  const camera = new BABYLON.ArcRotateCamera(
-    "camera",
-    -Math.PI / 2,
-    Math.PI / 2.5,
-    3,
-    new BABYLON.Vector3(0, 0, 0),
-    scene
-  );
-  camera.wheelDeltaPercentage = 0.01;
-  camera.upperBetaLimit = Math.PI / 1.5;
-  camera.lowerRadiusLimit = 2;
-  camera.upperRadiusLimit = 128;
-  camera.setPosition(new BABYLON.Vector3(0, 3.5, -6));
-  camera.setTarget(new BABYLON.Vector3(0, 1, 24));
-  camera.attachControl(canvas, true);
-
-  const hemiLight = new BABYLON.HemisphericLight(
-    "hemiLight",
-    new BABYLON.Vector3(0, 25, 0),
-    scene
-  );
-
-  hemiLight.intensity = 0.3;
-  hemiLight.diffuse = LabColors["light3"];
-
-  var sunPos = new BABYLON.Vector3(3, 6, 20);
-
-  var skyMaterial = new MAT.SkyMaterial("skyMaterial", scene);
-  skyMaterial.backFaceCulling = false;
-  skyMaterial.turbidity = 0.4;
-  skyMaterial.luminance = 0.2;
-  // skyMaterial.inclination = -0.4; // The solar inclination, related to the solar azimuth in interval [0, 1]
-  // skyMaterial.azimuth = 0.2; // The solar azimuth in interval [0, 1]
-
-  skyMaterial.useSunPosition = true; // Do not set sun position from azimuth and inclination
-  skyMaterial.sunPosition = sunPos;
-
-  var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, scene);
-  skybox.material = skyMaterial;
-
-  const daylight = new BABYLON.DirectionalLight(
-    "daylight",
-    new BABYLON.Vector3(
-      sunPos.x - sunPos.x * 2,
-      sunPos.y,
-      sunPos.z - sunPos.z * 2
-    ),
-    scene
-  );
-
-  daylight.intensity = 0.8;
-  daylight.diffuse = LabColors["light3"];
-
-  const point1 = new BABYLON.PointLight(
-    "point1",
-    new BABYLON.Vector3(-9, 1, -12),
-    scene
-  );
-  //   point1.diffuse = LabColors["orange"];
-  point1.intensity = 0.3;
-
-  const point2 = point1.clone("point2");
-  point2.position = new BABYLON.Vector3(9, 1, -12);
-
-  // // Make some boxes to test out the colors in VR
-  // makeBox("orange", group, scene).position = point1.position;
-  // makeBox("orange", group, scene).position = point2.position;
-
-  // const group = new BABYLON.Mesh("color-group");
-  // group.position = new BABYLON.Vector3(-3.5, 0.5, 6);
-
-  // makeBox("purple", group, scene).position = new BABYLON.Vector3(1, 0, 0);
-  // makeBox("blue", group, scene).position = new BABYLON.Vector3(2, 0, 0);
-  // makeBox("teal", group, scene).position = new BABYLON.Vector3(3, 0, 0);
-  // makeBox("green", group, scene).position = new BABYLON.Vector3(4, 0, 0);
-  // makeBox("yellow", group, scene).position = new BABYLON.Vector3(5, 0, 0);
-  // makeBox("orange", group, scene).position = new BABYLON.Vector3(6, 0, 0);
-  // makeBox("red", group, scene).position = new BABYLON.Vector3(7, 0, 0);
-  // makeBox("light1", group, scene).position = new BABYLON.Vector3(6, 1, 0);
-  // makeBox("light2", group, scene).position = new BABYLON.Vector3(7, 1, 0);
-  // makeBox("light3", group, scene).position = new BABYLON.Vector3(8, 1, 0);
-
-  // const sun = new BABYLON.MeshBuilder.CreateSphere(
-  //   "sun",
-  //   { diameter: 20, segments: 32 },
-  //   scene
-  // );
-  // sun.position = new BABYLON.Vector3(0, 100, 200);
-
-  // const sunMaterial = new BABYLON.StandardMaterial("sunMaterial", scene);
-  // sunMaterial.diffuseColor = LabColors["orange"];
-  // sunMaterial.emissiveColor = LabColors["orange"];
-
-  // const sunMaterial = new MAT.GradientMaterial("sunMaterial", scene);
-  // sunMaterial.topColor = LabColors["orange"];
-  // sunMaterial.bottomColor = LabColors["red"];
-  // sunMaterial.offset;
-  // sunMaterial.emissiveColor = LabColors["orange"];
-
-  // sun.material = sunMaterial;
+  setupCamera(scene, canvas, false);
+  setupSceneLighting();
 
   const teleportMeshes = addLabRoomLocal(scene);
 
@@ -203,19 +64,6 @@ const createScene = async (canvas) => {
   const columnIonic = createColumnIonic();
   columnIonic.position = new BABYLON.Vector3(-14, 0, -7);
   columnFactory2(columnIonic);
-
-  setTimeout(() => camera.spinTo("beta", 1.2, 20), 2000);
-  setTimeout(() => camera.spinTo("radius", 12, 20), 1000);
-  setTimeout(() => camera.spinTo("alpha", Math.PI / 2, 40), 4000);
-  setTimeout(() => camera.spinTo("radius", 24, 20), 5000);
-  setTimeout(() => camera.spinTo("alpha", -2, 20), 8000);
-  setTimeout(() => camera.spinTo("beta", 1.5, 20), 8000);
-  setTimeout(() => camera.spinTo("beta", 0, 20), 10000);
-  setTimeout(() => camera.spinTo("beta", 1.2, 20), 11000);
-  setTimeout(() => camera.spinTo("radius", 128, 20), 12000);
-  setTimeout(() => camera.spinTo("beta", 1.5, 20), 14000);
-  // setTimeout(() => camera.spinTo("altha", Math.PI / 2, 20), 16000);
-  // setTimeout(() => camera.spinTo("beta", 3, 30), 12000);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [
@@ -258,6 +106,108 @@ onMounted(() => {
 onUnmounted(() => {
   engine.dispose();
 });
+
+// Camera (non-XR)
+const setupCamera = (scene, canvas, animateIntro) => {
+  BABYLON.ArcRotateCamera.prototype.spinTo = function (
+    whichprop,
+    targetval,
+    speed
+  ) {
+    var ease = new BABYLON.CubicEase();
+    ease.setEasingMode(BABYLON.EasingFunction.EASINGMODE_EASEINOUT);
+    BABYLON.Animation.CreateAndStartAnimation(
+      "at4",
+      this,
+      whichprop,
+      speed,
+      120,
+      this[whichprop],
+      targetval,
+      0,
+      ease
+    );
+  };
+
+  const camera = new BABYLON.ArcRotateCamera(
+    "camera",
+    -Math.PI / 2,
+    Math.PI / 2.5,
+    3,
+    new BABYLON.Vector3(0, 0, 0),
+    scene
+  );
+  camera.wheelDeltaPercentage = 0.01;
+  camera.upperBetaLimit = Math.PI / 1.5;
+  camera.lowerRadiusLimit = 2;
+  camera.upperRadiusLimit = 128;
+  camera.setPosition(new BABYLON.Vector3(0, 3.5, -6));
+  camera.setTarget(new BABYLON.Vector3(0, 1, 24));
+  camera.attachControl(canvas, true);
+
+  if (animateIntro) {
+    setTimeout(() => camera.spinTo("beta", 1.2, 20), 2000);
+    setTimeout(() => camera.spinTo("radius", 12, 20), 1000);
+    setTimeout(() => camera.spinTo("alpha", Math.PI / 2, 40), 4000);
+    setTimeout(() => camera.spinTo("radius", 24, 20), 5000);
+    setTimeout(() => camera.spinTo("alpha", -2, 20), 8000);
+    setTimeout(() => camera.spinTo("beta", 1.5, 20), 8000);
+    setTimeout(() => camera.spinTo("beta", 0, 20), 10000);
+    setTimeout(() => camera.spinTo("beta", 1.2, 20), 11000);
+    setTimeout(() => camera.spinTo("radius", 128, 20), 12000);
+    setTimeout(() => camera.spinTo("beta", 1.5, 20), 14000);
+  }
+};
+
+// Lighting & Skybox
+
+const setupSceneLighting = (scene) => {
+  const hemiLight = new BABYLON.HemisphericLight(
+    "hemiLight",
+    new BABYLON.Vector3(0, 25, 0),
+    scene
+  );
+
+  hemiLight.intensity = 0.3;
+  hemiLight.diffuse = LabColors["light3"];
+
+  var sunPos = new BABYLON.Vector3(3, 5, 20);
+
+  var skyMaterial = new MAT.SkyMaterial("skyMaterial", scene);
+  skyMaterial.backFaceCulling = false;
+  skyMaterial.turbidity = 0.1;
+  skyMaterial.luminance = 0.25;
+  skyMaterial.useSunPosition = true; // Do not set sun position from azimuth and inclination
+  skyMaterial.sunPosition = sunPos;
+  skyMaterial.cameraOffset.y = 64;
+
+  var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, scene);
+  skybox.material = skyMaterial;
+
+  const daylight = new BABYLON.DirectionalLight(
+    "daylight",
+    new BABYLON.Vector3(
+      sunPos.x - sunPos.x * 2,
+      sunPos.y,
+      sunPos.z - sunPos.z * 2
+    ),
+    scene
+  );
+
+  daylight.intensity = 0.7;
+  daylight.diffuse = LabColors["light3"];
+
+  const point1 = new BABYLON.PointLight(
+    "point1",
+    new BABYLON.Vector3(-9, 1, -12),
+    scene
+  );
+  //   point1.diffuse = LabColors["orange"];
+  point1.intensity = 0.3;
+
+  const point2 = point1.clone("point2");
+  point2.position = new BABYLON.Vector3(9, 1, -12);
+};
 
 /*
 
@@ -641,14 +591,13 @@ const addLabRoomLocal = (scene) => {
   // Create Base
   const baseMat = new MAT.CellMaterial("column-ionic-mat", scene);
   baseMat.diffuseColor = LabColors["light3"];
-  //   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
   const baseTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
   baseTex.vScale = 100;
   baseTex.uScale = 100;
   baseMat.diffuseTexture = baseTex;
 
   const profile = [
-    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(0, -36, 0),
     new BABYLON.Vector3(22, -36, 0),
     new BABYLON.Vector3(34, -24, 0),
     new BABYLON.Vector3(48, -12, 0),
