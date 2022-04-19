@@ -42,6 +42,7 @@ const makeBox = (colorName, parent, scene) => {
   // Create a colored box from using a string to get the color from the Brand object
   const mat = new MAT.CellMaterial(`${colorName}-material`, scene);
   mat.diffuseColor = LabColors[colorName];
+  mat.computeHighLevel = true;
   const mesh = BABYLON.MeshBuilder.CreateBox(
     `${colorName}-box`,
     { size: 1 },
@@ -57,7 +58,7 @@ const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
   scene = new BABYLON.Scene(engine);
-  scene.clearColor = BABYLON.Color3.FromHexString("#a7dbff");
+  // scene.clearColor = BABYLON.Color3.FromHexString("#a7dbff");
   //   scene.debugLayer.show();
   const framesPerSecond = 60;
   const gravity = -9.81;
@@ -73,18 +74,28 @@ const createScene = async (canvas) => {
   hemiLight.intensity = 0.3;
   hemiLight.diffuse = LabColors["light3"];
 
-  //   var skyMaterial = new MAT.SkyMaterial("skyMaterial", scene);
-  //   skyMaterial.backFaceCulling = false;
-  //   skyMaterial.luminance = 0.2;
-  //   skyMaterial.inclination = -0.4; // The solar inclination, related to the solar azimuth in interval [0, 1]
-  //   skyMaterial.azimuth = 0.2; // The solar azimuth in interval [0, 1]
+  var sunPos = new BABYLON.Vector3(3, 6, 20);
 
-  //   var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, scene);
-  //   skybox.material = skyMaterial;
+  var skyMaterial = new MAT.SkyMaterial("skyMaterial", scene);
+  skyMaterial.backFaceCulling = false;
+  skyMaterial.turbidity = 0.4;
+  skyMaterial.luminance = 0.2;
+  // skyMaterial.inclination = -0.4; // The solar inclination, related to the solar azimuth in interval [0, 1]
+  // skyMaterial.azimuth = 0.2; // The solar azimuth in interval [0, 1]
+
+  skyMaterial.useSunPosition = true; // Do not set sun position from azimuth and inclination
+  skyMaterial.sunPosition = sunPos;
+
+  var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", { size: 1000 }, scene);
+  skybox.material = skyMaterial;
 
   const daylight = new BABYLON.DirectionalLight(
     "daylight",
-    new BABYLON.Vector3(-50, -50, -50),
+    new BABYLON.Vector3(
+      sunPos.x - sunPos.x * 2,
+      sunPos.y,
+      sunPos.z - sunPos.z * 2
+    ),
     scene
   );
 
@@ -119,6 +130,25 @@ const createScene = async (canvas) => {
   makeBox("light1", group, scene).position = new BABYLON.Vector3(6, 1, 0);
   makeBox("light2", group, scene).position = new BABYLON.Vector3(7, 1, 0);
   makeBox("light3", group, scene).position = new BABYLON.Vector3(8, 1, 0);
+
+  // const sun = new BABYLON.MeshBuilder.CreateSphere(
+  //   "sun",
+  //   { diameter: 20, segments: 32 },
+  //   scene
+  // );
+  // sun.position = new BABYLON.Vector3(0, 100, 200);
+
+  // const sunMaterial = new BABYLON.StandardMaterial("sunMaterial", scene);
+  // sunMaterial.diffuseColor = LabColors["orange"];
+  // sunMaterial.emissiveColor = LabColors["orange"];
+
+  // const sunMaterial = new MAT.GradientMaterial("sunMaterial", scene);
+  // sunMaterial.topColor = LabColors["orange"];
+  // sunMaterial.bottomColor = LabColors["red"];
+  // sunMaterial.offset;
+  // sunMaterial.emissiveColor = LabColors["orange"];
+
+  // sun.material = sunMaterial;
 
   const teleportMeshes = addLabRoomLocal(scene);
 
@@ -427,8 +457,9 @@ const createWallsOutside = () => {
 const createColumnDoric = () => {
   const colMat = new MAT.CellMaterial("column-doric-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
+  colMat.computeHighLevel = true;
   //   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
-  const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  const colTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
   colTex.vScale = 1;
   colTex.uScale = 5.6;
   colMat.diffuseTexture = colTex;
@@ -524,119 +555,78 @@ const columnFactory2 = (column) => {
 const addLabRoomLocal = (scene) => {
   // Copied from Lab 026 and modified
   // Add a ground plane to the scene. Used for WebXR teleportation
-  //   const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
-  //   groundMaterial.majorUnitFrequency = 5;
-  //   groundMaterial.minorUnitFrequency = 0.1;
-  //   groundMaterial.gridRatio = 1;
-  //   groundMaterial.backFaceCulling = false;
-  //   groundMaterial.mainColor = LabColors.light3;
-  //   groundMaterial.lineColor = new BABYLON.Color3(1.0, 1.0, 1.0);
-  //   groundMaterial.opacity = 0.98;
+  const groundGridMaterial = new MAT.GridMaterial("ground-mat", scene);
+  groundGridMaterial.majorUnitFrequency = 1;
+  // groundGridMaterial.minorUnitFrequency = 0.1;
+  groundGridMaterial.gridRatio = 1;
+  groundGridMaterial.backFaceCulling = false;
+  groundGridMaterial.mainColor = LabColors["light2"];
+  groundGridMaterial.lineColor = LabColors["light2"];
+  groundGridMaterial.opacity = 0.98;
+
+  const groundTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  groundTex.vScale = 100;
+  groundTex.uScale = 100;
 
   const groundMaterial = new MAT.CellMaterial("ground-mat", scene);
-  groundMaterial.diffuseColor = LabColors["light1"];
+  groundMaterial.diffuseColor = LabColors["light3"];
+  groundMaterial.diffuseTexture = groundTex;
+  groundMaterial.computeHighLevel = true;
 
   const ground = BABYLON.MeshBuilder.CreateDisc(
     "ground",
     {
-      radius: 100,
-      tessellation: 100,
+      radius: 64,
+      // tessellation: 100,
       //   ark: 0,
     },
     scene
   );
   ground.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-  ground.position = new BABYLON.Vector3(0, -0.5, 0);
+  ground.position = new BABYLON.Vector3(0, -0.5, 24);
 
-  //   const ground = BABYLON.MeshBuilder.CreateGround(
-  //     "ground",
-  //     { height: 100, width: 100, subdivisions: 4 },
-  //     scene
-  //   );
   ground.material = groundMaterial;
   ground.sideOrientation = "DOUBLESIDE";
   ground.checkCollisions = true;
 
-  // Note: the rotation of these elements is set to put the face of the plane/ground facing the inside of the room so that collisions will work.
+  const groundGrid = ground.clone("ground-grid");
+  groundGrid.material = groundGridMaterial;
+  groundGrid.position = new BABYLON.Vector3(0, -0.45, 24);
 
-  const wall1 = BABYLON.MeshBuilder.CreateGround(
-    "wall1",
-    { height: 10, width: 100, subdivisions: 4 },
-    scene
-  );
-  wall1.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI, Math.PI / 2);
-  wall1.position = new BABYLON.Vector3(-50, 5, 0);
-  wall1.material = groundMaterial;
-  wall1.sideOrientation = "DOUBLESIDE";
-  wall1.checkCollisions = true;
+  // Create Base
+  const colMat = new MAT.CellMaterial("column-ionic-mat", scene);
+  colMat.diffuseColor = LabColors["light3"];
+  //   colMat.specularColor = new BABYLON.Color3(0.1, 0.1, 0.1);
+  const colTex = new BABYLON.Texture("../assets/stoa-noise-01.jpg", scene);
+  colTex.vScale = 100;
+  colTex.uScale = 100;
+  colMat.diffuseTexture = colTex;
 
-  const wall2 = wall1.clone("wall2");
-  wall2.rotation.z = -Math.PI / 2;
-  wall2.position = new BABYLON.Vector3(50, 5, 0);
+  const profile = [
+    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(22, -36, 0),
+    new BABYLON.Vector3(34, -24, 0),
+    new BABYLON.Vector3(48, -12, 0),
+    new BABYLON.Vector3(64, 0, 0),
+    new BABYLON.Vector3(64, 1, 0),
+    new BABYLON.Vector3(62, 1, 0),
+    new BABYLON.Vector3(62, 0, 0),
+  ];
 
-  const wall3 = BABYLON.MeshBuilder.CreateGround(
-    "wall1",
-    { height: 10, width: 100, subdivisions: 4 },
-    scene
-  );
-  wall3.material = groundMaterial;
-  wall3.sideOrientation = "DOUBLESIDE";
-  wall3.checkCollisions = true;
-  wall3.rotation = new BABYLON.Vector3(Math.PI / 2, Math.PI / 2, Math.PI / 2);
-  wall3.position = new BABYLON.Vector3(0, 5, -50);
-
-  const wall4 = wall3.clone("wall4");
-  wall4.rotation.z = -Math.PI / 2;
-  wall4.position = new BABYLON.Vector3(0, 5, 50);
-
-  const subjectMat1 = new MAT.CellMaterial("grab-mat1", scene);
-  subjectMat1.diffuseColor = LabColors["light1"];
-  //   subjectMat1.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-
-  const subject1 = BABYLON.MeshBuilder.CreateBox("subject1", {
-    width: 6,
-    height: 3,
-    depth: 6,
+  const column = BABYLON.MeshBuilder.CreateLathe("base", {
+    tessellation: 64,
+    shape: profile,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE,
   });
-  subject1.material = subjectMat1;
-  subject1.position = new BABYLON.Vector3(-6, 1.5, 12);
-  subject1.checkCollisions = true;
 
-  const subjectMat2 = new MAT.CellMaterial("grab-mat2", scene);
-  subjectMat2.diffuseColor = LabColors["light1"];
-  //   subjectMat2.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject2 = BABYLON.MeshBuilder.CreateBox("subject2", {
-    width: 6,
-    height: 6,
-    depth: 6,
-  });
-  subject2.material = subjectMat2;
-  subject2.position = new BABYLON.Vector3(-12, 3, 12);
-  subject2.checkCollisions = true;
-
-  const subjectMat3 = new MAT.CellMaterial("grab-mat3", scene);
-  subjectMat3.diffuseColor = LabColors["light1"];
-  //   subjectMat3.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  const subject3 = BABYLON.MeshBuilder.CreateBox("subject3", {
-    width: 6,
-    height: 9,
-    depth: 6,
-  });
-  subject3.material = subjectMat3;
-  subject3.position = new BABYLON.Vector3(-18, 4.5, 12);
-  subject3.checkCollisions = true;
-
-  subject1.isVisible = false;
-  subject2.isVisible = false;
-  subject3.isVisible = false;
-  //   ground.isVisible = false;
-  wall1.isVisible = false;
-  wall2.isVisible = false;
-  wall3.isVisible = false;
-  wall4.isVisible = false;
+  column.material = colMat;
+  column.convertToFlatShadedMesh();
+  column.checkCollisions = true;
+  column.position = new BABYLON.Vector3(0, -0.55, 24);
+  // column.scaling = new BABYLON.Vector3(0.6, 1, 0.6);
 
   // return meshes for teleportation
-  return [ground, subject1, subject2, subject3];
+  return [ground];
 };
 </script>
 
