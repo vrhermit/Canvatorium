@@ -38,21 +38,21 @@ const LabColors = {
   light3: new BABYLON.Color3.FromHexString("#FFFFFF"),
 };
 
-const makeBox = (colorName, parent, scene) => {
-  // Create a colored box from using a string to get the color from the Brand object
-  const mat = new MAT.CellMaterial(`${colorName}-material`, scene);
-  mat.diffuseColor = LabColors[colorName];
-  mat.computeHighLevel = true;
-  const mesh = BABYLON.MeshBuilder.CreateBox(
-    `${colorName}-box`,
-    { size: 1 },
-    scene
-  );
-  mesh.material = mat;
-  mesh.parent = parent;
+// const makeBox = (colorName, parent, scene) => {
+//   // Create a colored box from using a string to get the color from the Brand object
+//   const mat = new MAT.CellMaterial(`${colorName}-material`, scene);
+//   mat.diffuseColor = LabColors[colorName];
+//   mat.computeHighLevel = true;
+//   const mesh = BABYLON.MeshBuilder.CreateBox(
+//     `${colorName}-box`,
+//     { size: 1 },
+//     scene
+//   );
+//   mesh.material = mat;
+//   mesh.parent = parent;
 
-  return mesh;
-};
+//   return mesh;
+// };
 
 BABYLON.ArcRotateCamera.prototype.spinTo = function (
   whichprop,
@@ -149,23 +149,23 @@ const createScene = async (canvas) => {
   const point2 = point1.clone("point2");
   point2.position = new BABYLON.Vector3(9, 1, -12);
 
-  // Make some boxes to test out the colors in VR
-  makeBox("orange", group, scene).position = point1.position;
-  makeBox("orange", group, scene).position = point2.position;
+  // // Make some boxes to test out the colors in VR
+  // makeBox("orange", group, scene).position = point1.position;
+  // makeBox("orange", group, scene).position = point2.position;
 
-  const group = new BABYLON.Mesh("color-group");
-  group.position = new BABYLON.Vector3(-3.5, 0.5, 6);
+  // const group = new BABYLON.Mesh("color-group");
+  // group.position = new BABYLON.Vector3(-3.5, 0.5, 6);
 
-  makeBox("purple", group, scene).position = new BABYLON.Vector3(1, 0, 0);
-  makeBox("blue", group, scene).position = new BABYLON.Vector3(2, 0, 0);
-  makeBox("teal", group, scene).position = new BABYLON.Vector3(3, 0, 0);
-  makeBox("green", group, scene).position = new BABYLON.Vector3(4, 0, 0);
-  makeBox("yellow", group, scene).position = new BABYLON.Vector3(5, 0, 0);
-  makeBox("orange", group, scene).position = new BABYLON.Vector3(6, 0, 0);
-  makeBox("red", group, scene).position = new BABYLON.Vector3(7, 0, 0);
-  makeBox("light1", group, scene).position = new BABYLON.Vector3(6, 1, 0);
-  makeBox("light2", group, scene).position = new BABYLON.Vector3(7, 1, 0);
-  makeBox("light3", group, scene).position = new BABYLON.Vector3(8, 1, 0);
+  // makeBox("purple", group, scene).position = new BABYLON.Vector3(1, 0, 0);
+  // makeBox("blue", group, scene).position = new BABYLON.Vector3(2, 0, 0);
+  // makeBox("teal", group, scene).position = new BABYLON.Vector3(3, 0, 0);
+  // makeBox("green", group, scene).position = new BABYLON.Vector3(4, 0, 0);
+  // makeBox("yellow", group, scene).position = new BABYLON.Vector3(5, 0, 0);
+  // makeBox("orange", group, scene).position = new BABYLON.Vector3(6, 0, 0);
+  // makeBox("red", group, scene).position = new BABYLON.Vector3(7, 0, 0);
+  // makeBox("light1", group, scene).position = new BABYLON.Vector3(6, 1, 0);
+  // makeBox("light2", group, scene).position = new BABYLON.Vector3(7, 1, 0);
+  // makeBox("light3", group, scene).position = new BABYLON.Vector3(8, 1, 0);
 
   // const sun = new BABYLON.MeshBuilder.CreateSphere(
   //   "sun",
