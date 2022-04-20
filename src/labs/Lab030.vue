@@ -45,7 +45,7 @@ const createScene = async (canvas) => {
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
 
-  setupCamera(scene, canvas, false);
+  setupCamera(scene, canvas, true);
   setupSceneLighting();
 
   createPlaceholder(scene);
@@ -69,15 +69,27 @@ const createScene = async (canvas) => {
   columnIonic.position = new BABYLON.Vector3(-14, 0, -7);
   columnFactory2(columnIonic);
 
+  //Right Side
   const columnDoricTemp1 = createColumnDoric();
-  columnDoricTemp1.position = new BABYLON.Vector3(6, -0.5, 16);
+  columnDoricTemp1.position = new BABYLON.Vector3(16, -0.5, 16);
   columnDoricTemp1.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
   columnFactoryTemp(columnDoricTemp1);
 
   const columnDoricTemp2 = createColumnDoric();
-  columnDoricTemp2.position = new BABYLON.Vector3(-6, -0.5, 16);
+  columnDoricTemp2.position = new BABYLON.Vector3(24, -0.5, 16);
   columnDoricTemp2.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
   columnFactoryTemp(columnDoricTemp2);
+
+  //Left Side
+  const columnDoricTemp3 = createColumnDoric();
+  columnDoricTemp3.position = new BABYLON.Vector3(-16, -0.5, 16);
+  columnDoricTemp3.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
+  columnFactoryTemp(columnDoricTemp3);
+
+  const columnDoricTemp4 = createColumnDoric();
+  columnDoricTemp4.position = new BABYLON.Vector3(-24, -0.5, 16);
+  columnDoricTemp4.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
+  columnFactoryTemp(columnDoricTemp4);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [
@@ -226,11 +238,52 @@ const setupSceneLighting = (scene) => {
 // Placeholder meshes
 
 const createPlaceholder = (scene) => {
+  const placeMat = new MAT.CellMaterial("base-mat", scene);
+  placeMat.diffuseColor = LabColors["light2"];
+  const placeTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  placeTex.uScale = 2;
+  placeTex.vScale = 2;
+  placeMat.diffuseTexture = placeTex;
+  const place1 = new BABYLON.MeshBuilder.CreateBox(
+    "place1",
+    { width: 7, height: 1, depth: 7 },
+    scene
+  );
+  place1.position = new BABYLON.Vector3(20, -0.9, 20);
+  place1.rotation = new BABYLON.Vector3(0, 0, 0);
+  place1.material = placeMat;
+
+  const place2 = place1.clone("place2");
+  place2.position = new BABYLON.Vector3(20, -0.9, 32);
+
+  const place3 = place1.clone("place3");
+  place3.position = new BABYLON.Vector3(20, -0.9, 44);
+
+  const place4 = place1.clone("place4");
+  place4.position = new BABYLON.Vector3(-20, -0.9, 20);
+
+  const place5 = place1.clone("place5");
+  place5.position = new BABYLON.Vector3(-20, -0.9, 32);
+
+  const place6 = place1.clone("place6");
+  place6.position = new BABYLON.Vector3(-20, -0.9, 44);
+
+  const placeRoof1 = new BABYLON.MeshBuilder.CreateBox(
+    "placeRoof1",
+    { width: 10, height: 0.2, depth: 34 },
+    scene
+  );
+  placeRoof1.position = new BABYLON.Vector3(-20, 5, 32);
+  placeRoof1.material = placeMat;
+
+  const placeRoof2 = placeRoof1.clone("placeRoof2");
+  placeRoof2.position = new BABYLON.Vector3(20, 5, 32);
+
   const blockMat = new MAT.CellMaterial("base-mat", scene);
   blockMat.diffuseColor = LabColors["blue"];
   const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
-  blockText.uScale = 12;
-  blockText.vScale = 12;
+  blockText.uScale = 6;
+  blockText.vScale = 6;
   blockMat.diffuseTexture = blockText;
 
   const pool = new BABYLON.MeshBuilder.CreateBox(
