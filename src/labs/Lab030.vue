@@ -45,8 +45,10 @@ const createScene = async (canvas) => {
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
 
-  setupCamera(scene, canvas, true);
+  setupCamera(scene, canvas, false);
   setupSceneLighting();
+
+  createPlaceholder(scene);
 
   const teleportMeshes = addLabRoomLocal(scene);
 
@@ -66,6 +68,16 @@ const createScene = async (canvas) => {
   const columnIonic = createColumnIonic();
   columnIonic.position = new BABYLON.Vector3(-14, 0, -7);
   columnFactory2(columnIonic);
+
+  const columnDoricTemp1 = createColumnDoric();
+  columnDoricTemp1.position = new BABYLON.Vector3(6, -0.5, 16);
+  columnDoricTemp1.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
+  columnFactoryTemp(columnDoricTemp1);
+
+  const columnDoricTemp2 = createColumnDoric();
+  columnDoricTemp2.position = new BABYLON.Vector3(-6, -0.5, 16);
+  columnDoricTemp2.scaling = new BABYLON.Vector3(0.7, 1, 0.7);
+  columnFactoryTemp(columnDoricTemp2);
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [
@@ -209,6 +221,79 @@ const setupSceneLighting = (scene) => {
 
   const point2 = point1.clone("point2");
   point2.position = new BABYLON.Vector3(9, 1, -12);
+};
+
+// Placeholder meshes
+
+const createPlaceholder = (scene) => {
+  const blockMat = new MAT.CellMaterial("base-mat", scene);
+  blockMat.diffuseColor = LabColors["blue"];
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText.uScale = 12;
+  blockText.vScale = 12;
+  blockMat.diffuseTexture = blockText;
+
+  const pool = new BABYLON.MeshBuilder.CreateBox(
+    "pool",
+    { width: 12, height: 1, depth: 12 },
+    scene
+  );
+  pool.position = new BABYLON.Vector3(0, -0.9, 64);
+  pool.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
+  pool.material = blockMat;
+
+  //https://playground.babylonjs.com/#TC31NV#4
+  // Create a particle system
+  var particleSystem = new BABYLON.ParticleSystem("particles", 1000, scene);
+
+  //Texture of each particle
+  particleSystem.particleTexture = new BABYLON.Texture(
+    "../assets/particle-01.png",
+    scene
+  );
+
+  // Where the particles come from
+  particleSystem.emitter = new BABYLON.Vector3(0, 0, 64); // the starting object, the emitter
+  particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, 0); // Starting all from
+  particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0); // To...
+
+  // Colors of all particles
+  particleSystem.color1 = new BABYLON.Color4.FromHexString("#a7dbff");
+  particleSystem.color2 = new BABYLON.Color4.FromHexString("#a7fff7");
+  particleSystem.colorDead = new BABYLON.Color4.FromHexString("#ffffff");
+
+  // Size of each particle (random between...
+  particleSystem.minSize = 0.03;
+  particleSystem.maxSize = 0.07;
+
+  // Life time of each particle (random between...
+  particleSystem.minLifeTime = 2;
+  particleSystem.maxLifeTime = 5;
+
+  // Emission rate
+  particleSystem.emitRate = 150;
+
+  // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
+  particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+
+  // Set the gravity of all particles
+  particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
+
+  // Direction of each particle after it has been emitted
+  particleSystem.direction1 = new BABYLON.Vector3(-1.4, 5, 1.4);
+  particleSystem.direction2 = new BABYLON.Vector3(1.4, 8, -1.4);
+
+  // Angular speed, in radians
+  particleSystem.minAngularSpeed = 0;
+  particleSystem.maxAngularSpeed = Math.PI;
+
+  // Speed
+  particleSystem.minEmitPower = 0.25;
+  particleSystem.maxEmitPower = 1.25;
+  particleSystem.updateSpeed = 0.015;
+
+  // Start the particle system
+  particleSystem.start();
 };
 
 /*
@@ -530,6 +615,22 @@ const columnFactory = (column) => {
   } while (i < numberOfColumns);
 };
 
+const columnFactoryTemp = (column) => {
+  const numberOfColumns = 8;
+  var z = column.position.z;
+  var i = 0;
+  do {
+    i++;
+    z += 4;
+    const newCol = column.createInstance("column");
+    newCol.position = new BABYLON.Vector3(
+      column.position.x,
+      column.position.y,
+      z
+    );
+  } while (i < numberOfColumns);
+};
+
 const createColumnIonic = () => {
   const colMat = new MAT.CellMaterial("column-ionic-mat", scene);
   colMat.diffuseColor = LabColors["light3"];
@@ -608,7 +709,7 @@ const addLabRoomLocal = (scene) => {
 
   const groundGrid = ground.clone("ground-grid");
   groundGrid.material = groundGridMaterial;
-  groundGrid.position = new BABYLON.Vector3(0, -0.45, 24);
+  groundGrid.position = new BABYLON.Vector3(0, -0.495, 24);
 
   // Create Base
   const baseMat = new MAT.CellMaterial("column-ionic-mat", scene);
