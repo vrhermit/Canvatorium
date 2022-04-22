@@ -50,7 +50,7 @@ const createScene = async (canvas) => {
   console.log(skybox);
 
   createPlaceholder(scene);
-  createFountain(scene, skybox);
+  createFountain(scene);
 
   const ground = addLabRoomLocal(scene);
 
@@ -279,7 +279,7 @@ const createPlaceholder = (scene) => {
   placeRoof2.position = new BABYLON.Vector3(20, 5, 32);
 };
 
-const createFountain = (scene, skyBox) => {
+const createFountain = (scene) => {
   const placeMat = new MAT.CellMaterial("base-mat", scene);
   placeMat.diffuseColor = LabColors["purple"];
   const placeTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
@@ -338,21 +338,32 @@ const createFountain = (scene, skyBox) => {
   fountainTop.position = new BABYLON.Vector3(0, 0, 0);
   fountainTop.material = placeMat;
 
-  var water = new MAT.WaterMaterial(
-    "water",
-    scene,
-    new BABYLON.Vector2(512, 512)
-  );
-  water.backFaceCulling = true;
-  water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
-  water.windForce = -10;
-  water.waveHeight = 0.05;
-  water.bumpHeight = 0.25;
-  water.waterColor = LabColors["purple"];
-  water.colorBlendFactor = 0.5;
+  // var water = new MAT.WaterMaterial(
+  //   "water",
+  //   scene,
+  //   new BABYLON.Vector2(512, 512)
+  // );
+  // water.backFaceCulling = true;
+  // water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
+  // water.windForce = -5;
+  // water.waveHeight = 0.05;
+  // water.bumpHeight = 0.15;
+  // water.waterColor = LabColors["purple"];
+  // water.colorBlendFactor = 0.5;
   // water.addToRenderList(fountainBase);
-  water.addToRenderList(fountainTop);
-  water.addToRenderList(skyBox);
+  // water.addToRenderList(fountainTop);
+  // water.addToRenderList(skyBox);
+
+  const blockMat = new MAT.CellMaterial("base-mat", scene);
+  blockMat.diffuseColor = LabColors["blue"];
+  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  blockText.uScale = 6;
+  blockText.vScale = 6;
+  blockMat.diffuseTexture = blockText;
+
+  // const blockMat = new BABYLON.StandardMaterial("blockMat", scene);
+  // blockMat.diffuseColor = LabColors["blue"];
+  // blockMat.specularColor = LabColors["teal"];
 
   const pool = new BABYLON.MeshBuilder.CreateBox(
     "pool",
@@ -361,9 +372,7 @@ const createFountain = (scene, skyBox) => {
   );
   group.addChild(pool);
   pool.position = new BABYLON.Vector3(0, 0, 0);
-  // pool.position = new BABYLON.Vector3(0, -1.7, 64);
-  // pool.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
-  pool.material = water;
+  pool.material = blockMat;
 
   // Move the entier group to the the location for the fountain
   group.position = new BABYLON.Vector3(0, -0.4, 32);
@@ -424,10 +433,10 @@ const createFountain = (scene, skyBox) => {
   particleSystem.start();
 
   //https://pixabay.com/sound-effects/small-fountain-7073/
-  new BABYLON.Sound("water", "assets/small-fountain-7073.mp3", scene, null, {
-    loop: true,
-    autoplay: true,
-  });
+  // new BABYLON.Sound("water", "assets/small-fountain-7073.mp3", scene, null, {
+  //   loop: true,
+  //   autoplay: true,
+  // });
 };
 
 /*
