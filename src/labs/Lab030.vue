@@ -366,7 +366,7 @@ const createFountain = (scene, skyBox) => {
   pool.material = water;
 
   // Move the entier group to the the location for the fountain
-  group.position = new BABYLON.Vector3(0, -0.4, 24);
+  group.position = new BABYLON.Vector3(0, -0.4, 32);
   group.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
 
   //https://playground.babylonjs.com/#TC31NV#4
