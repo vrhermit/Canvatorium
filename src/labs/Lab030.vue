@@ -45,12 +45,14 @@ const createScene = async (canvas) => {
   const gravity = -9.81;
   scene.gravity = new BABYLON.Vector3(0, gravity / framesPerSecond, 0);
 
-  setupCamera(scene, canvas, true);
-  setupSceneLighting();
+  setupCamera(scene, canvas, false);
+  const skybox = setupSceneLighting();
+  console.log(skybox);
 
   createPlaceholder(scene);
+  createFountain(scene, skybox);
 
-  const teleportMeshes = addLabRoomLocal(scene);
+  const ground = addLabRoomLocal(scene);
 
   const { floor, step1, step2 } = createBase();
   createRoof();
@@ -92,12 +94,7 @@ const createScene = async (canvas) => {
   columnFactoryTemp(columnDoricTemp4);
 
   // Use the LabPlayer
-  const { xr } = await createLabPlayer(scene, [
-    ...teleportMeshes,
-    floor,
-    step1,
-    step2,
-  ]);
+  const { xr } = await createLabPlayer(scene, [ground, floor, step1, step2]);
   console.log(xr);
 
   engine.runRenderLoop(() => {
@@ -233,6 +230,8 @@ const setupSceneLighting = (scene) => {
 
   const point2 = point1.clone("point2");
   point2.position = new BABYLON.Vector3(9, 1, -12);
+
+  return skybox;
 };
 
 // Placeholder meshes
@@ -278,22 +277,97 @@ const createPlaceholder = (scene) => {
 
   const placeRoof2 = placeRoof1.clone("placeRoof2");
   placeRoof2.position = new BABYLON.Vector3(20, 5, 32);
+};
 
-  const blockMat = new MAT.CellMaterial("base-mat", scene);
-  blockMat.diffuseColor = LabColors["blue"];
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
-  blockText.uScale = 6;
-  blockText.vScale = 6;
-  blockMat.diffuseTexture = blockText;
+const createFountain = (scene, skyBox) => {
+  const placeMat = new MAT.CellMaterial("base-mat", scene);
+  placeMat.diffuseColor = LabColors["purple"];
+  const placeTex = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  placeTex.uScale = 2;
+  placeTex.vScale = 2;
+  placeMat.diffuseTexture = placeTex;
+
+  const group = new BABYLON.AbstractMesh("group", scene);
+
+  const profile = [
+    // Base
+    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(6, 0, 0),
+    new BABYLON.Vector3(6, 0.6, 0),
+    new BABYLON.Vector3(5.4, 0.6, 0),
+    new BABYLON.Vector3(5.4, 0.2, 0),
+    new BABYLON.Vector3(0, 0.2, 0),
+  ];
+
+  const fountainBase = BABYLON.MeshBuilder.CreateLathe("colum-docic-01", {
+    tessellation: 4,
+    shape: profile,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+  });
+  fountainBase.rotation.y = Math.PI / 4;
+
+  fountainBase.convertToFlatShadedMesh();
+
+  group.addChild(fountainBase);
+  fountainBase.position = new BABYLON.Vector3(0, -0.2, 0);
+  fountainBase.material = placeMat;
+
+  const profileTop = [
+    // Top
+    new BABYLON.Vector3(0, 0, 0),
+    new BABYLON.Vector3(0.5, 0, 0),
+    new BABYLON.Vector3(0.5, 1, 0),
+    new BABYLON.Vector3(0.4, 1, 0),
+    new BABYLON.Vector3(0.4, 1.3, 0),
+    new BABYLON.Vector3(0.3, 1.3, 0),
+    new BABYLON.Vector3(0.3, 1.8, 0),
+    new BABYLON.Vector3(0.2, 1.8, 0),
+    new BABYLON.Vector3(0.2, 2.1, 0),
+  ];
+  const fountainTop = BABYLON.MeshBuilder.CreateLathe("colum-docic-01", {
+    tessellation: 4,
+    shape: profileTop,
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+  });
+
+  fountainTop.rotation.y = Math.PI / 4;
+
+  fountainTop.convertToFlatShadedMesh();
+
+  group.addChild(fountainTop);
+  fountainTop.position = new BABYLON.Vector3(0, 0, 0);
+  fountainTop.material = placeMat;
+
+  var water = new MAT.WaterMaterial(
+    "water",
+    scene,
+    new BABYLON.Vector2(512, 512)
+  );
+  water.backFaceCulling = true;
+  water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
+  water.windForce = -10;
+  water.waveHeight = 0.05;
+  water.bumpHeight = 0.25;
+  water.waterColor = LabColors["purple"];
+  water.colorBlendFactor = 0.5;
+  // water.addToRenderList(fountainBase);
+  water.addToRenderList(fountainTop);
+  water.addToRenderList(skyBox);
 
   const pool = new BABYLON.MeshBuilder.CreateBox(
     "pool",
-    { width: 12, height: 1, depth: 12 },
+    { width: 8, height: 0.2, depth: 8 },
     scene
   );
-  pool.position = new BABYLON.Vector3(0, -0.9, 64);
-  pool.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
-  pool.material = blockMat;
+  group.addChild(pool);
+  pool.position = new BABYLON.Vector3(0, 0, 0);
+  // pool.position = new BABYLON.Vector3(0, -1.7, 64);
+  // pool.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
+  pool.material = water;
+
+  // Move the entier group to the the location for the fountain
+  group.position = new BABYLON.Vector3(0, -0.4, 24);
+  group.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
 
   //https://playground.babylonjs.com/#TC31NV#4
   // Create a particle system
@@ -306,7 +380,7 @@ const createPlaceholder = (scene) => {
   );
 
   // Where the particles come from
-  particleSystem.emitter = new BABYLON.Vector3(0, 0, 64); // the starting object, the emitter
+  particleSystem.emitter = new BABYLON.Vector3(0, 1.8, group.position.z); // the starting object, the emitter
   particleSystem.minEmitBox = new BABYLON.Vector3(0, 0, 0); // Starting all from
   particleSystem.maxEmitBox = new BABYLON.Vector3(0, 0, 0); // To...
 
@@ -324,7 +398,7 @@ const createPlaceholder = (scene) => {
   particleSystem.maxLifeTime = 5;
 
   // Emission rate
-  particleSystem.emitRate = 150;
+  particleSystem.emitRate = 75;
 
   // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
   particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
@@ -341,12 +415,19 @@ const createPlaceholder = (scene) => {
   particleSystem.maxAngularSpeed = Math.PI;
 
   // Speed
-  particleSystem.minEmitPower = 0.25;
-  particleSystem.maxEmitPower = 1.25;
+  particleSystem.minEmitPower = 0.2;
+  particleSystem.maxEmitPower = 0.9;
+  // particleSystem.maxEmitPower = 1.15;
   particleSystem.updateSpeed = 0.015;
 
   // Start the particle system
   particleSystem.start();
+
+  //https://pixabay.com/sound-effects/small-fountain-7073/
+  new BABYLON.Sound("water", "assets/small-fountain-7073.mp3", scene, null, {
+    loop: true,
+    autoplay: true,
+  });
 };
 
 /*
@@ -795,7 +876,7 @@ const addLabRoomLocal = (scene) => {
   base.position = new BABYLON.Vector3(0, -0.55, 24);
 
   // return meshes for teleportation
-  return [ground];
+  return ground;
 };
 </script>
 
