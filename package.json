@@ -13,6 +13,7 @@
     "babylonjs-gui": "^5.0.0-rc.13",
     "babylonjs-loaders": "^5.0.0-rc.13",
     "babylonjs-materials": "^5.0.0-rc.13",
+    "babylonjs-procedural-textures": "^5.0.0-rc.13",
     "core-js": "^3.21.1",
     "marked": "^4.0.12",
     "vue": "^3.2.31",
