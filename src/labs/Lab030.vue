@@ -338,28 +338,28 @@ const createFountain = (scene) => {
   fountainTop.position = new BABYLON.Vector3(0, 0, 0);
   fountainTop.material = placeMat;
 
-  // var water = new MAT.WaterMaterial(
-  //   "water",
-  //   scene,
-  //   new BABYLON.Vector2(512, 512)
-  // );
-  // water.backFaceCulling = true;
-  // water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
-  // water.windForce = -5;
-  // water.waveHeight = 0.05;
-  // water.bumpHeight = 0.15;
-  // water.waterColor = LabColors["purple"];
-  // water.colorBlendFactor = 0.5;
+  var water = new MAT.WaterMaterial(
+    "water",
+    scene,
+    new BABYLON.Vector2(512, 512)
+  );
+  water.backFaceCulling = true;
+  water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
+  water.windForce = -5;
+  water.waveHeight = 0.05;
+  water.bumpHeight = 0.15;
+  water.waterColor = LabColors["blue"];
+  water.colorBlendFactor = 0.5;
   // water.addToRenderList(fountainBase);
-  // water.addToRenderList(fountainTop);
+  water.addToRenderList(fountainTop);
   // water.addToRenderList(skyBox);
 
-  const blockMat = new MAT.CellMaterial("base-mat", scene);
-  blockMat.diffuseColor = LabColors["blue"];
-  const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
-  blockText.uScale = 6;
-  blockText.vScale = 6;
-  blockMat.diffuseTexture = blockText;
+  // const blockMat = new MAT.CellMaterial("base-mat", scene);
+  // blockMat.diffuseColor = LabColors["blue"];
+  // const blockText = new BABYLON.Texture("../assets/stoa-noise-02.png", scene);
+  // blockText.uScale = 6;
+  // blockText.vScale = 6;
+  // blockMat.diffuseTexture = blockText;
 
   // const blockMat = new BABYLON.StandardMaterial("blockMat", scene);
   // blockMat.diffuseColor = LabColors["blue"];
@@ -372,7 +372,7 @@ const createFountain = (scene) => {
   );
   group.addChild(pool);
   pool.position = new BABYLON.Vector3(0, 0, 0);
-  pool.material = blockMat;
+  pool.material = water;
 
   // Move the entier group to the the location for the fountain
   group.position = new BABYLON.Vector3(0, -0.4, 32);
@@ -869,8 +869,8 @@ const addLabRoomLocal = (scene) => {
     new BABYLON.Vector3(48, -12, 0),
     new BABYLON.Vector3(64, 0, 0),
     new BABYLON.Vector3(64, 1, 0),
-    new BABYLON.Vector3(62, 1, 0),
-    new BABYLON.Vector3(62, 0, 0),
+    new BABYLON.Vector3(63.7, 1, 0),
+    new BABYLON.Vector3(63.7, 0, 0),
   ];
 
   const base = BABYLON.MeshBuilder.CreateLathe("base", {
