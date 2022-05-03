@@ -10,10 +10,10 @@ import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 labNotes.value = `
 This is a work in progress version of a Stoa for a side project I'm considering.
-- Uses Skybox material and directional lighting (fixed position for now)
-- New version of the noise texture
-- Switch to Cell Material
-- New Color palette
+- Playing with the idea of water in the Stoa scene
+- This scene uses the Water Material from the Babylon JS Material Library
+- Performance is not great on Quest. Seeing some dropped frames and black bars when turning my head with the water in view
+- I also tried a [stylized water shader](https://forum.babylonjs.com/t/simple-stylized-water-shader/17672/5) but it didn't work in VR at all.
 `;
 const bjsCanvas = ref(null);
 
@@ -245,27 +245,15 @@ const createPlaceholder = (scene) => {
   placeMat.diffuseTexture = placeTex;
   const place1 = new BABYLON.MeshBuilder.CreateBox(
     "place1",
-    { width: 7, height: 1, depth: 7 },
+    { width: 10, height: 0.2, depth: 34 },
     scene
   );
-  place1.position = new BABYLON.Vector3(20, -0.9, 20);
+  place1.position = new BABYLON.Vector3(20, -0.45, 32);
   place1.rotation = new BABYLON.Vector3(0, 0, 0);
   place1.material = placeMat;
 
   const place2 = place1.clone("place2");
-  place2.position = new BABYLON.Vector3(20, -0.9, 32);
-
-  const place3 = place1.clone("place3");
-  place3.position = new BABYLON.Vector3(20, -0.9, 44);
-
-  const place4 = place1.clone("place4");
-  place4.position = new BABYLON.Vector3(-20, -0.9, 20);
-
-  const place5 = place1.clone("place5");
-  place5.position = new BABYLON.Vector3(-20, -0.9, 32);
-
-  const place6 = place1.clone("place6");
-  place6.position = new BABYLON.Vector3(-20, -0.9, 44);
+  place2.position = new BABYLON.Vector3(-20, -0.45, 32);
 
   const placeRoof1 = new BABYLON.MeshBuilder.CreateBox(
     "placeRoof1",
@@ -345,11 +333,12 @@ const createFountain = (scene, skyBox) => {
   );
   water.backFaceCulling = true;
   water.bumpTexture = new BABYLON.Texture("../assets/waterbump.png", scene);
-  water.windForce = -10;
+  water.windForce = -5;
   water.waveHeight = 0.05;
-  water.bumpHeight = 0.25;
-  water.waterColor = LabColors["purple"];
+  water.bumpHeight = 0.15;
+  water.waterColor = LabColors["blue"];
   water.colorBlendFactor = 0.5;
+  // the reflection of the containing base didn't look good, so I'm removing it
   // water.addToRenderList(fountainBase);
   water.addToRenderList(fountainTop);
   water.addToRenderList(skyBox);
@@ -361,12 +350,10 @@ const createFountain = (scene, skyBox) => {
   );
   group.addChild(pool);
   pool.position = new BABYLON.Vector3(0, 0, 0);
-  // pool.position = new BABYLON.Vector3(0, -1.7, 64);
-  // pool.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
   pool.material = water;
 
   // Move the entier group to the the location for the fountain
-  group.position = new BABYLON.Vector3(0, -0.4, 32);
+  group.position = new BABYLON.Vector3(0, -0.4, 24);
   group.rotation = new BABYLON.Vector3(0, Math.PI / 4, 0);
 
   //https://playground.babylonjs.com/#TC31NV#4
@@ -424,10 +411,10 @@ const createFountain = (scene, skyBox) => {
   particleSystem.start();
 
   //https://pixabay.com/sound-effects/small-fountain-7073/
-  new BABYLON.Sound("water", "assets/small-fountain-7073.mp3", scene, null, {
-    loop: true,
-    autoplay: true,
-  });
+  // new BABYLON.Sound("water", "assets/small-fountain-7073.mp3", scene, null, {
+  //   loop: true,
+  //   autoplay: true,
+  // });
 };
 
 /*
@@ -860,8 +847,8 @@ const addLabRoomLocal = (scene) => {
     new BABYLON.Vector3(48, -12, 0),
     new BABYLON.Vector3(64, 0, 0),
     new BABYLON.Vector3(64, 1, 0),
-    new BABYLON.Vector3(62, 1, 0),
-    new BABYLON.Vector3(62, 0, 0),
+    new BABYLON.Vector3(63.7, 1, 0),
+    new BABYLON.Vector3(63.7, 0, 0),
   ];
 
   const base = BABYLON.MeshBuilder.CreateLathe("base", {

@@ -1,6 +1,6 @@
 <template>
-  <div class="flex-grid">
-    <aside class="sidebar" style="padding: 0.25rem">
+  <div class="flex-grid container-fluid">
+    <aside class="sidebar">
       <router-link to="/">
         <div class="headings">
           <h2>Canvatorium</h2>

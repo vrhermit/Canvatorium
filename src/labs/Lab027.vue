@@ -16,7 +16,10 @@ import { createLabPlayer } from "../lab-shared/LabPlayer";
 
 labNotes.value = `
 Performance Testing
-
+Playing with Clones, Instances, and Thin Instances.
+All three options take a while to create the copies, leading to slower initial load time.
+Clones offer the most customization, but are the least performant.
+Thin instances are the most performant, but are the least customizable.
 `;
 const bjsCanvas = ref(null);
 
@@ -30,6 +33,8 @@ const createScene = async (canvas) => {
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
+  scene.getCameraByName("camera").position = new BABYLON.Vector3(26, 52, -26);
+  scene.getCameraByName("camera").setTarget(new BABYLON.Vector3(26, 52, 0));
   addLabLights(scene);
 
   const ground = BABYLON.MeshBuilder.CreateGround(
@@ -38,10 +43,9 @@ const createScene = async (canvas) => {
     scene
   );
   ground.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-  // ground.position.y = 10;
   ground.sideOrientation = "DOUBLESIDE";
   ground.position = new BABYLON.Vector3(25.5, 49.5, 0);
-  //   ground.position = new BABYLON.Vector3(25.5, -0.05, 49.5);
+  // ground.position = new BABYLON.Vector3(25.5, -0.05, 49.5);
   const groundMaterial = new MAT.GridMaterial("ground-mat", scene);
   groundMaterial.majorUnitFrequency = 13;
   groundMaterial.minorUnitFrequency = 0.1;
@@ -53,54 +57,31 @@ const createScene = async (canvas) => {
   groundMaterial.gridOffset = new BABYLON.Vector3(0, 0, 2);
   ground.material = groundMaterial;
   ground.checkCollisions = true;
-  //   ground.scaling = new BABYLON.Vector3(0.5, 0.5, 0.5);
-  //   const ground = addLabRoom(scene);
-  //   console.log(ground);
 
-  //   const pastMat = new BABYLON.StandardMaterial(scene);
-  //   pastMat.diffuseColor = new BABYLON.Color3.FromHexString("#03c4a1");
-  //   pastMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  const boxMat = new BABYLON.StandardMaterial(scene);
+  boxMat.diffuseColor = new BABYLON.Color3.FromHexString("#718096");
+  boxMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+  boxMat.parent = ground;
 
-  const futureMat = new BABYLON.StandardMaterial(scene);
-  futureMat.diffuseColor = new BABYLON.Color3.FromHexString("#718096");
-  futureMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-  futureMat.parent = ground;
-
-  //   const pastRect = new BABYLON.MeshBuilder.CreatePlane("plane", {
-  //     width: 0.9,
-  //     height: 0.9,
-  //   });
-  //   pastRect.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-  //   pastRect.position = new BABYLON.Vector3(0, 0, 0);
-  //   pastRect.material = pastMat;
-
-  const futureRect = new BABYLON.MeshBuilder.CreatePlane("plane", {
-    width: 0.9,
-    height: 0.9,
+  const box = new BABYLON.MeshBuilder.CreateBox("plane", {
+    width: 0.8,
+    height: 0.8,
+    depth: 0.2,
   });
-  //   futureRect.rotation = new BABYLON.Vector3(Math.PI / 2, 0, 0);
-  futureRect.position = new BABYLON.Vector3(0, 0, 0);
-  futureRect.material = futureMat;
-
-  function diff_weeks(dt2, dt1) {
-    var diff = (dt2.getTime() - dt1.getTime()) / 1000;
-    diff /= 60 * 60 * 24 * 7;
-    return Math.abs(Math.round(diff));
-  }
+  box.position = new BABYLON.Vector3(0, 0, 0);
+  box.material = boxMat;
 
   const createRects = () => {
-    let week = 0;
-    const startDate = new Date("March 29, 1982 12:00:00");
-    const today = new Date("March 29, 2022 12:00:00");
+    let row = 0;
 
-    let numberOfWeeks = diff_weeks(startDate, today);
-    console.log(numberOfWeeks);
+    let numberOfItems = 5200;
+    console.log(numberOfItems);
     let z = 0;
     do {
       let x = 0;
 
       do {
-        week++;
+        row++;
         // console.log("week:", week);
         // console.log(z, x);
         // Instance version
@@ -108,17 +89,15 @@ const createScene = async (canvas) => {
         // rect.position = new BABYLON.Vector3(x, 0, z);
         // Thin instance version
         var matrix = BABYLON.Matrix.Translation(x, z, 0);
-        futureRect.thinInstanceAdd(matrix);
+        box.thinInstanceAdd(matrix);
         x += 1;
-      } while (x < 52 && week < numberOfWeeks);
+      } while (x < 52 && row < numberOfItems);
       z += 1;
-    } while (z < 99 && week < numberOfWeeks);
-    console.log("week:", week);
-    console.log("done");
+    } while (z < 100 && row < numberOfItems);
   };
   //   console.log(createRects);
   createRects();
-  futureRect.isVisisble = false;
+  box.isVisisble = false;
 
   // Use the LabPlayer
   const { xr } = await createLabPlayer(scene, [ground]);
@@ -126,8 +105,9 @@ const createScene = async (canvas) => {
 
   // Move the player when thet enter immersive mode
   xr.baseExperience.onInitialXRPoseSetObservable.add((xrCamera) => {
-    xrCamera.position.x = 0;
-    xrCamera.position.z = -10;
+    xrCamera.position.x = 26;
+    xrCamera.position.y = 52;
+    xrCamera.position.z = -26;
     xrCamera.applyGravity = false;
   });
 
