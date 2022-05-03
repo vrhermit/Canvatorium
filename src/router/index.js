@@ -346,7 +346,7 @@ const routes = [
     meta: {
       title: "Lab 030",
       subtitle: "Stoa (Scene Composition)",
-      status: "running"
+      status: "failed"
     }
   }
 ];
