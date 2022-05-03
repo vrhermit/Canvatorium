@@ -57,7 +57,19 @@ If you don't want to use these certs just disable the following lines in `vue.co
     },
 ```
 
-### Babylon JS
+### Babylon JS Stable
+
+Install the latest Stable version Babylon JS
+
+```
+npm install --save babylonjs babylonjs-gui babylonjs-loaders
+npm install --save babylonjs-materials
+npm install --save babylonjs-procedural-textures
+npm install --save-dev babylonjs-inspector
+
+```
+
+### Babylon JS Preview
 
 Babylon JS 5.0 is in beta as of time of writing. With updates shipping often, it find it best to install all of the dependencies at once after a new release.
 Install the latest Babylon JS 5.0 Preview
