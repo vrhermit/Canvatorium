@@ -345,7 +345,7 @@ const routes = [
     component: Lab030,
     meta: {
       title: "Lab 030",
-      subtitle: "Stoa (Scene Composition)",
+      subtitle: "Stoa (Water)",
       status: "failed"
     }
   }
