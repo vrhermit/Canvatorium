@@ -31,6 +31,7 @@ import Lab027 from "../labs/Lab027.vue";
 import Lab028 from "../labs/Lab028.vue";
 import Lab029 from "../labs/Lab029.vue";
 import Lab030 from "../labs/Lab030.vue";
+import Lab031 from "../labs/Lab031.vue";
 
 const routes = [
   {
@@ -347,6 +348,16 @@ const routes = [
       title: "Lab 030",
       subtitle: "Stoa (Water)",
       status: "failed"
+    }
+  },
+  {
+    path: "/Lab031",
+    name: "Lab031",
+    component: Lab031,
+    meta: {
+      title: "Lab 031",
+      subtitle: "Playing with Images",
+      status: "running"
     }
   }
 ];
