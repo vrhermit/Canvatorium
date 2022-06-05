@@ -32,6 +32,7 @@ import Lab028 from "../labs/Lab028.vue";
 import Lab029 from "../labs/Lab029.vue";
 import Lab030 from "../labs/Lab030.vue";
 import Lab031 from "../labs/Lab031.vue";
+import Lab032 from "../labs/Lab032.vue";
 
 const routes = [
   {
@@ -357,6 +358,16 @@ const routes = [
     meta: {
       title: "Lab 031",
       subtitle: "Playing with Images",
+      status: "running"
+    }
+  },
+  {
+    path: "/Lab032",
+    name: "Lab032",
+    component: Lab032,
+    meta: {
+      title: "Lab 032",
+      subtitle: "VR Lathe Array",
       status: "running"
     }
   }
