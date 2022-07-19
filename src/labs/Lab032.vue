@@ -3,13 +3,15 @@ import { labNotes } from "../composables/LabData";
 
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
-import { ref, onMounted, onUnmounted } from "@vue/runtime-core";
+import { ref, reactive, onMounted, onUnmounted } from "@vue/runtime-core";
 
 import LabLayout from "../components/LabLayout.vue";
 import addLabCamera from "../lab-shared/LabCamera";
 import addLabLights from "../lab-shared/LabLights";
 import addLabRoom from "../lab-shared/LabRoom";
 import LabColors from "../lab-shared/LabColors";
+
+import { useStorage } from "@vueuse/core";
 // Import the LabPlayer
 import { createLabPlayer } from "../lab-shared/LabPlayer";
 
@@ -23,6 +25,31 @@ const bjsCanvas = ref(null);
 let engine;
 let scene;
 
+// Default settings for the lathe data
+const defaultLatheSettings = {
+  numberOfPoints: 12,
+  tessellation: 12,
+  isFlat: true,
+  arc: 1,
+  cap: "NO_CAP",
+};
+
+// Spread the default settings into the stored settings
+// This will only be set if the local storage value is not found, else it will use the local storage value
+let storedLatheSettings = useStorage("lab-lathe-settings", {
+  ...defaultLatheSettings,
+});
+
+// Map the stored settings to the reactive settings object
+// I could not find a way to get Watch working with useStorage
+let actualLatheSettings = reactive({
+  numberOfPoints: storedLatheSettings.value.numberOfPoints,
+  tessellation: storedLatheSettings.value.tessellation,
+  isFlat: storedLatheSettings.value.isFlat,
+  arc: storedLatheSettings.value.arc,
+  cap: storedLatheSettings.value.cap,
+});
+
 const createScene = async (canvas) => {
   // Create and customize the scene
   engine = new BABYLON.Engine(canvas);
@@ -30,6 +57,7 @@ const createScene = async (canvas) => {
 
   // Use the shared lab tools
   addLabCamera(canvas, scene);
+  scene.getCameraByName("camera").position = new BABYLON.Vector3(0, 1, -4);
   addLabLights(scene);
   const ground = addLabRoom(scene);
   console.log(ground);
@@ -38,7 +66,7 @@ const createScene = async (canvas) => {
   cardMat.diffuseColor = LabColors["dark3"];
   cardMat.specularColor = new BABYLON.Color3(0.2, 0.2, 0.2);
 
-  const cardWidth = 1;
+  const cardWidth = 2;
   const cardHeight = 2;
   const cardThickness = 0.01;
   const card = BABYLON.MeshBuilder.CreateBox(
@@ -48,7 +76,7 @@ const createScene = async (canvas) => {
   );
   card.isPickable = false;
   card.material = cardMat;
-  card.position = new BABYLON.Vector3(0.5, 1, 0);
+  card.position = new BABYLON.Vector3(1, 1, 0);
 
   const boundsWidth = 0;
   const boundsHeight = 0;
@@ -71,7 +99,7 @@ const createScene = async (canvas) => {
   let i;
   let grabbers = [];
 
-  for (i = 0; i < 6; i++) {
+  for (i = 0; i < actualLatheSettings.numberOfPoints; i++) {
     var planeDragBehavior = new BABYLON.PointerDragBehavior({
       dragPlaneNormal: boundsPlane.forward,
     });
@@ -112,7 +140,7 @@ const createScene = async (canvas) => {
     depth: 0.2,
   });
   subject1.material = cardMat;
-  subject1.position = new BABYLON.Vector3(1.2, 1, 0);
+  subject1.position = new BABYLON.Vector3(2.2, 1, 0);
 
   // Subject 1 Action: ExecuteCodeAction -> OnPickTrigger
   // Run code when the trigger is activated
@@ -127,14 +155,18 @@ const createScene = async (canvas) => {
       }
 
       const lathe = BABYLON.MeshBuilder.CreateLathe("lathe", {
-        tessellation: 12,
         shape: latheArray,
         sideOrientation: BABYLON.Mesh.DOUBLESIDE,
+        tessellation: actualLatheSettings.tessellation,
+        arc: actualLatheSettings.arc,
+        cap: actualLatheSettings.cap,
       });
       lathe.material = latheMat;
-      lathe.visibility = 0.5;
-      lathe.closed = true;
-      lathe.convertToFlatShadedMesh();
+      lathe.visibility = 0.6;
+      // lathe.closed = true;
+      if (actualLatheSettings.isFlat) {
+        lathe.convertToFlatShadedMesh();
+      }
 
       lathe.addBehavior(
         new BABYLON.PointerDragBehavior({
