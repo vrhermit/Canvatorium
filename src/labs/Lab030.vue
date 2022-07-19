@@ -361,10 +361,8 @@ const createFountain = (scene, skyBox) => {
   var particleSystem = new BABYLON.ParticleSystem("particles", 1000, scene);
 
   //Texture of each particle
-  particleSystem.particleTexture = new BABYLON.Texture(
-    "../assets/particle-01.png",
-    scene
-  );
+  const partTex = new BABYLON.Texture("../assets/particle-01.png", scene);
+  particleSystem.particleTexture = partTex;
 
   // Where the particles come from
   particleSystem.emitter = new BABYLON.Vector3(0, 1.8, group.position.z); // the starting object, the emitter
@@ -388,7 +386,7 @@ const createFountain = (scene, skyBox) => {
   particleSystem.emitRate = 75;
 
   // Blend mode : BLENDMODE_ONEONE, or BLENDMODE_STANDARD
-  particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_ONEONE;
+  particleSystem.blendMode = BABYLON.ParticleSystem.BLENDMODE_STANDARD;
 
   // Set the gravity of all particles
   particleSystem.gravity = new BABYLON.Vector3(0, -9.81, 0);
