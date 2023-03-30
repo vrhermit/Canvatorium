@@ -1,5 +1,13 @@
 # Canvatorium
 
+
+
+**UPDATE: This version of Canvatorium was archived in March of 2023. Please see the project: [Radical Canvatorium](https://github.com/radicalappdev/radical-canvatorium).**
+
+
+-----
+
+
 An experimental design lab for spatial computing built in Vue JS and Babylon JS.
 
 Canvatorium is a place where I'm experimenting with UI/UX ideas in WebXR, mostly in the context of VR.
